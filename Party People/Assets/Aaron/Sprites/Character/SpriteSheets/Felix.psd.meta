@@ -1,0 +1,428 @@
+fileFormatVersion: 2
+guid: 541978a1cf10f45c1b97e968b4123770
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -9142084918697078302
+    second: Felix_0
+  - first:
+      213: 2701878972942152844
+    second: Felix_1
+  - first:
+      213: 1926675579013833162
+    second: Felix_2
+  - first:
+      213: -2053493151129940515
+    second: Felix_3
+  - first:
+      213: -1338999290023603784
+    second: Felix_4
+  - first:
+      213: 7568370652839860454
+    second: Felix_5
+  - first:
+      213: 3907500460510719238
+    second: Felix_6
+  - first:
+      213: -6561145830372189682
+    second: Felix_7
+  - first:
+      213: 8660355491007401014
+    second: Felix_8
+  - first:
+      213: 7369209361063222904
+    second: Felix_9
+  - first:
+      213: -2678374763575752675
+    second: Felix_10
+  - first:
+      213: 7898978918552091530
+    second: Felix_11
+  - first:
+      213: 6239530934232762400
+    second: Felix_12
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Felix_0
+      rect:
+        serializedVersion: 2
+        x: 46
+        y: 696
+        width: 59
+        height: 61
+      alignment: 9
+      pivot: {x: 0.99667835, y: 0.9803937}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e1da9a043ac02180800000000000000
+      internalID: -9142084918697078302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_1
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 327
+        width: 347
+        height: 402
+      alignment: 9
+      pivot: {x: 0.49687225, y: 0.011329537}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8470585c900f7520800000000000000
+      internalID: 2701878972942152844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_2
+      rect:
+        serializedVersion: 2
+        x: 751
+        y: 684
+        width: 156
+        height: 93
+      alignment: 9
+      pivot: {x: 0.10343542, y: 0.18490306}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac12a8c2b3decba10800000000000000
+      internalID: 1926675579013833162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_3
+      rect:
+        serializedVersion: 2
+        x: 958
+        y: 675
+        width: 91
+        height: 72
+      alignment: 9
+      pivot: {x: 0.13027048, y: 0.3191113}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dddc332ebd68083e0800000000000000
+      internalID: -2053493151129940515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_4
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 574
+        width: 87
+        height: 112
+      alignment: 9
+      pivot: {x: 0.9116786, y: 0.9070004}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b194a37d3bea6de0800000000000000
+      internalID: -1338999290023603784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_5
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 438
+        width: 136
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e8d2038201480960800000000000000
+      internalID: 7568370652839860454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_6
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 529
+        width: 130
+        height: 156
+      alignment: 9
+      pivot: {x: 0.18274865, y: 0.79916304}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60daa6c47fa3a3630800000000000000
+      internalID: 3907500460510719238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_7
+      rect:
+        serializedVersion: 2
+        x: 958
+        y: 544
+        width: 112
+        height: 73
+      alignment: 9
+      pivot: {x: 0.08330863, y: 0.6932791}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0a512531a022f4a0800000000000000
+      internalID: -6561145830372189682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_8
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 419
+        width: 80
+        height: 118
+      alignment: 9
+      pivot: {x: 0.120132826, y: 0.90470135}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63c891e3f63cf2870800000000000000
+      internalID: 8660355491007401014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_9
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 47
+        width: 179
+        height: 453
+      alignment: 9
+      pivot: {x: 0.694027, y: 0.47364527}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87e18a1ced0b44660800000000000000
+      internalID: 7369209361063222904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_10
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 220
+        width: 122
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1842b9d75084dad0800000000000000
+      internalID: -2678374763575752675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_11
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 37
+        width: 60
+        height: 163
+      alignment: 9
+      pivot: {x: 0.6628001, y: 0.92614365}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8bb890d97fce9d60800000000000000
+      internalID: 7898978918552091530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Felix_12
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 37
+        width: 59
+        height: 164
+      alignment: 9
+      pivot: {x: 0.38962722, y: 0.91692734}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 02841048354479650800000000000000
+      internalID: 6239530934232762400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

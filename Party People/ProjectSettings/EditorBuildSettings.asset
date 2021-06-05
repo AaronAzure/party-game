@@ -1,0 +1,169 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Aaron/Scenes/1Startup/1PlayerSetup.unity
+    guid: 3864cb189e9cb4003a0b409b8adcafc9
+  - enabled: 1
+    path: Assets/Aaron/Scenes/1Startup/2Lobby.unity
+    guid: 595505904666f4f12b3e339ba623e9f9
+  - enabled: 1
+    path: Assets/Aaron/Scenes/1Startup/3Quests.unity
+    guid: 45e2da02942ae4614910c4cdea6c7999
+  - enabled: 1
+    path: Assets/Aaron/Scenes/1Startup/4Results.unity
+    guid: d999ddeb654c544f0a838e5e31e4a869
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Maps/Crystal_Caverns.unity
+    guid: 6f693fc28f49bfa4294818b63f69b720
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/0Prize_Money.unity
+    guid: a7a92c46d0a5147898980ff71f1879db
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Overlay.unity
+    guid: a7b3e1e96dbfb4ea28f078291401a944
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Sneak_And_Snore.unity
+    guid: a5905db668029427ba093488a1119f6c
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Sneak And Snore.unity
+    guid: b680394f8b97d46d1bd934996112f09a
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Food_Festival.unity
+    guid: e01af2ada21b241daba4033af1ee192b
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Feast-ival.unity
+    guid: 3402b820f70ea42568d66bbfeac77e42
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Colour_Chaos.unity
+    guid: 261e0b19f50d541d4bf95c0fdfc3ab5e
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Colour Chaos.unity
+    guid: f9f3c5f2be5a54ff0b3122b16aad2ca5
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Card_Collectors.unity
+    guid: 5a4171c88ee2f4a98b8ec133484afe4b
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Card Collectors.unity
+    guid: 407c65dd556174496b20a42e898ac6b3
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Leaf_Leap.unity
+    guid: 8e86d586763094d2aae0cfcf841c47ad
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Leaf Leap.unity
+    guid: 4d2cf5ab47f644a9697923cb9d3f41df
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Lava_Or_Leave_'Em.unity
+    guid: ddc4ea45f2f2643cc9a1e9118a7829a5
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Lava Or Leave 'Em.unity
+    guid: eefc523f3fde74d8f9394db4c9e93b4e
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Lilypad_Leapers.unity
+    guid: 1dd9a7ce6ceb94f1a9064b449c337e60
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Lilypad Leapers.unity
+    guid: 7979c66b8e96f48fc8488c0b8d7b4242
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Stop_Watchers.unity
+    guid: f3a96d749fd2e479bb41441c896da3b0
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Stop Watchers.unity
+    guid: 0d0ed718f7e774033844d02ddb6eb8a0
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Spotlight-Fight.unity
+    guid: f591b1df651074b8b87bd7fcda48bb27
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Spotlight Fight.unity
+    guid: debb59108ea4a4f0eb8b024dc0cabf94
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Pushy-Penguins.unity
+    guid: dc526c081f0eb4cbb94e6ad10d306597
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Pushy Penguins.unity
+    guid: 821e9d09ccb4446d8a9840a16bb7c3e5
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Fun_Run.unity
+    guid: d9b271e56acc84bcdbe10e80dd01bbaa
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Fun Run.unity
+    guid: 9661512a76cfe4c9298b2d95c3d381df
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Money_Belt.unity
+    guid: a748a8961de5846439b90c840fe432d0
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Coin-veyor.unity
+    guid: a2f3869e1144c4333b447102ed106da8
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Stamp-By-Me.unity
+    guid: 4bab78f6b0988432b8b8c5006484cae9
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Stamp By Me.unity
+    guid: b800d40ca4a3744d48d7263b69fb617d
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Maps/Shogun_Seaport.unity
+    guid: bc54e7714718642e3a69304d38125a18
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Maps/Crystal_Caverns Intro.unity
+    guid: e80edbd24b7a6418fb2b8504aad6b542
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Maps/Shogun_Seaport Intro.unity
+    guid: aa6c8d312b9964a168c4f7396b2d1bd8
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Shocking-Situation.unity
+    guid: 840bb234993364f4b8da0d9936a87089
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Shocking Situation.unity
+    guid: dc76d0449a36a4e409c6fbc9b64bce3f
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Attack-On-Titan.unity
+    guid: 5cf5a4a1e57ed487cb3148eda1ebc8c1
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Attack Of Titan.unity
+    guid: 48eae49fe88004c25b46ab7a8dfc14b7
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Flower-Shower.unity
+    guid: b97ae3fd38e9e4a5c88f170a29a89fc6
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Flower Shower.unity
+    guid: 7a9dd2b15c2ba45a5b8801d638f4a7e5
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Don't-Be-A-Zombie.unity
+    guid: 83e4f8c800111411bb0b7859b6144120
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Don't Be A Zombie.unity
+    guid: 48b9a36bbef5b41cd9ec47bd29e0ab19
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Barrier_Bearers.unity
+    guid: fb7dc01a2768141319e5f13eee3b4410
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Barrier Bearers.unity
+    guid: e8789b2329401488cbfd2aaaf93ac146
+  - enabled: 1
+    path: Assets/Aaron/Scenes/BOSS/Aaron-Boss-Battle.unity
+    guid: 695770115df30436489495c0eb2c4fb0
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Plunder-Ground.unity
+    guid: f39f790a57b6d43acb9bbabd396ea0a5
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Plunder Ground.unity
+    guid: 0a222aeb6a2fa42199e13f7b01903fc2
+  - enabled: 1
+    path: Assets/Aaron/Scenes/BOSS/Dojo.unity
+    guid: 0206e6f81924742e79245bf034ad0f04
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: dafa5d874f13d4d68a7b2bfee57e933b,
+      type: 2}

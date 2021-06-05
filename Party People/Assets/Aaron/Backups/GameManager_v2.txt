@@ -1,0 +1,347 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class GameManager : MonoBehaviour
+{
+    // GLOBAL VARIABLES
+
+    [SerializeField] private int nPlayers;
+    //private Text textPlayer;
+
+    [Header("Player Info")]
+    private int playerOrder;
+    private PathFollower player1;
+    private PathFollower player2;
+    private PathFollower player3;
+    private PathFollower player4;
+    private PathFollower player5;
+    private PathFollower player6;
+    private PathFollower player7;
+    private PathFollower player8;
+    [SerializeField] private int[] coins;
+    [SerializeField] private int[] orbs;
+    [SerializeField] private Text[] textBox;
+
+    [SerializeField] private AudioSource coinPickup;
+    [SerializeField] private AudioSource coinLoss;
+
+    private Camera mainCam;
+    private float transitionTime = 0.4f;
+    [SerializeField] Image blackScreen;
+    [SerializeField] Text turnNumber;
+    private int currentTurn;
+    private int maxTurn = 20;       // CONST
+    private GameController controller;
+
+    // -------------------------------------------------------------------------------
+    // RECEIVE INFO/DATA FROM GAME CONTROLLER
+
+    private void SET_PLAYERS()
+    {
+        switch (nPlayers)
+        {
+            case 2:
+                player3.gameObject.SetActive(false);
+                player4.gameObject.SetActive(false);
+                player5.gameObject.SetActive(false);
+                player6.gameObject.SetActive(false);
+                player7.gameObject.SetActive(false);
+                player8.gameObject.SetActive(false);
+                break;
+            case 4:
+                player5.gameObject.SetActive(false);
+                player6.gameObject.SetActive(false);
+                player7.gameObject.SetActive(false);
+                player8.gameObject.SetActive(false);
+                break;
+            case 6:
+                player7.gameObject.SetActive(false);
+                player8.gameObject.SetActive(false);
+                break;
+            case 8:
+                break;
+            default:
+                Debug.LogError("DISABLING the WRONG number of players!!");
+                break;
+        }
+    }
+
+    // -------------------------------------------------------------------------------
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        blackScreen.canvasRenderer.SetAlpha(1);
+        blackScreen.gameObject.SetActive(true);
+
+        controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+        nPlayers = controller.nPlayers;
+
+        player1 = GameObject.Find("Player_1").GetComponent<PathFollower>();
+        player2 = GameObject.Find("Player_2").GetComponent<PathFollower>();
+        player3 = GameObject.Find("Player_3").GetComponent<PathFollower>();
+        player4 = GameObject.Find("Player_4").GetComponent<PathFollower>();
+        player5 = GameObject.Find("Player_5").GetComponent<PathFollower>();
+        player6 = GameObject.Find("Player_6").GetComponent<PathFollower>();
+        player7 = GameObject.Find("Player_7").GetComponent<PathFollower>();
+        player8 = GameObject.Find("Player_8").GetComponent<PathFollower>();
+
+        SET_PLAYERS();
+        /***********************************************************************************************/
+        Time.timeScale = 1f;  // DELETE
+        /***********************************************************************************************/
+
+        // TURN 2+
+        if (controller.hasStarted)
+        {
+            currentTurn = controller.turnNumber;
+            for (int i = 0; i < nPlayers; i++)
+            {
+                coins[i] = controller.GET_COINS(i);
+            }
+        }
+        // TURN 1 ONLY
+        else
+        {
+            currentTurn = 1;
+            // SCREEN FADES FROM BLACK
+            blackScreen.CrossFadeAlpha(0f, transitionTime, false);
+            for (int i = 0; i < nPlayers; i++)
+            {
+                coins[i] = 10;
+            }
+        }
+
+        // GET PLAYERS
+        if (SceneManager.GetActiveScene().buildIndex > 1)
+        {
+            playerOrder = 1;
+            mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
+
+            mainCam.gameObject.SetActive(false);
+            player1.BEGIN(); 
+
+            turnNumber.text = "Turn: " + currentTurn + " / " + maxTurn;
+            StartCoroutine(CAMERA_TRANSITION());
+        }
+    }
+    private void Update()
+    {
+        textBox[0].text = " coins = " + coins[0];
+        textBox[1].text = " coins = " + coins[1];
+        textBox[2].text = " coins = " + coins[2];
+        textBox[3].text = " coins = " + coins[3];
+        textBox[4].text = " coins = " + coins[4];
+        textBox[5].text = " coins = " + coins[5];
+        textBox[6].text = " coins = " + coins[6];
+        textBox[7].text = " coins = " + coins[7];
+    }
+
+    public IEnumerator INCREMENT_TURN(string player)
+    {
+        playerOrder++;
+        StartCoroutine(CAMERA_TRANSITION());
+    }
+
+    public void NEXT_PLAYER_TURN()
+    {
+        if (playerOrder <= nPlayers)
+        {
+            if (playerOrder == 1)
+            {
+                Debug.Log("Player 1 turn");
+                player1.StartCoroutine(player1.YOUR_TURN());
+            }
+            else if (playerOrder == 2)
+            {
+                Debug.Log("Player 2 turn");
+                player2.StartCoroutine(player2.YOUR_TURN());
+            }
+            else if (playerOrder == 3)
+            {
+                Debug.Log("Player 3 turn");
+                player3.StartCoroutine(player3.YOUR_TURN());
+            }
+            else if (playerOrder == 4)
+            {
+                Debug.Log("Player 4 turn");
+                player4.StartCoroutine(player4.YOUR_TURN());
+            }
+            else if (playerOrder == 5)
+            {
+                Debug.Log("Player 5 turn");
+                player4.StartCoroutine(player5.YOUR_TURN());
+            }
+            else if (playerOrder == 6)
+            {
+                Debug.Log("Player 6 turn");
+                player4.StartCoroutine(player6.YOUR_TURN());
+            }
+            else if (playerOrder == 7)
+            {
+                Debug.Log("Player 7 turn");
+                player4.StartCoroutine(player7.YOUR_TURN());
+            }
+            else if (playerOrder == 8)
+            {
+                Debug.Log("Player 8 turn");
+                player4.StartCoroutine(player8.YOUR_TURN());
+            }
+        }
+        else
+        {
+            // MINIGAME TIME!
+            controller.GAME_START();
+            controller.NEXT_TURN();
+            PlayerPrefs.SetString("sceneName", SceneManager.GetActiveScene().name);
+            PlayerPrefs.Save();
+            SceneManager.LoadScene("Quest_Game");
+
+            // PLAYER TURN AGAIN
+            playerOrder = 1;
+            StartCoroutine(CAMERA_TRANSITION());
+        }
+    }
+
+    IEnumerator CAMERA_TRANSITION()
+    {
+        yield return new WaitForSeconds(transitionTime + 0.3f);
+        blackScreen.gameObject.SetActive(true);
+        // SCREEN FADES FROM BLACK
+        blackScreen.CrossFadeAlpha(0f, transitionTime, false);
+        NEXT_PLAYER_TURN();
+    }
+
+    // SCREEN FADES TO BLACK IN 0.4s
+    public void FADE_TO_BLACK()
+    {
+        blackScreen.gameObject.SetActive(true);
+        blackScreen.CrossFadeAlpha(1f, transitionTime, false);
+    }
+
+    // SCREEN FADES FROM BLACK IN 0.4s
+    public void FADE_FROM_BLACK()
+    {
+        blackScreen.gameObject.SetActive(true);
+        blackScreen.CrossFadeAlpha(0f, transitionTime, false);
+    }
+
+
+    public IEnumerator UPDATE_GAME_INFO(string player, int n)
+    {
+        if (n > 0)
+        {
+            // GAIN COINS
+            for (int i = 0; i < n; i++)
+            {
+                yield return new WaitForSeconds(0.1f);
+                coinPickup.Play();
+                switch (player)
+                {
+                    case "Player_1":
+                        coins[0]++;
+                        break;
+                    case "Player_2":
+                        coins[1]++;
+                        break;
+                    case "Player_3":
+                        coins[2]++;
+                        break;
+                    case "Player_4":
+                        coins[3]++;
+                        break;
+                    case "Player_5":
+                        coins[4]++;
+                        break;
+                    case "Player_6":
+                        coins[5]++;
+                        break;
+                    case "Player_7":
+                        coins[6]++;
+                        break;
+                    case "Player_8":
+                        coins[7]++;
+                        break;
+                    default:
+                        Debug.LogError("CHANGE PLAYER NAME! PLAYER NAME DOESN'T EXIST");
+                        break;
+                }
+            }
+        }
+        else
+        {
+            // LOSE COINS
+            for (int i = 0; i > n; i--)
+            {
+                yield return new WaitForSeconds(0.1f);
+                coinLoss.Play();
+                switch (player)
+                {
+                    case "Player_1":
+                        coins[0]--;
+                        break;
+                    case "Player_2":
+                        coins[1]--;
+                        break;
+                    case "Player_3":
+                        coins[2]--;
+                        break;
+                    case "Player_4":
+                        coins[3]--;
+                        break;
+                    case "Player_5":
+                        coins[4]--;
+                        break;
+                    case "Player_6":
+                        coins[5]--;
+                        break;
+                    case "Player_7":
+                        coins[6]--;
+                        break;
+                    case "Player_8":
+                        coins[7]--;
+                        break;
+                    default:
+                        Debug.LogError("CHANGE PLAYER NAME! PLAYER NAME DOESN'T EXIST");
+                        break;
+                }
+            }
+        }
+        yield return new WaitForSeconds(1f);
+        FADE_TO_BLACK();
+        yield return new WaitForSeconds(transitionTime);
+        switch (player)
+        {
+            case "Player_1":
+                player1.PLAYER_CAM_OFF();
+                break;
+            case "Player_2":
+                player2.PLAYER_CAM_OFF();
+                break;
+            case "Player_3":
+                player3.PLAYER_CAM_OFF();
+                break;
+            case "Player_4":
+                player4.PLAYER_CAM_OFF();
+                break;
+            case "Player_5":
+                player5.PLAYER_CAM_OFF();
+                break;
+            case "Player_6":
+                player6.PLAYER_CAM_OFF();
+                break;
+            case "Player_7":
+                player7.PLAYER_CAM_OFF();
+                break;
+            case "Player_8":
+                player8.PLAYER_CAM_OFF();
+                break;
+            default:
+                Debug.LogError("CHANGE PLAYER NAME! PLAYER NAME DOESN'T EXIST");
+                break;
+        }
+    }
+}

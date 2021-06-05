@@ -1,0 +1,329 @@
+fileFormatVersion: 2
+guid: b02d57f2135d9473bb819373b0302d40
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2719007040809455295
+    second: Laurel_0
+  - first:
+      213: 6126063891919080964
+    second: Laurel_1
+  - first:
+      213: -7001696557850399640
+    second: Laurel_2
+  - first:
+      213: 4368034362319774410
+    second: Laurel_3
+  - first:
+      213: 7549830793946935186
+    second: Laurel_4
+  - first:
+      213: -6742559692795484495
+    second: Laurel_5
+  - first:
+      213: -4600005326224327007
+    second: Laurel_6
+  - first:
+      213: -7678664284307827314
+    second: Laurel_0
+  - first:
+      213: -3170695375923278913
+    second: Laurel_1
+  - first:
+      213: 1122222083577323582
+    second: Laurel_2
+  - first:
+      213: 5078794295439916365
+    second: Laurel_3
+  - first:
+      213: -2871520763162021750
+    second: Laurel_4
+  - first:
+      213: -6996779580004146076
+    second: Laurel_5
+  - first:
+      213: 9201986071917763298
+    second: Laurel_6
+  - first:
+      213: 7124513888782093755
+    second: Laurel_7
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Laurel_0
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 587
+        width: 332
+        height: 224
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e855a584487ef6590800000000000000
+      internalID: -7678664284307827314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Laurel_1
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 496
+        width: 316
+        height: 318
+      alignment: 9
+      pivot: {x: 0.48055738, y: 0.059394114}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fbb8e1bca5d6ff3d0800000000000000
+      internalID: -3170695375923278913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Laurel_2
+      rect:
+        serializedVersion: 2
+        x: 801
+        y: 580
+        width: 63
+        height: 119
+      alignment: 9
+      pivot: {x: 0.7907143, y: 0.84885746}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e30a9ba0a0fe29f00800000000000000
+      internalID: 1122222083577323582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Laurel_3
+      rect:
+        serializedVersion: 2
+        x: 963
+        y: 580
+        width: 63
+        height: 119
+      alignment: 9
+      pivot: {x: 0.18990459, y: 0.84885746}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4df9fac0808b7640800000000000000
+      internalID: 5078794295439916365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Laurel_4
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 265
+        width: 143
+        height: 116
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a80b192741f4628d0800000000000000
+      internalID: -2871520763162021750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Laurel_5
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 204
+        width: 126
+        height: 195
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4646522ea0276ee90800000000000000
+      internalID: -6996779580004146076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Laurel_6
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 163
+        width: 260
+        height: 256
+      alignment: 9
+      pivot: {x: 0.38729224, y: 0.13274562}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ea10c4049504bf70800000000000000
+      internalID: 9201986071917763298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Laurel_7
+      rect:
+        serializedVersion: 2
+        x: 663
+        y: 124
+        width: 437
+        height: 403
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbd813272ab5fd260800000000000000
+      internalID: 7124513888782093755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

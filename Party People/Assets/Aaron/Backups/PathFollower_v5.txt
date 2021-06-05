@@ -1,0 +1,1125 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
+
+public class PathFollower : MonoBehaviour
+{
+    // GLOBAL VARIABLES
+    [Header("Data to save across Scenes")]
+    private Node[] _currentPath;                    // CURRENT NODE(PATH)
+    private int _currentNode;                       // INDEX OF THE CURRENT SPACE ON NODE(PATH)
+    private Vector3 _currentPositionHolder;         // POSITION OF THE CURRENT SPACE
+
+    [Header("Custom Paths")]
+    private GameObject   _path0;
+    private Node[]      _nodes0;
+    private GameObject   _path1;
+    private Node[]      _nodes1;
+    private GameObject   _path2;
+    private Node[]      _nodes2;
+    private GameObject   _path3;
+    private Node[]      _nodes3;
+    private GameObject   _path4;
+    private Node[]      _nodes4;
+    private GameObject   _path5;
+    private Node[]      _nodes5;
+    private GameObject   _path6;
+    private Node[]      _nodes6;
+    private GameObject   _path7;
+    private Node[]      _nodes7;
+    private GameObject   _path8;
+    private Node[]      _nodes8;
+    private GameObject   _path9;
+    private Node[]      _nodes9;
+    private GameObject   _path10;
+    private Node[]      _nodes10;
+    private GameObject   _path11;
+    private Node[]      _nodes11;
+    private GameObject   _path12;
+    private Node[]      _nodes12;
+    private GameObject   _path13;
+    private Node[]      _nodes13;
+    private GameObject   _path14;
+    private Node[]      _nodes14;
+    private GameObject   _path15;
+    private Node[]      _nodes15;
+    private GameObject   _path16;
+    private Node[]      _nodes16;
+    private GameObject   _path17;
+    private Node[]      _nodes17;
+    private GameObject   _path18;
+    private Node[]      _nodes18;
+    private GameObject   _path19;
+    private Node[]      _nodes19;
+    private GameObject   _path20;
+    private Node[]      _nodes20;
+
+    private int _movesRemaining;
+    [SerializeField] private SpriteRenderer _movesSprite;
+    [SerializeField] private Sprite[] _howManyMovesRemaining;
+    [SerializeField] private Text _mapMoves;
+
+    [Header("Player Settings")]
+    private float _moveSpeed = 7.5f;   // SPEED TO MOVE TO NEXT SPACE
+    private float _timer;                           
+
+    private GameManager _gm;
+    [SerializeField] private Camera _cam;           // PLAYER TRACKING CAM
+    private float camSpeed = 15f;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
+    private float transitionTime = 0.4f;
+    private bool _mapMode = false;                  // VIEWING MAP AT CROSSROADS
+    [SerializeField] private GameObject _choice;    // VISUAL INDICATING WHICH WAY TO GO
+    private bool _pathChosen = true;                // HAS CHOSEN A PATH
+
+    private BoxCollider2D _collider;
+    private string _currentScene;
+    private bool _readyToMove = false;
+    private bool _isPlayerTurn = false;
+
+    private bool gotAsidePos = false;
+    private bool landed = false;
+    private bool readyToMovedAside = false;
+    private Vector3 asidePos1;
+    private Vector3 asidePos2;
+    private Vector3 asidePos3;
+    private Vector3 asidePos4;
+    private Vector3 asidePos5;
+    private Vector3 asidePos6;
+    private Vector3 asidePos7;
+    private Vector3 asidePos8;
+
+    [Header("Game data")]
+    private int coinsGained = 0;
+    private int  orbsGained = 0;   // MARIO PARTY STARS
+
+    // ETC
+    private GameController controller;
+    private SwitchControls controls;
+
+    [Header("Player Choices At Start Of Turn")]
+    //[SerializeField] private Image back;
+    [SerializeField] private Image buttonMove;
+    [SerializeField] private Image buttonSpells;
+    [SerializeField] private Image buttonMap;
+
+    [SerializeField] private Slider moveBar;
+    private int buttonIndex = 0;
+    private bool stopped = false;
+
+
+
+    // ---------------------------------------------------------------------
+
+
+    private void Awake()
+    {
+        controls = new SwitchControls();
+    }
+    //private void OnEnable()
+    //{
+    //    controls.Enable();
+    //}
+    //private void OnDisable()
+    //{
+    //    controls.Disable();
+    //}
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+        _gm = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        _currentScene = SceneManager.GetActiveScene().name;
+        _collider = this.transform.GetComponent<BoxCollider2D>();
+        _collider.enabled = false;
+        buttonMove.gameObject.SetActive(false);
+        buttonSpells.gameObject.SetActive(false);
+        buttonMap.gameObject.SetActive(false);
+        moveBar.gameObject.SetActive(false);
+
+        // GET PATHS (VARIOUS BETWEEN MAPS)
+        if (GameObject.Find("Path_0") != null)
+        {
+            _path0 = GameObject.Find("Path_0");
+            _nodes0 = _path0.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_1") != null)
+        {
+            _path1 = GameObject.Find("Path_1");
+            _nodes1 = _path1.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_2") != null)
+        {
+            _path2 = GameObject.Find("Path_2");
+            _nodes2 = _path2.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_3") != null)
+        {
+            _path3 = GameObject.Find("Path_3");
+            _nodes3 = _path3.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_4") != null)
+        {
+            _path4 = GameObject.Find("Path_4");
+            _nodes4 = _path4.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_5") != null)
+        {
+            _path5 = GameObject.Find("Path_5");
+            _nodes5 = _path5.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_6") != null)
+        {
+            _path6 = GameObject.Find("Path_6");
+            _nodes6 = _path6.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_7") != null)
+        {
+            _path7 = GameObject.Find("Path_7");
+            _nodes7 = _path7.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_8") != null)
+        {
+            _path8 = GameObject.Find("Path_8");
+            _nodes8 = _path8.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_9") != null)
+        {
+            _path9 = GameObject.Find("Path_9");
+            _nodes9 = _path9.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_10") != null)
+        {
+            _path10 = GameObject.Find("Path_10");
+            _nodes10 = _path10.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_11") != null)
+        {
+            _path11 = GameObject.Find("Path_11");
+            _nodes11 = _path11.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_12") != null)
+        {
+            _path12 = GameObject.Find("Path_12");
+            _nodes12 = _path12.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_13") != null)
+        {
+            _path13 = GameObject.Find("Path_13");
+            _nodes13 = _path13.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_14") != null)
+        {
+            _path14 = GameObject.Find("Path_14");
+            _nodes14 = _path14.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_15") != null)
+        {
+            _path15 = GameObject.Find("Path_15");
+            _nodes15 = _path15.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_16") != null)
+        {
+            _path16 = GameObject.Find("Path_16");
+            _nodes16 = _path16.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_17") != null)
+        {
+            _path17 = GameObject.Find("Path_17");
+            _nodes17 = _path17.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_18") != null)
+        {
+            _path18 = GameObject.Find("Path_18");
+            _nodes18 = _path18.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_19") != null)
+        {
+            _path19 = GameObject.Find("Path_19");
+            _nodes19 = _path19.GetComponentsInChildren<Node>();
+        }
+        if (GameObject.Find("Path_20") != null)
+        {
+            _path20 = GameObject.Find("Path_20");
+            _nodes20 = _path20.GetComponentsInChildren<Node>();
+        }
+
+        // TURN 2+
+        if (controller.hasStarted)  
+        {
+            // THE PATH THAT THE PLAYER IS TRAVERSING ACROSS (CONSTANT BETWEEN MAPS)
+            switch (controller.GET_PATH_NODE(name))
+            {
+                case "Path_0":
+                    _currentPath = _nodes0;
+                    break;
+                case "Path_1":
+                    _currentPath = _nodes1;
+                    break;
+                case "Path_2":
+                    _currentPath = _nodes2;
+                    break;
+                case "Path_3":
+                    _currentPath = _nodes3;
+                    break;
+                case "Path_4":
+                    _currentPath = _nodes4;
+                    break;
+                case "Path_5":
+                    _currentPath = _nodes5;
+                    break;
+                case "Path_6":
+                    _currentPath = _nodes6;
+                    break;
+                case "Path_7":
+                    _currentPath = _nodes7;
+                    break;
+                case "Path_8":
+                    _currentPath = _nodes8;
+                    break;
+                case "Path_9":
+                    _currentPath = _nodes9;
+                    break;
+                case "Path_10":
+                    _currentPath = _nodes10;
+                    break;
+                case "Path_11":
+                    _currentPath = _nodes11;
+                    break;
+                case "Path_12":
+                    _currentPath = _nodes12;
+                    break;
+                case "Path_13":
+                    _currentPath = _nodes13;
+                    break;
+                case "Path_14":
+                    _currentPath = _nodes14;
+                    break;
+                case "Path_15":
+                    _currentPath = _nodes15;
+                    break;
+                case "Path_16":
+                    _currentPath = _nodes16;
+                    break;
+                case "Path_17":
+                    _currentPath = _nodes17;
+                    break;
+                case "Path_18":
+                    _currentPath = _nodes18;
+                    break;
+                case "Path_19":
+                    _currentPath = _nodes19;
+                    break;
+                case "Path_20":
+                    _currentPath = _nodes20;
+                    break;
+            }
+            _currentNode = controller.GET_NODE_INDEX(name);
+            _currentPositionHolder = controller.GET_POS_VECTOR(name);
+            transform.position = controller.GET_END_POS(name);
+            this.transform.localScale -= new Vector3(0.075f, 0.075f, 0);
+            //transform.position = _currentPositionHolder;
+        }
+        // TURN 1 ONLY
+        else
+        {
+            // THE PATH THAT THE PLAYER IS TRAVERSING ACROSS (CONSTANT BETWEEN MAPS)
+            _collider.enabled = true;
+            _currentPath = _nodes0;
+            _currentPositionHolder = _currentPath[_currentNode].transform.position + new Vector3(0, 1, 0);
+        }
+
+        _choice.SetActive(false);
+        _movesSprite.enabled = false;
+    }
+
+
+
+    // START THE CAMERA BEFORE THE START OF THE FIRST TURN (NO ABRUPT TRANSTIONS)
+    public void BEGIN()
+    {
+        _cam.gameObject.SetActive(true);
+    }
+
+
+    // CHECK NODE AND MOVE TO IT
+    private void CHECK_NODE()
+    {
+        _timer = 0;
+        
+        if (_currentNode < _currentPath.Length)
+        {
+            _currentPositionHolder = _currentPath[_currentNode].transform.position + new Vector3(0, 1, 0);
+            // PLAYER CAN MAKE NOISE WHEN GOING OVER SPACES
+            if (!_collider.enabled) { StartCoroutine(WALK_OVER_SOUND_ON()); }
+        }
+    }
+
+
+    // DEBUG PATH LINES (SCENE VIEW EDITOR ONLY)
+    private void DRAW_LINES()
+    {
+        for ( int i=0; i< _currentPath.Length-1; i++)
+        {
+            Debug.DrawLine(_currentPath[i].transform.position, _currentPath[i + 1].transform.position, Color.blue);
+        }
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (_isPlayerTurn)
+        {
+            // THE PLAYER IS MOVING TO A NEW SPACE
+            if (_movesRemaining > 0 && _readyToMove)
+            {
+                MOVE_PLAYER();
+                UPDATE_MOVEMENT(_movesRemaining);
+            }
+            else if (!landed && _readyToMove)
+            {
+                landed = true;
+                coinsGained += _currentPath[_currentNode].SPACE_LANDED();
+                _gm.StartCoroutine(_gm.UPDATE_GAME_INFO(name, coinsGained));
+                //MOVE_ASIDE();
+                // SPACE LANDED EFFECT
+            }
+            else if (readyToMovedAside && _readyToMove)
+            {
+                MOVE_ASIDE();
+            }
+
+            // PLAYER START MENU SELECT
+            else if (!_readyToMove)
+            {
+                if (!_mapMode)
+                {
+                    if (Input.GetKeyDown(KeyCode.DownArrow))
+                    {
+                        buttonIndex++;
+                        if (buttonIndex >= 3)
+                        {
+                            buttonIndex = 0;
+                        }
+                    }
+                    else if (Input.GetKeyDown(KeyCode.UpArrow))
+                    {
+                        buttonIndex--;
+                        if (buttonIndex < 0)
+                        {
+                            buttonIndex = 2;
+                        }
+                    }
+
+                    // BUTTON HIGHLIGHT
+                    if (buttonIndex == 0)
+                    {
+                        buttonMove.color = new Color(1, 1, 1, 1);
+                        buttonSpells.color = new Color(1, 1, 1, 0.2f);
+                        buttonMap.color = new Color(1, 1, 1, 0.2f);
+                        if (Input.GetKeyDown(KeyCode.Space))
+                        {
+                            //_readyToMove = true;
+                            //_movesRemaining = Random.Range(6, 11);   // DELETE
+
+                            buttonMove.gameObject.SetActive(false);
+                            buttonSpells.gameObject.SetActive(false);
+                            buttonMap.gameObject.SetActive(false);
+                            moveBar.gameObject.SetActive(true);
+                        }
+                    }
+                    else if (buttonIndex == 1)
+                    {
+                        buttonMove.color = new Color(1, 1, 1, 0.2f);
+                        buttonSpells.color = new Color(1, 1, 1, 1);
+                        buttonMap.color = new Color(1, 1, 1, 0.2f);
+                    }
+                    else if (buttonIndex == 2)
+                    {
+                        buttonMove.color = new Color(1, 1, 1, 0.2f);
+                        buttonSpells.color = new Color(1, 1, 1, 0.2f);
+                        buttonMap.color = new Color(1, 1, 1, 1);
+                        // ENTER MAP MODE
+                        if (Input.GetKeyDown(KeyCode.Space))
+                        {
+                            buttonMove.gameObject.SetActive(false);
+                            buttonSpells.gameObject.SetActive(false);
+                            buttonMap.gameObject.SetActive(false);
+
+                            _mapMode = true;
+                            
+                            _cam.orthographicSize *= 1.4f;
+                            _gm.HIDE_UI();
+                        }
+                    }
+                    // ROLLING (DICE)
+                    if (moveBar.IsActive())
+                    {
+                        if (!stopped)
+                        {
+                            moveBar.value += Random.Range(1,3);
+                        }
+                        if (moveBar.value > 99)
+                        {
+                            moveBar.value = 0;
+                        }
+                        if (Input.GetKeyDown(KeyCode.Q))
+                        {
+                            //moveBar.gameObject.SetActive(false);
+                            stopped = true;
+                            Debug.Log(moveBar.value + 10);
+                            StartCoroutine(PLAYER_MOVES());
+                        }
+                    }
+                }
+                // MOVE MAP
+                else
+                {
+                    if (Input.GetKey(KeyCode.LeftArrow))
+                    {
+                        _cam.transform.Translate(Vector3.left * camSpeed * Time.deltaTime);
+                    }
+                    if (Input.GetKey(KeyCode.RightArrow))
+                    {
+                        _cam.transform.Translate(Vector3.right * camSpeed * Time.deltaTime);
+                    }
+                    if (Input.GetKey(KeyCode.UpArrow))
+                    {
+                        _cam.transform.Translate(Vector3.up * camSpeed * Time.deltaTime);
+                    }
+                    if (Input.GetKey(KeyCode.DownArrow))
+                    {
+                        _cam.transform.Translate(Vector3.down * camSpeed * Time.deltaTime);
+                    }
+                    // EXIT MAP MODE
+                    if (Input.GetKeyDown(KeyCode.Q))
+                    {
+                        buttonMove.gameObject.SetActive(true);
+                        buttonSpells.gameObject.SetActive(true);
+                        buttonMap.gameObject.SetActive(true);
+
+                        _mapMode = false;
+
+                        _cam.orthographicSize /= 1.4f;
+                        _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -10f);
+                        _cam.transform.localPosition = new Vector3(0, 0, -10f);
+                        _gm.UNHIDE_UI();
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void MOVE_PLAYER()
+    {
+        //DRAW_LINES();   // DEBUGGING
+        _timer += _moveSpeed * Time.deltaTime;
+
+        if (this.transform.position != _currentPositionHolder)
+        {
+            this.transform.position = Vector3.Lerp(this.transform.position, _currentPositionHolder, _timer);
+
+            // THE PLAYER HAS MOVED A SPACE
+            if (this.transform.position == _currentPositionHolder)
+            {
+                _movesRemaining--;
+                //Debug.Log("Moves Left = " + _movesRemaining);
+            }
+        }
+        else if (_currentNode < _currentPath.Length)        // MOVE TO NEXT NODE ON PATH
+        {
+            _currentNode++;
+            CHECK_NODE();
+        }
+
+        // NEXT NODE IS EITHER A SPLIT PATH OR A CONJOINING PATH
+        else if (_currentNode == _currentPath.Length)       // REACHED THE END OF A PATH
+        {
+            _choice.SetActive(true);
+            _pathChosen = false;
+            CHOOSE_PATH();
+        }
+    }
+
+    // USER INPUT DIRECTIONS
+    /*
+    if (Input.GetKeyDown(KeyCode.LeftArrow))
+    {
+        _currentNode = 0;
+        _currentPath = _nodes1;
+        CHECK_NODE();
+    }
+    else if (Input.GetKeyDown(KeyCode.RightArrow))
+    {
+        _currentNode = 0;
+        _currentPath = _nodes2;
+        CHECK_NODE();
+    }
+    else if (Input.GetKeyDown(KeyCode.DownArrow))
+    {
+        _currentNode = 0;
+        _currentPath = _nodes0;
+        CHECK_NODE();
+    }
+    else if (Input.GetKeyDown(KeyCode.UpArrow))
+    {
+        _currentNode = 4;
+        _currentPath = _nodes0;
+        CHECK_NODE();
+    }
+    */
+
+
+    // CHECK END OF PATHS BASED ON MAPS | VIEW MAP
+    private void CHOOSE_PATH()
+    {
+        // GO INTO MAP MODE
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            _mapMode = !_mapMode;
+            // IN MAP MODE
+            if (_mapMode)
+            {
+                _cam.orthographicSize *= 1.4f;
+                _gm.HIDE_UI();
+                if (_movesRemaining > 0)
+                {
+                    _mapMoves.text = _movesRemaining + " Moves Left";
+                }
+                else
+                {
+                    _mapMoves.text = "? Moves Left";
+                }
+            }
+            // OUT OF MAP
+            else
+            {
+                _cam.orthographicSize /= 1.4f;
+                _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -10f);
+                _cam.transform.localPosition = new Vector3(0, 0, -10f);
+                _mapMoves.text = "";
+                _gm.UNHIDE_UI();
+            }
+        }
+
+        // CHOOSE A PATH (BASED ON MAP)
+        if (!_mapMode)
+        {
+            // "CRYSTAL CAVERNS" MAP
+            if (_currentScene == "Crystal_Caverns")
+            {
+                // END OF PATH 0
+                if (_currentPath == _nodes0)
+                {
+                    // MOVE TO PATH 1
+                    if (Input.GetKeyDown(KeyCode.RightArrow)) // CHANGE DIR INPUT
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;       // CHANGE SPACE IN PATH
+                        _currentPath = _nodes1; // CHANGE PATH
+                        CHECK_NODE();
+                        _pathChosen = true;
+                    }
+                    // MOVE TO PATH 2
+                    else if (Input.GetKeyDown(KeyCode.UpArrow)) // CHANGE DIR INPUT
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;       // CHANGE SPACE IN PATH
+                        _currentPath = _nodes2; // CHANGE PATH
+                        CHECK_NODE();
+                        _pathChosen = true;
+                    }
+                }
+                // END OF PATH 1
+                else if (_currentPath == _nodes1)            // FOLLOW PATH LOOP
+                {
+
+                    // MOVE TO PATH 3
+                    if (Input.GetKeyDown(KeyCode.DownArrow))   // CHANGE DIR INPUT
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;       // CHANGE SPACE IN PATH
+                        _currentPath = _nodes3; // CHANGE PATH
+                        CHECK_NODE();
+                        _pathChosen = true;
+                    }
+                    // MOVE TO PATH 4
+                    else if (Input.GetKeyDown(KeyCode.UpArrow)) // CHANGE DIR INPUT
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;       // CHANGE SPACE IN PATH
+                        _currentPath = _nodes4; // CHANGE PATH
+                        CHECK_NODE();
+                        _pathChosen = true;
+                    }
+                }
+                // END OF PATH 2
+                else if (_currentPath == _nodes2)            // FOLLOW PATH LOOP
+                {
+                    _choice.SetActive(false);
+                    _currentNode = 2;   // 3RD NODE
+                    _currentPath = _nodes0;
+                    CHECK_NODE();
+                    _pathChosen = true;
+                }
+                // END OF PATH 3
+                else if (_currentPath == _nodes3)            // FOLLOW PATH LOOP
+                {
+                    _choice.SetActive(false);
+                    _currentNode = 0;
+                    _currentPath = _nodes0;
+                    CHECK_NODE();
+                    _pathChosen = true;
+                }
+                // END OF PATH 4
+                else if (_currentPath == _nodes4)            // FOLLOW PATH LOOP
+                {
+                    _choice.SetActive(false);
+                    _currentNode = 1;
+                    _currentPath = _nodes2;
+                    CHECK_NODE();
+                    _pathChosen = true;
+                }
+            }
+
+            // OTHER MAPS
+            if (_currentScene == "2P_Test")
+            {
+                if (_currentPath == _nodes0)                    // END OF PATH 1
+                {
+                    // USER INPUT DIRECTION OF TRAVEL
+                    if (Input.GetKeyDown(KeyCode.RightArrow))
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;
+                        _currentPath = _nodes3;
+                        CHECK_NODE();
+                    }
+                    else if (Input.GetKeyDown(KeyCode.UpArrow))
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;
+                        _currentPath = _nodes4;
+                        CHECK_NODE();
+                    }
+                }
+                else if (_currentPath == _nodes1)            // FOLLOW PATH LOOP
+                {
+                    _choice.SetActive(false);
+                    _currentNode = 0;
+                    _currentPath = _nodes0;
+                    CHECK_NODE();
+                }
+                else if (_currentPath == _nodes2)        // FOLLOW PATH LOOP
+                {
+                    _choice.SetActive(false);
+                    _currentNode = 5 - 1;
+                    _currentPath = _nodes3;
+                    CHECK_NODE();
+                }
+                else if (_currentPath == _nodes3)           // FOLLOW PATH LOOP
+                {
+                    _choice.SetActive(false);
+                    _currentNode = 0;
+                    _currentPath = _nodes5;
+                    CHECK_NODE();
+                }
+                else if (_currentPath == _nodes4)
+                {
+                    if (Input.GetKeyDown(KeyCode.LeftArrow))
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;
+                        _currentPath = _nodes1;
+                        CHECK_NODE();
+                    }
+                    else if (Input.GetKeyDown(KeyCode.RightArrow))
+                    {
+                        _choice.SetActive(false);
+                        _currentNode = 0;
+                        _currentPath = _nodes2;
+                        CHECK_NODE();
+                    }
+                }
+                else if (_currentPath == _nodes5)           // CONTINUE OTHER PATH
+                {
+                    _choice.SetActive(false);
+                    _currentNode = 3;
+                    _currentPath = _nodes1;
+                    CHECK_NODE();
+                }
+            }
+
+            // RESUME SOUND EFFECTS
+            if (_pathChosen)
+            {
+                StartCoroutine(WALK_OVER_SOUND_ON());
+            }
+        }
+        // VIEW MAP
+        else
+        {
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                _cam.transform.Translate(Vector3.left * camSpeed * Time.deltaTime);
+            }
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                _cam.transform.Translate(Vector3.right * camSpeed * Time.deltaTime);
+            }
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                _cam.transform.Translate(Vector3.up * camSpeed * Time.deltaTime);
+            }
+            if (Input.GetKey(KeyCode.DownArrow)) 
+            { 
+                _cam.transform.Translate(Vector3.down * camSpeed * Time.deltaTime);
+            }
+        }
+    }
+
+    private void UPDATE_MOVEMENT(int movesLeft)
+    {
+        _movesSprite.enabled = true;
+        if (movesLeft <= _howManyMovesRemaining.Length)
+        {
+            _movesSprite.sprite = _howManyMovesRemaining[movesLeft];
+        }
+    }
+
+    public void DONE_LANDING()
+    {
+        readyToMovedAside = true;
+    }
+
+    // MOVE PLAYER ASIDE FOR VISUAL INDICATION OF WHO'S ON WHAT SPACE
+    private void MOVE_ASIDE()
+    {
+        if (!gotAsidePos)   // CALL ONCE
+        {
+            _timer = 0;
+            float scaleFactor = 0.9f;
+            float playerX = transform.position.x;
+            float playerY = transform.position.y;
+            float trig1 = 0.5f   * scaleFactor;
+            float trig2 = 0.866f * scaleFactor;
+            asidePos1 = new Vector3(playerX - trig2, playerY + trig1);
+            asidePos2 = new Vector3(playerX - trig1, playerY + trig2);
+            asidePos3 = new Vector3(playerX + trig1, playerY + trig2);
+            asidePos4 = new Vector3(playerX + trig2, playerY + trig1);
+            asidePos5 = new Vector3(playerX + trig2, playerY - trig1 + 0.25f);
+            asidePos6 = new Vector3(playerX + trig1, playerY - trig2 + 0.25f);
+            asidePos7 = new Vector3(playerX - trig1, playerY - trig2 + 0.25f);
+            asidePos8 = new Vector3(playerX - trig2, playerY - trig1 + 0.25f);
+            gotAsidePos = true;
+        }
+
+        _timer += _moveSpeed * Time.deltaTime;
+        this.transform.localScale -= new Vector3(0.025f, 0.025f, 0);    // STRINK
+
+        // MOVE TO ASIDE POSITION
+        switch (name)
+        {
+            case "Player_1":
+                if (this.transform.position != asidePos1)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos1, _timer);
+                }
+                break;
+
+            case "Player_2":
+                if (this.transform.position != asidePos2)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos2, _timer);
+                }
+                break;
+
+            case "Player_3":
+                if (this.transform.position != asidePos3)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos3, _timer);
+                }
+                break;
+
+            case "Player_4":
+                if (this.transform.position != asidePos4)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos4, _timer);
+                }
+                break;
+
+            case "Player_5":
+                if (this.transform.position != asidePos5)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos5, _timer);
+                }
+                break;
+
+            case "Player_6":
+                if (this.transform.position != asidePos6)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos6, _timer);
+                }
+                break;
+
+            case "Player_7":
+                if (this.transform.position != asidePos7)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos7, _timer);
+                }
+                break;
+
+            case "Player_8":
+                if (this.transform.position != asidePos8)
+                {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos8, _timer);
+                }
+                break;
+        }
+
+        // END TURN
+        switch (name)
+        {
+            case "Player_1":
+                if (this.transform.position == asidePos1)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+
+            case "Player_2":
+                if (this.transform.position == asidePos2)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+
+            case "Player_3":
+                if (this.transform.position == asidePos3)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+
+            case "Player_4":
+                if (this.transform.position == asidePos4)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+
+            case "Player_5":
+                if (this.transform.position == asidePos5)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+
+            case "Player_6":
+                if (this.transform.position == asidePos6)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+
+            case "Player_7":
+                if (this.transform.position == asidePos7)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+
+            case "Player_8":
+                if (this.transform.position == asidePos8)
+                {
+                    UPDATE_INFORMATION();
+                }
+                break;
+        }
+
+    }
+
+
+    /* ------------ PLAYER'S TURN ------------ */
+
+    // CAMERA FOCUSES ON PLAYER, WAIT BEFORE STARTING TURN
+    public void YOUR_TURN()
+    {
+        // PLAYER CHOICES
+        buttonMove.gameObject.SetActive(true);
+        buttonSpells.gameObject.SetActive(true);
+        buttonMap.gameObject.SetActive(true);
+        _isPlayerTurn = true;           // THIS PLAYER'S TURN
+
+        _cam.gameObject.SetActive(true);    // CAM TURNS ON
+        this.transform.localScale += new Vector3(0.075f, 0.075f, 0);
+        if (controller.hasStarted)  // MOVE BACK (UNASIDE)
+        {
+            transform.position = controller.GET_POS_VECTOR(name);   
+        }
+        _gm.FADE_FROM_BLACK();
+        _movesSprite.enabled = true;
+        UPDATE_MOVEMENT(_movesRemaining);
+    }
+
+    // CAMERA CHANGES, WAIT BEFORE ENDING TURN
+    private void TURN_FINISHED()
+    {
+        _movesSprite.enabled = false;
+        _gm.StartCoroutine(_gm.INCREMENT_TURN(name));
+    }
+
+    public void PLAYER_CAM_ON()
+    {
+        _cam.gameObject.SetActive(true);    // CAM TURNS ON
+    }
+    public void PLAYER_CAM_OFF()
+    {
+        _cam.gameObject.SetActive(false);   // CAM TURNS OFF
+    }
+
+    IEnumerator WALK_OVER_SOUND_ON()
+    {
+        yield return new WaitForSeconds(0.05f);
+        _collider.enabled = true;
+    }
+
+    private void UPDATE_INFORMATION()
+    {
+        // STORE DATA ON THE PATH THE PLAYER IS CURRENTLY ON
+        if (_currentPath == _nodes0)
+        {
+            controller.SET_PATH_NODE(name,"Path_0");
+        }
+        else if (_currentPath == _nodes1)
+        {
+            controller.SET_PATH_NODE(name, "Path_1");
+        }
+        else if (_currentPath == _nodes2)
+        {
+            controller.SET_PATH_NODE(name, "Path_2");
+        }
+        else if (_currentPath == _nodes3)
+        {
+            controller.SET_PATH_NODE(name, "Path_3");
+        }
+        else if (_currentPath == _nodes4)
+        {
+            controller.SET_PATH_NODE(name, "Path_4");
+        }
+        else if (_currentPath == _nodes5)
+        {
+            controller.SET_PATH_NODE(name, "Path_5");
+        }
+        else if (_currentPath == _nodes6)
+        {
+            controller.SET_PATH_NODE(name, "Path_6");
+        }
+        else if (_currentPath == _nodes7)
+        {
+            controller.SET_PATH_NODE(name, "Path_7");
+        }
+        else if (_currentPath == _nodes8)
+        {
+            controller.SET_PATH_NODE(name, "Path_8");
+        }
+        else if (_currentPath == _nodes9)
+        {
+            controller.SET_PATH_NODE(name, "Path_9");
+        }
+        else if (_currentPath == _nodes10)
+        {
+            controller.SET_PATH_NODE(name, "Path_10");
+        }
+        else if (_currentPath == _nodes11)
+        {
+            controller.SET_PATH_NODE(name, "Path_11");
+        }
+        else if (_currentPath == _nodes12)
+        {
+            controller.SET_PATH_NODE(name, "Path_12");
+        }
+        else if (_currentPath == _nodes13)
+        {
+            controller.SET_PATH_NODE(name, "Path_13");
+        }
+        else if (_currentPath == _nodes14)
+        {
+            controller.SET_PATH_NODE(name, "Path_14");
+        }
+        else if (_currentPath == _nodes15)
+        {
+            controller.SET_PATH_NODE(name, "Path_15");
+        }
+        else if (_currentPath == _nodes16)
+        {
+            controller.SET_PATH_NODE(name, "Path_16");
+        }
+        else if (_currentPath == _nodes17)
+        {
+            controller.SET_PATH_NODE(name, "Path_17");
+        }
+        else if (_currentPath == _nodes18)
+        {
+            controller.SET_PATH_NODE(name, "Path_18");
+        }
+        else if (_currentPath == _nodes19)
+        {
+            controller.SET_PATH_NODE(name, "Path_19");
+        }
+        else if (_currentPath == _nodes20)
+        {
+            controller.SET_PATH_NODE(name, "Path_20");
+        }
+
+        // STORE DATA ON THE NODE THE PLAYER IS CURRENTLY ON
+        controller.SET_NODE_INDEX(name, _currentNode);
+
+        // STORE DATA ON THE GLOBAL POSITION THE PLAYER IS CURRENTLY LOCATED
+        controller.SET_END_POS(name, transform.position);
+        controller.SET_POS_VECTOR(name, _currentPositionHolder);
+
+        // STORE DATA ON THE CURRENT PLAYER'S COIN AND ORB VALUES
+        controller.SET_COINS(name, coinsGained);
+        controller.SET_ORBS(name, orbsGained);
+
+        _isPlayerTurn = false;
+        _readyToMove = false;
+        TURN_FINISHED();
+    }
+
+
+    /* ------------ DURING THE START OF PLAYER TURN ------------ */
+    IEnumerator PLAYER_MOVES()
+    {
+        int nMoves = (int) (moveBar.value + 10) / 10;
+        _movesRemaining = nMoves;
+        _movesSprite.sprite = _howManyMovesRemaining[_movesRemaining];
+        yield return new WaitForSeconds(1f);
+        _readyToMove = true;
+        moveBar.gameObject.SetActive(false);
+    }
+
+
+    /* ------------ SWITCH PRO CONTROLLER INPUTS ------------ */
+    void OnMove()
+    {
+        Debug.Log("  Moving!");
+    }
+
+    void OnSelect()
+    {
+        Debug.Log("  Selected!");
+    }
+
+    void OnCancel()
+    {
+        Debug.Log("  Canceled!");
+    }
+}
