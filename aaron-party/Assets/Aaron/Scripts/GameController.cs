@@ -670,7 +670,9 @@ public class GameController : MonoBehaviour
         if (!firstMagicOrbShown) { r = 0; }
         currentMagicOrbIndex = r;
 
-        Node node = GameObject.Find("/PATHS/" + magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
+        Debug.Log(magicOrbSpace[r].parentPath + "  -  " + magicOrbSpace[r].childNode);
+        // Node node = GameObject.Find("/PATHS/" + magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
+        Node node = GameObject.Find(magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         camNode = node;
         node.TURN_INTO_ORB_SPACE();
         

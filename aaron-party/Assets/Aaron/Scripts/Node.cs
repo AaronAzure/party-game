@@ -5,8 +5,9 @@ using TMPro;
 
 public class Node : MonoBehaviour
 {
-
     private AudioSource _soundNode;                 // AUDIO FOR GOING OVER A NODE/SPACE
+    [SerializeField] private GameObject nodeContainer;     // space containing sprite
+    
     [Tooltip("The shop keeper number")] public int whoIsTheSeller;
     [SerializeField] private SpriteRenderer lockedOn;
     [SerializeField] private GameObject magicOrb;
@@ -17,6 +18,18 @@ public class Node : MonoBehaviour
     [SerializeField] private Animator aaronAnim;
     [SerializeField] private GameObject teleportEffect;
 
+
+    // TODO : which node each node connects to
+    public enum Directions { none, left, right, up, down }
+    [System.Serializable] public class Nexts
+    {
+        public GameObject node;
+        public Directions direction;
+    }
+    [Header("Paths - next node(s)")]
+    public Nexts[] nexts;
+
+    
 
     [Header("Type of Space")]
     [SerializeField] private Sprite emptySpace;     //
@@ -89,7 +102,7 @@ public class Node : MonoBehaviour
     void Start()
     {
         if (_anim == null)      { _anim = this.GetComponentInChildren<Animator>(); }
-        if (_spaceType == null) { _spaceType = this.GetComponent<SpriteRenderer>(); }
+        if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
 
         _soundNode = this.GetComponentInChildren<AudioSource>();
         if (aaron != null) { 
@@ -105,10 +118,14 @@ public class Node : MonoBehaviour
         CHANGE_ANIMATION();
     }
 
+    // WALK OVER SOUND EFFECT
+    public void PlaySound() {
+        _soundNode.Play();
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Player")
+        if (other.tag == "hello")
         {
             // SPACES THAT DO DECREASE MOVEMENT
             if (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace &&  _spaceType.sprite != freeSpace &&

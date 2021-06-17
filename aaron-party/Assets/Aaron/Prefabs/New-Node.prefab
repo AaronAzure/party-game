@@ -24236,6 +24236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec4cc7b541a6d784e8ff7654b8e445a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nodeContainer: {fileID: 6945034686109693343}
   whoIsTheSeller: 0
   lockedOn: {fileID: 854071645970123018}
   magicOrb: {fileID: 405553350848496210}
