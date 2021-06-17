@@ -1482,24 +1482,22 @@ public class MinigameControls : MonoBehaviour
 
     void CAMOFLAGE()
     {
-        if (characterName == "Charlotte") {
-
+        if (player.GetButtonDown("A"))
+        {
+            _anim.speed = 2;
+            _anim.SetBool("isBuff", true);
         }
-        else {
-            if (player.GetButtonDown("A"))
-            {
-                _anim.speed = 2;
-                _anim.SetBool("isBuff", true);
-            }
-            if (player.GetButtonUp("A"))
-            {
-                _anim.SetBool("isBuff", false);
-                _anim.SetTrigger("isDone");
-                _collider.enabled = true;
-            }
-            if (_anim.GetCurrentAnimatorStateInfo(0).IsTag("invisible")) { _collider.enabled = false; }
-            else { _collider.enabled = true; }
+        if (player.GetButtonUp("A"))
+        {
+            _anim.SetBool("isBuff", false);
+            _anim.SetTrigger("isDone");
+            _collider.enabled = true;
         }
+        if (_anim.GetCurrentAnimatorStateInfo(0).IsTag("invisible")) 
+        { 
+            _collider.enabled = false; 
+        }
+        else { _collider.enabled = true; }
     }
 
     // ----------------------------------------------------------- //
