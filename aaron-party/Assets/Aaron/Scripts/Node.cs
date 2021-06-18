@@ -584,16 +584,19 @@ public class Node : MonoBehaviour
 
 
     // TODO - SHOW SPACES AWAY
-    public void DISPLAY_MOVEMENT(int n)
+    public void DISPLAY_MOVEMENT(int n, int moveLeft)
     {
         // SPACE DECREMENTS MOVEMENT //? DISPLAY MOVEMENT
         if (!noCostSpace.Contains(_spaceType.sprite)) {
             if (nSpace.text == "x") {
                 nSpace.gameObject.SetActive(true);
                 nSpace.text = n.ToString();
+                if (n == moveLeft) {
+                    nSpace.color = new Color(0,1,0);
+                }
                 foreach (Nexts next in nexts) {
                     Debug.Log(name);
-                    next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1);
+                    next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
                 }
             }
             else {
@@ -604,7 +607,7 @@ public class Node : MonoBehaviour
                     nSpace.text = n.ToString();
                     foreach (Nexts next in nexts) {
                         Debug.Log(name + ", "  + n + ", " + number);
-                        next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1);
+                        next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
                     }
                 }
             }
@@ -613,7 +616,7 @@ public class Node : MonoBehaviour
         // SPACE DOES NOT DECREMENT MOVEMENT //? DON'T DISPLAY
         else {
             foreach (Nexts next in nexts) {
-                next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n);
+                next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n, moveLeft);
             }
         }
 
@@ -621,7 +624,9 @@ public class Node : MonoBehaviour
     // HIDE SPACES AWAY
     public void HIDE_MOVEMENT() { 
         if (nSpace.text != "x") {
-            nSpace.gameObject.SetActive(false); nSpace.text = "x";
+            nSpace.gameObject.SetActive(false); 
+            nSpace.text = "x";
+            nSpace.color = new Color(1,1,1);
 
             foreach (Nexts next in nexts) {
                 next.node.GetComponent<Node>().HIDE_MOVEMENT();

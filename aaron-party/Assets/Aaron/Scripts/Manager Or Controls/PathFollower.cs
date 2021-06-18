@@ -1321,7 +1321,7 @@ public class PathFollower : MonoBehaviour
         {
             // DISPLAY SPACES AWAY
             for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-                currentNode.nexts[i].node.GetComponent<Node>().DISPLAY_MOVEMENT(1);
+                currentNode.nexts[i].node.GetComponent<Node>().DISPLAY_MOVEMENT(1, _movesRemaining);
             }
 
             mapViewmap.gameObject.SetActive(false);
