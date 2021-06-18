@@ -20,9 +20,11 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private Player player;
     public List<PlayerPrevData> data;
     private List<PlayerBuffData> stat;
-    public Node[] _currentPath;                    // CURRENT NODE(PATH)
-    public int _currentNode;                       // INDEX OF THE CURRENT SPACE ON NODE(PATH)
-    public Vector3 _currentPositionHolder;         // POSITION OF THE CURRENT SPACE
+    
+    //! DELETE
+    //// public Node[] _currentPath;                    // CURRENT NODE(PATH)    
+    //// public int _currentNode;                       // INDEX OF THE CURRENT SPACE ON NODE(PATH)  
+    //// public Vector3 _currentPositionHolder;         // POSITION OF THE CURRENT SPACE 
     private Vector3 asidePos1;
     private Vector3 asidePos2;
     private Vector3 asidePos3;
@@ -42,51 +44,53 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private GameObject[] heads;        // ** inspector
     
 
-    // CUSTOM PATHS
+    // CUSTOM PATHS 
     [SerializeField] private Node currentNode;
     [SerializeField] private Node nextNode;
-    private GameObject  _path0;
-    private Node[]      _nodes0;
-    private GameObject  _path1;
-    private Node[]      _nodes1;
-    private GameObject  _path2;
-    private Node[]      _nodes2;
-    private GameObject  _path3;
-    private Node[]      _nodes3;
-    private GameObject  _path4;
-    private Node[]      _nodes4;
-    private GameObject  _path5;
-    private Node[]      _nodes5;
-    private GameObject  _path6;
-    private Node[]      _nodes6;
-    private GameObject  _path7;
-    private Node[]      _nodes7;
-    private GameObject  _path8;
-    private Node[]      _nodes8;
-    private GameObject  _path9;
-    private Node[]      _nodes9;
-    private GameObject  _path10;
-    private Node[]      _nodes10;
-    private GameObject  _path11;
-    private Node[]      _nodes11;
-    private GameObject  _path12;
-    private Node[]      _nodes12;
-    private GameObject  _path13;
-    private Node[]      _nodes13;
-    private GameObject  _path14;
-    private Node[]      _nodes14;
-    private GameObject  _path15;
-    private Node[]      _nodes15;
-    private GameObject  _path16;
-    private Node[]      _nodes16;
-    private GameObject  _path17;
-    private Node[]      _nodes17;
-    private GameObject  _path18;
-    private Node[]      _nodes18;
-    private GameObject  _path19;
-    private Node[]      _nodes19;
-    private GameObject  _path20;
-    private Node[]      _nodes20;
+    //! -------- DELETE --------
+    //// private GameObject  _path0;
+    //// private Node[]      _nodes0;
+    //// private GameObject  _path1;
+    //// private Node[]      _nodes1;
+    //// private GameObject  _path2;
+    //// private Node[]      _nodes2;
+    //// private GameObject  _path3;
+    //// private Node[]      _nodes3;
+    //// private GameObject  _path4;
+    //// private Node[]      _nodes4;
+    //// private GameObject  _path5;
+    //// private Node[]      _nodes5;
+    //// private GameObject  _path6;
+    //// private Node[]      _nodes6;
+    //// private GameObject  _path7;
+    //// private Node[]      _nodes7;
+    //// private GameObject  _path8;
+    //// private Node[]      _nodes8;
+    //// private GameObject  _path9;
+    //// private Node[]      _nodes9;
+    //// private GameObject  _path10;
+    //// private Node[]      _nodes10;
+    //// private GameObject  _path11;
+    //// private Node[]      _nodes11;
+    //// private GameObject  _path12;
+    //// private Node[]      _nodes12;
+    //// private GameObject  _path13;
+    //// private Node[]      _nodes13;
+    //// private GameObject  _path14;
+    //// private Node[]      _nodes14;
+    //// private GameObject  _path15;
+    //// private Node[]      _nodes15;
+    //// private GameObject  _path16;
+    //// private Node[]      _nodes16;
+    //// private GameObject  _path17;
+    //// private Node[]      _nodes17;
+    //// private GameObject  _path18;
+    //// private Node[]      _nodes18;
+    //// private GameObject  _path19;
+    //// private Node[]      _nodes19;
+    //// private GameObject  _path20;
+    //// private Node[]      _nodes20;
+    //! -------- DELETE --------
 
 
     [Header("Movement Related")]
@@ -95,15 +99,15 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private Text _mapMoves;
     [SerializeField] private GameObject setting;
     [SerializeField] private Slider pSpeed;
-    private bool inContactWithNode;
     public int _movesRemaining;
+    private bool moveDecremented;
 
-    private float _moveSpeed = 7.5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
+    private float _moveSpeed = 2.5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
     private float _timer;
 
     private GameManager manager;
     public Camera _cam;           // PLAYER TRACKING CAM
-    private float camSizeLarge = 13.5f;
+    private float camSizeLarge = 17.5f;
     private float camSizeNormal = 7.5f;
     [SerializeField] private float camSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
     private float transitionTime = 1;
@@ -508,8 +512,12 @@ public class PathFollower : MonoBehaviour
             // }
         }
         
+        // GET PATHS
         if (GameObject.Find("New-Node") != null) {
             currentNode = GameObject.Find("New-Node").GetComponent<Node>();
+        }
+        if (nextNode == null && nextNode.nexts.Length <= 1 && currentNode.nexts[0] != null) {
+            nextNode = currentNode.nexts[0].node.GetComponent<Node>();
         }
 
         // TURN 2+
@@ -519,8 +527,12 @@ public class PathFollower : MonoBehaviour
             data = controller.GET_PLAYER_DATA(playerID);
 
             string newPath  = data[0].path;
-            _currentNode    = data[0].node;
-            _currentPositionHolder = data[0].pos;
+            currentNode = GameObject.Find(newPath).GetComponent<Node>();
+            if (nextNode == null && nextNode.nexts.Length <= 1 && currentNode.nexts[0] != null) {
+                nextNode = currentNode.nexts[0].node.GetComponent<Node>();
+            }   
+            // _currentNode    = data[0].node;  //! DELETE
+            // _currentPositionHolder = data[0].pos;    //! DELETE
             transform.position     = data[0].posAside;
             mpBar.value     = data[0].mp;
             coins           = data[0].coins;
@@ -559,32 +571,6 @@ public class PathFollower : MonoBehaviour
             if (playerExtraBuy) maxNPurchases = 3;
             else                maxNPurchases = 1;
             if (playerRange2)   areaOfEffect.transform.localScale *= 2;
-
-            // THE PATH THAT THE PLAYER IS TRAVERSING ACROSS (CONSTANT BETWEEN MAPS)
-            switch (newPath)
-            {
-                case "Path_0": _currentPath = _nodes0; break;
-                case "Path_1": _currentPath = _nodes1; break;
-                case "Path_2": _currentPath = _nodes2; break;
-                case "Path_3": _currentPath = _nodes3; break;
-                case "Path_4": _currentPath = _nodes4; break;
-                case "Path_5": _currentPath = _nodes5; break;
-                case "Path_6": _currentPath = _nodes6; break;
-                case "Path_7": _currentPath = _nodes7; break;
-                case "Path_8": _currentPath = _nodes8; break;
-                case "Path_9": _currentPath = _nodes9; break;
-                case "Path_10": _currentPath = _nodes10; break;
-                case "Path_11": _currentPath = _nodes11; break;
-                case "Path_12": _currentPath = _nodes12; break;
-                case "Path_13": _currentPath = _nodes13; break;
-                case "Path_14": _currentPath = _nodes14; break;
-                case "Path_15": _currentPath = _nodes15; break;
-                case "Path_16": _currentPath = _nodes16; break;
-                case "Path_17": _currentPath = _nodes17; break;
-                case "Path_18": _currentPath = _nodes18; break;
-                case "Path_19": _currentPath = _nodes19; break;
-                case "Path_20": _currentPath = _nodes20; break;
-            }
         }
         // TURN 1 ONLY
         else
@@ -778,6 +764,7 @@ public class PathFollower : MonoBehaviour
                     buttonSpells.gameObject.SetActive(false);
                     buttonMap.gameObject.SetActive(false);
 
+                    SHOW_NODE_DISTANCE();   // DISPLAY SPACES AWAY
                     mapMapping.gameObject.SetActive(true);
                     isViewingMap = true;
 
@@ -788,6 +775,8 @@ public class PathFollower : MonoBehaviour
             // VIEW MAP SHORTCUT
             else if (player.GetButtonDown("X"))
             {
+                SHOW_NODE_DISTANCE();   // DISPLAY SPACES AWAY
+
                 buttonMove.gameObject.SetActive(false);
                 buttonSpells.gameObject.SetActive(false);
                 buttonMap.gameObject.SetActive(false);
@@ -863,9 +852,9 @@ public class PathFollower : MonoBehaviour
         {
             if (diceRolled && !isAtShop || diceRolled && !isAtPotion || diceRolled && !isAtMagicOrb) { 
                 nMovesLeft.gameObject.SetActive(true); 
-                for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-                    currentNode.nexts[i].node.GetComponent<Node>().HIDE_MOVEMENT();
-                }
+            }
+            for (int i=0 ; i<currentNode.nexts.Length ; i++) {
+                currentNode.nexts[i].node.GetComponent<Node>().HIDE_MOVEMENT();
             }
 
             mapMapping.gameObject.SetActive(false);
@@ -911,7 +900,6 @@ public class PathFollower : MonoBehaviour
         if (player.GetButtonDown("X")) { camSpeed = 45; }
         if (player.GetButtonUp("X"))   { camSpeed = 15;}
 
-        // character.transform.localScale = new Vector3(lScale, lScale, lScale); // FLIP
         float moveHorizontal = player.GetAxis("Move Horizontal");
         float moveVertical   = player.GetAxis("Move Vertical");
         Vector3 direction = new Vector3(moveHorizontal, moveVertical, 0);
@@ -1116,10 +1104,8 @@ public class PathFollower : MonoBehaviour
         }
         else if (nextNode == null) {
             // SINGULAR PATH
-            if (currentNode.nexts.Length <= 1) {
-                if (currentNode.nexts[0] != null) {
-                    nextNode = currentNode.nexts[0].node.GetComponent<Node>();
-                }
+            if (currentNode.nexts[0] != null && currentNode.nexts.Length <= 1) {
+                nextNode = currentNode.nexts[0].node.GetComponent<Node>();
             }
             // PATH SPLITS/FORKS
             else {
@@ -1134,31 +1120,45 @@ public class PathFollower : MonoBehaviour
         }
         //* MOVEMENT
         else {
+            // SOUND EFFECT
+            if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && 
+                Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
+                    currentNode.PlaySound();   
+            }
+            // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
+            if (_movesRemaining != 1) {
+                if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && !player.GetButton('Y') && !moveDecremented &&
+                    Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
+                        moveDecremented = true;
+                        _movesRemaining--;  
+                }
+            }
             // MOVING TO NEXT NODE
-            if (this.transform.position != nextNode.transform.position)
-            {
+            if (this.transform.position != nextNode.transform.position) {
                 _timer += _moveSpeed * Time.deltaTime;
                 this.transform.position = Vector3.Lerp(this.transform.position, nextNode.transform.position, _timer);
             }
             // REACHED NEXT NODE
             else if (nextNode != null && this.transform.position == nextNode.transform.position) {
-                currentNode.PlaySound();    // SOUND EFFECT
+                // if (currentNode.DOES_SPACE_DECREASE_MOVEMENT()) currentNode.PlaySound();    // SOUND EFFECT
                 currentNode = nextNode;
                 nextNode = null;
                 _timer = 0;
+                // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
+                if (_movesRemaining == 1 && !moveDecremented) {
+                    if (currentNode.DOES_SPACE_DECREASE_MOVEMENT() && !player.GetButton('Y')) {
+                        moveDecremented = true;
+                        _movesRemaining--;  
+                    }
+                }
+                moveDecremented = false;
+
                 // SINGULAR PATH
                 if (currentNode.nexts.Length <= 1) {
                     if (currentNode.nexts[0] != null) {
                         nextNode = currentNode.nexts[0].node.GetComponent<Node>();
                     }
-                    // FACE RIGHT
-                    if (nextNode.transform.position.x > transform.position.x) { 
-                        character.transform.localScale = new Vector3(-lScale, lScale, lScale); 
-                    }
-                    // FACE LEFT (STANDARD)
-                    else  { 
-                        character.transform.localScale = new Vector3(lScale, lScale, lScale); 
-                    }
+                    if (_movesRemaining > 0) WHERE_TO_FACE();
                 }
                 // PATH SPLITS/FORKS
                 else {
@@ -1168,24 +1168,6 @@ public class PathFollower : MonoBehaviour
                     SHOW_ARROWS();
                 }
             }
-            // // THE PLAYER HAS MOVED A SPACE (DECREMENT MOVEMENT DISPLAY)
-            // if (inContactWithNode && _movesRemaining != 1)
-            // {
-            //     if (!_animator.GetBool("IsWalking")) {
-            //         _animator.SetBool("IsWalking", true);
-            //         _animator.speed = _moveSpeed;
-            //     }
-            //     if(!player.GetButton("Y")) _movesRemaining--;  // ** COMMENT OUT FOR INFINITE MOVEMENT ** //
-            //     // _movesRemaining--;
-            //     inContactWithNode = false;
-            // }
-            // // LAST MOVEMENT LEFT
-            // else if (inContactWithNode && this.transform.position == _currentPositionHolder && _movesRemaining == 1) 
-            // {
-            //     if(!player.GetButton("Y")) _movesRemaining--;  // ** COMMENT OUT FOR INFINITE MOVEMENT ** //
-            //     // _movesRemaining--; 
-            //     inContactWithNode = false;
-            // }
         }
 
 
@@ -1304,6 +1286,19 @@ public class PathFollower : MonoBehaviour
         // }
     }
 
+    // FLIP CHARACTER BASED ON DIRECTION MOVEMENT
+    private void WHERE_TO_FACE()
+    {
+        // FACE RIGHT
+        if (nextNode.transform.position.x > transform.position.x) { 
+            character.transform.localScale = new Vector3(-lScale, lScale, lScale); 
+        }
+        // FACE LEFT (STANDARD)
+        else  { 
+            character.transform.localScale = new Vector3(lScale, lScale, lScale); 
+        }
+    }
+
     private void SHOW_ARROWS() 
     {
         for (int i=0 ; i<currentNode.nexts.Length ; i++) {
@@ -1314,15 +1309,20 @@ public class PathFollower : MonoBehaviour
         }
     }
 
+    // DISPLAY SPACES AWAY
+    private void SHOW_NODE_DISTANCE()
+    {
+        for (int i=0 ; i<currentNode.nexts.Length ; i++) {
+            currentNode.nexts[i].node.GetComponent<Node>().DISPLAY_MOVEMENT(1, _movesRemaining);
+        }
+    }
+
     private void UserPathForkMenu()
     {
-        if (isAtFork) mapViewmap.gameObject.SetActive(true);
+        if (isAtFork && !isViewingMap) mapViewmap.gameObject.SetActive(true);
         if (player.GetButtonDown("X"))
         {
-            // DISPLAY SPACES AWAY
-            for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-                currentNode.nexts[i].node.GetComponent<Node>().DISPLAY_MOVEMENT(1, _movesRemaining);
-            }
+            SHOW_NODE_DISTANCE();   // DISPLAY SPACES AWAY
 
             mapViewmap.gameObject.SetActive(false);
             _cam.orthographicSize = camSizeLarge;
@@ -1467,6 +1467,7 @@ public class PathFollower : MonoBehaviour
         }
     }
 
+    //! DELETE
     // GET THE NEXT NODE TO MOVE TO | FLIPS CHARACTER
     private void CHECK_NODE()
     {
@@ -1475,26 +1476,8 @@ public class PathFollower : MonoBehaviour
         if (_currentNode < _currentPath.Length)
         {
             _currentPositionHolder = _currentPath[_currentNode].transform.position;
-            
-            // FACE RIGHT
-            if (_currentPositionHolder.x > transform.position.x) { 
-                character.transform.localScale = new Vector3(-lScale, lScale, lScale); 
-            }
-            // FACE LEFT (STANDARD)
-            else  { 
-                character.transform.localScale = new Vector3(lScale, lScale, lScale); 
-            }
-            
-            // // PLAYER CAN MAKE NOISE WHEN GOING OVER SPACES
-            // if (!_collider.enabled) { StartCoroutine(WALK_OVER_SOUND_ON()); }
+            WHERE_TO_FACE();
         }
-    }
-
-    private void StartOptionUI(bool activate)
-    {
-        buttonMove.gameObject.SetActive(activate);
-        buttonSpells.gameObject.SetActive(activate);
-        buttonMap.gameObject.SetActive(activate);
     }
 
     // TEXT SHOWING MOVES REMAINING
@@ -1569,7 +1552,6 @@ public class PathFollower : MonoBehaviour
     {
         if (!gotAsidePos)   // CALL ONCE
         {
-            // character.transform.localScale = new Vector3(lScale, lScale, lScale); // FLIP
             _timer = 0;
             float scaleFactor = 1f;
             float playerX = transform.position.x;
@@ -1652,10 +1634,7 @@ public class PathFollower : MonoBehaviour
                 if (this.transform.position == asidePos8) { TURN_FINISHED(); }     break;
         }
     }
-    private void REVEAL_MOVEMENT_UI()
-    {
 
-    }
 
 
     /* --------------------------------------------- */
@@ -1807,11 +1786,6 @@ public class PathFollower : MonoBehaviour
         _collider.enabled = true;
     }
 
-    public void IN_CONTACT()
-    {
-        inContactWithNode = true;
-    }
-
     public void HIDE_DATA_CANVAS() 
     {
         layout.SetActive(false);
@@ -1852,14 +1826,7 @@ public class PathFollower : MonoBehaviour
         _animator.speed = _moveSpeed;
         isReadyToMove = true;
 
-        // FACE RIGHT
-        if (_currentPositionHolder.x > transform.position.x) { 
-            character.transform.localScale = new Vector3(-lScale, lScale, lScale); 
-        }
-        // FACE LEFT (STANDARD)
-        else  { 
-            character.transform.localScale = new Vector3(lScale, lScale, lScale); 
-        }
+        WHERE_TO_FACE();
     }
 
     private void RESET_PLAYER_UI()
@@ -2266,7 +2233,7 @@ public class PathFollower : MonoBehaviour
     /* -------------- PATHING WHICH NODE IS NEXT -------------- */
 
 
-
+    //! DELETE
     // RETURN TRUE IF THERE IS A FORK AT THE END OF PATH (WHERE TO GO NEXT/CONJOIN),   FALSE OTHERWISE
     private bool CHECK_FORK()
     {
@@ -2478,6 +2445,7 @@ public class PathFollower : MonoBehaviour
                     arrowRight.gameObject.SetActive(false);
                     arrowUp.gameObject.SetActive(false);
                     arrowDown.gameObject.SetActive(false);
+                    WHERE_TO_FACE();
                     break;
                 }
             }

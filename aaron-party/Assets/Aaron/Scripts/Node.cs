@@ -190,6 +190,13 @@ public class Node : MonoBehaviour
         // }
     }
 
+    // TRUE = DECREASE MOVEMENTS
+    // FALSK = EMPTY
+    public bool DOES_SPACE_DECREASE_MOVEMENT() 
+    {
+        return !noCostSpace.Contains(_spaceType.sprite);
+    }
+
     // NORMAL SPACE
     public bool SPACE_LANDED()
     {
@@ -584,34 +591,33 @@ public class Node : MonoBehaviour
 
 
     // TODO - SHOW SPACES AWAY
-    public void DISPLAY_MOVEMENT(int n, int moveLeft)
+    public void DISPLAY_MOVEMENT(int n, int moveLeft=1000)
     {
         // SPACE DECREMENTS MOVEMENT //? DISPLAY MOVEMENT
         if (!noCostSpace.Contains(_spaceType.sprite)) {
             if (nSpace.text == "x") {
                 nSpace.gameObject.SetActive(true);
                 nSpace.text = n.ToString();
-                if (n == moveLeft) {
-                    nSpace.color = new Color(0,1,0);
-                }
+                if (n == moveLeft) { nSpace.color = new Color(0,1,0); } //* WHERE YOU'LL LAND
                 foreach (Nexts next in nexts) {
-                    Debug.Log(name);
-                    next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
+                    Debug.Log(name);    //! DELETE
+                    if (next.node != null) next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
                 }
             }
+            // IF NUMBER ALREADY EXISTS, THEN DISPLAY THE SMALLER ONE //? DISPLAY MOVEMENT
             else {
                 int number;
                 bool success = int.TryParse(nSpace.text, out number);
                 if (success && n < number) {
                     nSpace.gameObject.SetActive(true);
                     nSpace.text = n.ToString();
+                    if (n == moveLeft) { nSpace.color = new Color(0,1,0); } //* WHERE YOU'LL LAND
                     foreach (Nexts next in nexts) {
-                        Debug.Log(name + ", "  + n + ", " + number);
-                        next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
+                        Debug.Log(name + ", "  + n + ", " + number);    //! DELETE
+                        if (next.node != null) next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
                     }
                 }
             }
-            // IF THERE IS ALREADY A NUMBER, THEN STOP NUMBERING
         }
         // SPACE DOES NOT DECREMENT MOVEMENT //? DON'T DISPLAY
         else {
@@ -619,11 +625,10 @@ public class Node : MonoBehaviour
                 next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n, moveLeft);
             }
         }
-
     }
     // HIDE SPACES AWAY
     public void HIDE_MOVEMENT() { 
-        if (nSpace.text != "x") {
+        if (nSpace.gameObject.activeSelf || noCostSpace.Contains(_spaceType.sprite)) {
             nSpace.gameObject.SetActive(false); 
             nSpace.text = "x";
             nSpace.color = new Color(1,1,1);
@@ -633,6 +638,7 @@ public class Node : MonoBehaviour
             }
         }
     }
+
 
     // ----------------------------------------------------------------------------------------- //
     // ------------------------------------ ORB RELATED ---------------------------------------- //
