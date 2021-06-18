@@ -586,27 +586,46 @@ public class Node : MonoBehaviour
     // TODO - SHOW SPACES AWAY
     public void DISPLAY_MOVEMENT(int n)
     {
+        // SPACE DECREMENTS MOVEMENT //? DISPLAY MOVEMENT
         if (!noCostSpace.Contains(_spaceType.sprite)) {
             if (nSpace.text == "x") {
                 nSpace.gameObject.SetActive(true);
                 nSpace.text = n.ToString();
+                foreach (Nexts next in nexts) {
+                    Debug.Log(name);
+                    next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1);
+                }
             }
+            else {
+                int number;
+                bool success = int.TryParse(nSpace.text, out number);
+                if (success && n < number) {
+                    nSpace.gameObject.SetActive(true);
+                    nSpace.text = n.ToString();
+                    foreach (Nexts next in nexts) {
+                        Debug.Log(name + ", "  + n + ", " + number);
+                        next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1);
+                    }
+                }
+            }
+            // IF THERE IS ALREADY A NUMBER, THEN STOP NUMBERING
         }
+        // SPACE DOES NOT DECREMENT MOVEMENT //? DON'T DISPLAY
         else {
-            n--;
-        }
-        if (n<)
-        foreach (Nexts next in nexts) {
-            next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1);
+            foreach (Nexts next in nexts) {
+                next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n);
+            }
         }
 
     }
     // HIDE SPACES AWAY
     public void HIDE_MOVEMENT() { 
-        nSpace.gameObject.SetActive(false); nSpace.text = "x";
+        if (nSpace.text != "x") {
+            nSpace.gameObject.SetActive(false); nSpace.text = "x";
 
-        foreach (Nexts next in nexts) {
-            next.node.GetComponent<Node>().HIDE_MOVEMENT();
+            foreach (Nexts next in nexts) {
+                next.node.GetComponent<Node>().HIDE_MOVEMENT();
+            }
         }
     }
 

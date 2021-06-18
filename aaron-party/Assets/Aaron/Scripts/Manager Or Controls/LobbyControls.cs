@@ -184,7 +184,7 @@ public class LobbyControls : MonoBehaviour
             {
                 controller.LOAD_MINIGAME();
             }
-            else if (player.GetButtonDoublePressDown("X")) 
+            else if (boardName != null && Application.CanStreamedLevelBeLoaded(boardName) && player.GetButtonDoublePressDown("X")) 
             {
                 StartCoroutine( manager.FADE(boardName) );
             }
