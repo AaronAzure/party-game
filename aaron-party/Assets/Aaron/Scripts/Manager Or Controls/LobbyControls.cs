@@ -41,6 +41,7 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private Camera cam;
     public bool touchingBoard;
     public string boardToPlay;
+    public string boardName;
     private bool boardSelected;
 
     private bool sideQuest;
@@ -178,10 +179,14 @@ public class LobbyControls : MonoBehaviour
             }
             // vs AARON
             else if (player.GetButtonDown("Y")) StartSideQuest();
-            // QUICK MINIGAME (TEST)    // ** DELETE ** //
+            // QUICK MINIGAME (TEST)    //! DELETE 
             else if (player.GetButtonDoublePressDown("Minus")) 
             {
                 controller.LOAD_MINIGAME();
+            }
+            else if (player.GetButtonDoublePressDown("X")) 
+            {
+                StartCoroutine( manager.FADE(boardName) );
             }
             // PLAY BOARD, OPEN SETTINGS
             else if (player.GetButtonDown("A") && touchingBoard && !boardSelected && boardToPlay != null

@@ -24282,7 +24282,7 @@ MonoBehaviour:
   charlotteCoin10: {fileID: 21300000, guid: 99e36675cab654d22b6bb18d89f5db6a, type: 3}
   charlotteCoin20: {fileID: 21300000, guid: 034e3d3bce191482696e0bd5a1f91a32, type: 3}
   charlotteOrb: {fileID: 21300000, guid: 99a3d800631fd4545b134aa220787d69, type: 3}
-  nSpace: {fileID: 0}
+  nSpace: {fileID: 7826182701447639266}
   trapCreateEffect: {fileID: 188698, guid: d59453060233d2f49884f7de0b768335, type: 3}
   instanBlueEffect: {fileID: 164592, guid: 5423bfc84896575469c1270496ce5a32, type: 3}
   instanRedEffect: {fileID: 164592, guid: 6c5a1edc962704c64b9d2c92bd893337, type: 3}

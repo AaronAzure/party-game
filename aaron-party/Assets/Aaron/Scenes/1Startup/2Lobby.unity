@@ -10092,7 +10092,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   crystalCavernsPopup: {fileID: 1736558028}
-  boardName: Shogun_Seaport Intro
+  introName: Shogun_Seaport Intro
+  boardName: Shogun_Seaport
 --- !u!61 &1353824574
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12676,7 +12677,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   crystalCavernsPopup: {fileID: 210368099}
-  boardName: Crystal_Caverns Intro
+  introName: Crystal_Caverns Intro
+  boardName: Crystal_Caverns
 --- !u!1 &1680106419
 GameObject:
   m_ObjectHideFlags: 0

@@ -43,6 +43,8 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite shopSpace;      //
     [SerializeField] private Sprite potionSpace;    //
     [SerializeField] private Sprite specialSpace;   //
+    [SerializeField] private HashSet<Sprite> noCostSpace = new HashSet<Sprite>();   // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
+
 
 
     [Header("Player Spaces")]
@@ -104,6 +106,14 @@ public class Node : MonoBehaviour
         if (_anim == null)      { _anim = this.GetComponentInChildren<Animator>(); }
         if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
 
+        // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
+        noCostSpace.Add(emptySpace);
+        noCostSpace.Add(orbSpace);
+        noCostSpace.Add(freeSpace);
+        noCostSpace.Add(shopSpace);
+        noCostSpace.Add(potionSpace);
+        noCostSpace.Add(specialSpace);
+
         _soundNode = this.GetComponentInChildren<AudioSource>();
         if (aaron != null) { 
             aaron.SetActive(false); aaron.transform.parent = null; 
@@ -125,59 +135,59 @@ public class Node : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "hello")
-        {
-            // SPACES THAT DO DECREASE MOVEMENT
-            if (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace &&  _spaceType.sprite != freeSpace &&
-                _spaceType.sprite != shopSpace && _spaceType.sprite != potionSpace && _spaceType.sprite != specialSpace) 
-            {
-                PathFollower p = other.GetComponent<PathFollower>();
-                p.IN_CONTACT();
-                STEALING_AURA(p);   // DOES PLAYER HAVE STEALING EFFECT ACTIVE
+        // if (other.tag == "hello")
+        // {
+        //     // SPACES THAT DO DECREASE MOVEMENT
+        //     if (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace &&  _spaceType.sprite != freeSpace &&
+        //         _spaceType.sprite != shopSpace && _spaceType.sprite != potionSpace && _spaceType.sprite != specialSpace) 
+        //     {
+        //         PathFollower p = other.GetComponent<PathFollower>();
+        //         p.IN_CONTACT();
+        //         STEALING_AURA(p);   // DOES PLAYER HAVE STEALING EFFECT ACTIVE
 
-                _soundNode.Play();
-            }
-            // AT MAGIC ORB SPACE
-            else if (_spaceType.sprite == orbSpace && magicOrb.activeSelf)  // BUY A MAGIC ORB
-            {
-                PathFollower p = other.GetComponent<PathFollower>();
-                p.isAtMagicOrb = true;
-            }
-            // AT SHOP
-            else if (_spaceType.sprite == shopSpace)                         // BUY SPELL(S)
-            {
-                PathFollower p = other.GetComponent<PathFollower>();
-                if (whoIsTheSeller == 1) p.shop1 = true;    // MANUALLY EDIT IN INSPECTOR
-                if (whoIsTheSeller == 2) p.shop2 = true;    // MANUALLY EDIT IN INSPECTOR
-                if (whoIsTheSeller == 3) p.shop3 = true;    // MANUALLY EDIT IN INSPECTOR
-                if (whoIsTheSeller == 4) p.shop4 = true;    // MANUALLY EDIT IN INSPECTOR
-                p.isAtShop = true;
-                p.RESET_PURCHASES();
-                p.PURCHASES_LEFT();
-            }
-            // AT ITEM SHOP
-            else if (_spaceType.sprite == potionSpace)                       // BUY ITEM(S)
-            {
-                PathFollower p = other.GetComponent<PathFollower>();
-                if (whoIsTheSeller == 4) p.shop4 = true;    // MANUALLY EDIT IN INSPECTOR
-                p.isAtShop = true;
-                p.RESET_PURCHASES();
-                p.PURCHASES_LEFT();
-            }
-            // AT FREE SPELL SPACE
-            else if (_spaceType.sprite == freeSpace)
-            {
-                PathFollower p = other.GetComponent<PathFollower>();
-                p.isAtFree = true;
-                StartCoroutine( p.GAIN_FREE_SPELL() );
-            }
-            // AT BOAT MAGIC SPACE
-            else if (_spaceType.sprite == specialSpace)                      // MULTIPLE EVENTS
-            {
-                PathFollower p = other.GetComponent<PathFollower>();
-                if (!p.isBoat) p.MANAGER_EVENT();
-            }
-        }
+        //         _soundNode.Play();
+        //     }
+        //     // AT MAGIC ORB SPACE
+        //     else if (_spaceType.sprite == orbSpace && magicOrb.activeSelf)  // BUY A MAGIC ORB
+        //     {
+        //         PathFollower p = other.GetComponent<PathFollower>();
+        //         p.isAtMagicOrb = true;
+        //     }
+        //     // AT SHOP
+        //     else if (_spaceType.sprite == shopSpace)                         // BUY SPELL(S)
+        //     {
+        //         PathFollower p = other.GetComponent<PathFollower>();
+        //         if (whoIsTheSeller == 1) p.shop1 = true;    // MANUALLY EDIT IN INSPECTOR
+        //         if (whoIsTheSeller == 2) p.shop2 = true;    // MANUALLY EDIT IN INSPECTOR
+        //         if (whoIsTheSeller == 3) p.shop3 = true;    // MANUALLY EDIT IN INSPECTOR
+        //         if (whoIsTheSeller == 4) p.shop4 = true;    // MANUALLY EDIT IN INSPECTOR
+        //         p.isAtShop = true;
+        //         p.RESET_PURCHASES();
+        //         p.PURCHASES_LEFT();
+        //     }
+        //     // AT ITEM SHOP
+        //     else if (_spaceType.sprite == potionSpace)                       // BUY ITEM(S)
+        //     {
+        //         PathFollower p = other.GetComponent<PathFollower>();
+        //         if (whoIsTheSeller == 4) p.shop4 = true;    // MANUALLY EDIT IN INSPECTOR
+        //         p.isAtShop = true;
+        //         p.RESET_PURCHASES();
+        //         p.PURCHASES_LEFT();
+        //     }
+        //     // AT FREE SPELL SPACE
+        //     else if (_spaceType.sprite == freeSpace)
+        //     {
+        //         PathFollower p = other.GetComponent<PathFollower>();
+        //         p.isAtFree = true;
+        //         StartCoroutine( p.GAIN_FREE_SPELL() );
+        //     }
+        //     // AT BOAT MAGIC SPACE
+        //     else if (_spaceType.sprite == specialSpace)                      // MULTIPLE EVENTS
+        //     {
+        //         PathFollower p = other.GetComponent<PathFollower>();
+        //         if (!p.isBoat) p.MANAGER_EVENT();
+        //     }
+        // }
     }
 
     // NORMAL SPACE
@@ -572,16 +582,33 @@ public class Node : MonoBehaviour
         }
     }
 
+
+    // TODO - SHOW SPACES AWAY
     public void DISPLAY_MOVEMENT(int n)
     {
-        nSpace.gameObject.SetActive(true);
-        nSpace.text = n.ToString();
-    }
-    public void HIDE_MOVEMENT()
-    {
-        nSpace.gameObject.SetActive(false);
-    }
+        if (!noCostSpace.Contains(_spaceType.sprite)) {
+            if (nSpace.text == "x") {
+                nSpace.gameObject.SetActive(true);
+                nSpace.text = n.ToString();
+            }
+        }
+        else {
+            n--;
+        }
+        if (n<)
+        foreach (Nexts next in nexts) {
+            next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1);
+        }
 
+    }
+    // HIDE SPACES AWAY
+    public void HIDE_MOVEMENT() { 
+        nSpace.gameObject.SetActive(false); nSpace.text = "x";
+
+        foreach (Nexts next in nexts) {
+            next.node.GetComponent<Node>().HIDE_MOVEMENT();
+        }
+    }
 
     // ----------------------------------------------------------------------------------------- //
     // ------------------------------------ ORB RELATED ---------------------------------------- //

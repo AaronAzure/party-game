@@ -383,44 +383,7 @@ public class PathFollower : MonoBehaviour
                 Debug.LogError("ERROR : Have not assign character to name");
             }
         }
-        if (false) {
-            // switch (characterName)
-            // {
-            //     case "Felix" :       
-            //         var obj1 = Instantiate(_Felix, transform.position, Quaternion.identity, this.transform);
-            //         felixH.SetActive(true); 
-            //         character = obj1.gameObject; _animator = obj1.GetComponent<Animator>();      break;
-            //     case "Jacob" :       
-            //         var obj2 = Instantiate(_Jacob, transform.position, Quaternion.identity, this.transform);
-            //         jacobH.SetActive(true); 
-            //         character = obj2.gameObject; _animator = obj2.GetComponent<Animator>();      break;
-            //     case "Laurel" :      
-            //         var obj3 = Instantiate(_Laurel, transform.position, Quaternion.identity, this.transform); 
-            //         laurelH.SetActive(true);
-            //         character = obj3.gameObject; _animator = obj3.GetComponent<Animator>();     break;
-            //     case "Maurice" :     
-            //         var obj4 = Instantiate(_Maurice, transform.position, Quaternion.identity, this.transform); 
-            //         mauriceH.SetActive(true);
-            //         character = obj4.gameObject; _animator = obj4.GetComponent<Animator>();    break;
-            //     case "Mimi" :        
-            //         var obj5 = Instantiate(_Mimi, transform.position, Quaternion.identity, this.transform); 
-            //         mimiH.SetActive(true);
-            //         character = obj5.gameObject; _animator = obj5.GetComponent<Animator>();      break;
-            //     case "Pinkins" :     
-            //         var obj6 = Instantiate(_Pinkins, transform.position, Quaternion.identity, this.transform); 
-            //         pinkinsH.SetActive(true);
-            //         character = obj6.gameObject; _animator = obj6.GetComponent<Animator>();    break;
-            //     case "Sweeterella" : 
-            //         var obj7 = Instantiate(_Sweeterella, transform.position, Quaternion.identity, this.transform);
-            //         sweeterellaH.SetActive(true); 
-            //         character = obj7.gameObject; _animator = obj7.GetComponent<Animator>(); break;
-            //     case "Thanatos" :    
-            //         var obj8 = Instantiate(_Thanatos, transform.position, Quaternion.identity, this.transform); 
-            //         thanatosH.SetActive(true);
-            //         character = obj8.gameObject; _animator = obj8.GetComponent<Animator>();   break;
-            //     default :       Debug.LogError("ERROR : Have not assign character to name"); break;
-            // }
-        }
+
         if (character != null) {
             character.transform.localScale *= 2;
             lScale      = character.transform.localScale.x;
@@ -456,7 +419,7 @@ public class PathFollower : MonoBehaviour
         areaOfEffect.SetActive(false);
         powerup.SetActive(false);
 
-        // GET PATHS (VARIOUS BETWEEN MAPS)
+        //! DELETE
         if (true)
         {
             // if (GameObject.Find("Path_0") != null){
@@ -631,8 +594,6 @@ public class PathFollower : MonoBehaviour
             coins = 10; // TO BE CHANGED // DELETE
             orbs = 0;
             _collider.enabled = true;
-            // _currentPath = _nodes0;
-            // _currentPositionHolder = _currentPath[_currentNode].transform.position;
             maxNPurchases = 1;
         }
         
@@ -663,8 +624,6 @@ public class PathFollower : MonoBehaviour
         _choice.SetActive(false);
         nMovesLeft.gameObject.SetActive(false);
         camSpeed = 15;
-
-        
     }
 
 
@@ -904,6 +863,9 @@ public class PathFollower : MonoBehaviour
         {
             if (diceRolled && !isAtShop || diceRolled && !isAtPotion || diceRolled && !isAtMagicOrb) { 
                 nMovesLeft.gameObject.SetActive(true); 
+                for (int i=0 ; i<currentNode.nexts.Length ; i++) {
+                    currentNode.nexts[i].node.GetComponent<Node>().HIDE_MOVEMENT();
+                }
             }
 
             mapMapping.gameObject.SetActive(false);
@@ -912,7 +874,6 @@ public class PathFollower : MonoBehaviour
             _cam.orthographicSize = camSizeNormal;
             _cam.transform.position = 
                 new Vector3(this.transform.position.x, this.transform.position.y, _cam.transform.position.z);
-            // _cam.transform.localPosition = new Vector3(0, 0, -30f);
             manager.UNHIDE_UI();
             if (isAtSpecial)
             {
@@ -922,7 +883,7 @@ public class PathFollower : MonoBehaviour
 
             if (isAtFork)
             {
-                FORK_ARROW_VISUAL();
+                SHOW_ARROWS();
                 _mapMoves.text = "";
             }
             else if (isAtShop)
@@ -1204,12 +1165,7 @@ public class PathFollower : MonoBehaviour
                     isAtFork = true;
                     _animator.SetBool("IsWalking", false);
                     _animator.speed = 1;
-                    for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-                        if (currentNode.nexts[i].direction == Node.Directions.left) { arrowLeft.gameObject.SetActive(true); continue; }
-                        if (currentNode.nexts[i].direction == Node.Directions.right) { arrowRight.gameObject.SetActive(true); continue; }
-                        if (currentNode.nexts[i].direction == Node.Directions.up) { arrowUp.gameObject.SetActive(true); continue; }
-                        if (currentNode.nexts[i].direction == Node.Directions.down) { arrowDown.gameObject.SetActive(true); continue; }
-                    }
+                    SHOW_ARROWS();
                 }
             }
             // // THE PLAYER HAS MOVED A SPACE (DECREMENT MOVEMENT DISPLAY)
@@ -1310,14 +1266,14 @@ public class PathFollower : MonoBehaviour
         //             _animator.SetBool("IsWalking", true);
         //             _animator.speed = _moveSpeed;
         //         }
-        //         if(!player.GetButton("Y")) _movesRemaining--;  // ** COMMENT OUT FOR INFINITE MOVEMENT ** //
+        //         if(!player.GetButton("Y")) _movesRemaining--;  //! COMMENT OUT FOR INFINITE MOVEMENT ** //
         //         // _movesRemaining--;
         //         inContactWithNode = false;
         //     }
         //     // LAST MOVEMENT LEFT
         //     else if (inContactWithNode && this.transform.position == _currentPositionHolder && _movesRemaining == 1) 
         //     {
-        //         if(!player.GetButton("Y")) _movesRemaining--;  // ** COMMENT OUT FOR INFINITE MOVEMENT ** //
+        //         if(!player.GetButton("Y")) _movesRemaining--;  //! COMMENT OUT FOR INFINITE MOVEMENT ** //
         //         // _movesRemaining--; 
         //         inContactWithNode = false;
         //     }
@@ -1348,11 +1304,26 @@ public class PathFollower : MonoBehaviour
         // }
     }
 
+    private void SHOW_ARROWS() 
+    {
+        for (int i=0 ; i<currentNode.nexts.Length ; i++) {
+            if (currentNode.nexts[i].direction == Node.Directions.left) { arrowLeft.gameObject.SetActive(true); continue; }
+            if (currentNode.nexts[i].direction == Node.Directions.right) { arrowRight.gameObject.SetActive(true); continue; }
+            if (currentNode.nexts[i].direction == Node.Directions.up) { arrowUp.gameObject.SetActive(true); continue; }
+            if (currentNode.nexts[i].direction == Node.Directions.down) { arrowDown.gameObject.SetActive(true); continue; }
+        }
+    }
+
     private void UserPathForkMenu()
     {
         if (isAtFork) mapViewmap.gameObject.SetActive(true);
         if (player.GetButtonDown("X"))
         {
+            // DISPLAY SPACES AWAY
+            for (int i=0 ; i<currentNode.nexts.Length ; i++) {
+                currentNode.nexts[i].node.GetComponent<Node>().DISPLAY_MOVEMENT(1);
+            }
+
             mapViewmap.gameObject.SetActive(false);
             _cam.orthographicSize = camSizeLarge;
             isViewingMap = true;
@@ -1363,7 +1334,6 @@ public class PathFollower : MonoBehaviour
             arrowUp.gameObject.SetActive(false);
             arrowDown.gameObject.SetActive(false);
             nMovesLeft.gameObject.SetActive(false); 
-            // character.transform.localScale = new Vector3(lScale, lScale, lScale); 
             manager.HIDE_UI();
 
             if (_movesRemaining > 0) { _mapMoves.text = _movesRemaining + " Moves Left"; }

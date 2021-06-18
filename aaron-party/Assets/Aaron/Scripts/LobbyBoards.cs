@@ -5,6 +5,7 @@ using UnityEngine;
 public class LobbyBoards : MonoBehaviour
 {
     [SerializeField] private GameObject crystalCavernsPopup;
+    [SerializeField] private string introName;
     [SerializeField] private string boardName;
     private LobbyControls playerZero;
     private GameObject playerObj;
@@ -19,9 +20,10 @@ public class LobbyBoards : MonoBehaviour
                 playerObj = guy.gameObject;
                 playerZero = guy;
                 guy.touchingBoard = true;
-                guy.boardToPlay = boardName;
+                guy.boardToPlay = introName;
+                guy.boardName = boardName;
                 crystalCavernsPopup.SetActive(true);
-                Debug.Log("Play " + boardName + "?");
+                Debug.Log("Play " + introName + "?");
             }
         }
     }
