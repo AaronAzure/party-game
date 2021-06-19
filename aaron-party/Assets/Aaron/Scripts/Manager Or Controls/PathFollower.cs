@@ -45,8 +45,8 @@ public class PathFollower : MonoBehaviour
     
 
     // CUSTOM PATHS 
-    [SerializeField] private Node currentNode;
-    [SerializeField] private Node nextNode;
+    [SerializeField] public Node currentNode;
+    [SerializeField] public Node nextNode;
     //! -------- DELETE --------
     //// private GameObject  _path0;
     //// private Node[]      _nodes0;
@@ -94,6 +94,7 @@ public class PathFollower : MonoBehaviour
 
 
     [Header("Movement Related")]
+    [SerializeField] private bool noMovementLoss;   //todo DEBUGGING ONLY
     [SerializeField] public TextMeshProUGUI nMovesLeft; // UI ABOVE PLAYER SHOWING N MOVES LEFT
     [SerializeField] private Animator movesTextAnim; // ** INSPECTOR
     [SerializeField] private Text _mapMoves;
@@ -102,7 +103,7 @@ public class PathFollower : MonoBehaviour
     public int _movesRemaining;
     private bool moveDecremented;
 
-    private float _moveSpeed = 2.5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
+    private float _moveSpeed = 5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
     private float _timer;
 
     private GameManager manager;
@@ -125,7 +126,7 @@ public class PathFollower : MonoBehaviour
     private bool isCastingSpell;            //   CASTING SPELL
     private bool isViewingMap;              //   VIEWING MAP AT CROSSROADS | AT START OF TURN
     private bool isAtCentre;                // PLAYER AT CENTRE OF NODE
-    private bool isAtFork;                  // (OPT. STATE)  SPLIT IN PATH
+    public  bool isAtFork;                  // (OPT. STATE)  SPLIT IN PATH
     public  bool isAtShop;                  // (OPT. STATE)  AT SPELL STORE
     public  bool isAtFree;                  // (OPT. STATE)  AT FREE SPELL NODE
     public  bool isAtPotion;                  // (OPT. STATE)  AT ITEM STORE
@@ -210,11 +211,6 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private Image arrowUp;     // 3
     [SerializeField] private Image arrowDown;   // 4
     private Node.Directions arrowDirection;
-    // private int arrowDirection = 0;
-    // private int _left = 1;
-    // private int _right = 2;
-    // private int _up = 3;
-    // private int _down = 4;
 
 
     [Header("Spells")]
@@ -271,6 +267,7 @@ public class PathFollower : MonoBehaviour
     private GameObject currentSelected;
     private int spellToGain;        // RANDOM SPELL FROM CONTROLLER
     private bool fromGoodSpell;
+    private int shopSeller;
     public bool shop1;
     public bool shop2;
     public bool shop3;
@@ -511,14 +508,6 @@ public class PathFollower : MonoBehaviour
             //     _nodes20 = _path20.GetComponentsInChildren<Node>();
             // }
         }
-        
-        // GET PATHS
-        if (GameObject.Find("New-Node") != null) {
-            currentNode = GameObject.Find("New-Node").GetComponent<Node>();
-        }
-        if (nextNode == null && nextNode.nexts.Length <= 1 && currentNode.nexts[0] != null) {
-            nextNode = currentNode.nexts[0].node.GetComponent<Node>();
-        }
 
         // TURN 2+
         if (controller.hasStarted)
@@ -528,15 +517,10 @@ public class PathFollower : MonoBehaviour
 
             string newPath  = data[0].path;
             currentNode = GameObject.Find(newPath).GetComponent<Node>();
-            if (nextNode == null && nextNode.nexts.Length <= 1 && currentNode.nexts[0] != null) {
-                nextNode = currentNode.nexts[0].node.GetComponent<Node>();
-            }   
-            // _currentNode    = data[0].node;  //! DELETE
-            // _currentPositionHolder = data[0].pos;    //! DELETE
-            transform.position     = data[0].posAside;
-            mpBar.value     = data[0].mp;
-            coins           = data[0].coins;
-            orbs            = data[0].orbs;
+            transform.position  = data[0].posAside;
+            mpBar.value         = data[0].mp;
+            coins               = data[0].coins;
+            orbs                = data[0].orbs;
 
             if (controller.playerOrder[0] == playerID) { transform.position = data[0].pos; }
 
@@ -575,7 +559,14 @@ public class PathFollower : MonoBehaviour
         // TURN 1 ONLY
         else
         {
-            // THE PATH THAT THE PLAYER IS TRAVERSING ACROSS (CONSTANT BETWEEN MAPS)
+            // GET PATHS
+            if (GameObject.Find("New-Node") != null) {
+                currentNode = GameObject.Find("New-Node").GetComponent<Node>();
+            }
+            if (nextNode == null && currentNode.nexts.Length <= 1 && currentNode.nexts[0] != null) {
+                nextNode = currentNode.nexts[0].node.GetComponent<Node>();
+            }
+
             mpBar.value = mpBar.maxValue;
             coins = 10; // TO BE CHANGED // DELETE
             orbs = 0;
@@ -792,7 +783,8 @@ public class PathFollower : MonoBehaviour
         else if (isRollingDice && !diceRolled) 
         {
             if (slowDice)           radialBar.value += 1;
-            else if (!diceRolled)   radialBar.value += Random.Range(6f,72f);
+            // else if (!diceRolled)   radialBar.value += Random.Range(6f,72f);
+            else if (!diceRolled)   radialBar.value += 2;   // TODO : DELETE (DEBUG)
             if (radialBar.value >= radialBar.maxValue) radialBar.value -= radialBar.maxValue;
             if (radialBar.value >= radialBar.maxValue) radialBar.value = 0; // ** NOT GONNA ROLL A ONE
 
@@ -810,10 +802,8 @@ public class PathFollower : MonoBehaviour
                 buttonMove.gameObject.SetActive(true);
                 buttonSpells.gameObject.SetActive(true);
                 buttonMap.gameObject.SetActive(true);
-                // moveBar.gameObject.SetActive(false);
                 radialBar.gameObject.SetActive(false);
                 isRollingDice = false;
-                // manager.UNHIDE_UI();
             }
         }
         // READING GRIMOIRE
@@ -870,7 +860,7 @@ public class PathFollower : MonoBehaviour
                 _cam.transform.position += new Vector3(0,16.25f);
             }
 
-            if (isAtFork)
+            if (isAtFork && _movesRemaining > 0)
             {
                 SHOW_ARROWS();
                 _mapMoves.text = "";
@@ -1102,23 +1092,78 @@ public class PathFollower : MonoBehaviour
         if (isAtFork) {
             UserPathForkMenu();
         }
-        else if (nextNode == null) {
+        //* AT SHOP SPACE
+        else if (isAtShop) 
+        {
+            if (shopUI.activeSelf == false && !isViewingMap) { 
+                nMovesLeft.gameObject.SetActive(false); 
+                _mapMoves.text = _movesRemaining + " Moves Left";
+                _animator.speed = 1;
+                _animator.SetBool("IsWalking", false);
+                manager.HIDE_UI();
+                shopUI.SetActive(true); 
+                if (!shopKeeperUI.activeSelf && !shopSpellUI.activeSelf)
+                {
+                    shopKeeperUI.SetActive(true); shopSpellUI.SetActive(false);
+                }
+                // SET SELLER SPRITE
+                switch (shopSeller)
+                {
+                    case 0 :  
+                        shopKeeperImg.sprite = shopKeepers[0]; sellerGreetings.text = "WELCOME to my humble store!";
+                        break;
+                    case 1 :  
+                        shopKeeperImg.sprite = shopKeepers[1]; sellerGreetings.text = "How may I help you today.";
+                        break;
+                    case 2 :  
+                        shopKeeperImg.sprite = shopKeepers[2]; sellerGreetings.text = "Salutations.";
+                        break;
+                    case 3 :  
+                        shopKeeperImg.sprite = shopKeepers[3]; 
+                        sellerGreetings.text = "One shall nev'r knoweth at which hour the tide shalt turneth.";
+                        break;
+                }
+            }
+            //* User Input *//
+            else { UserAtShop(); }
+        }
+        //* AT BOAT SPACE
+        else if (isAtSpecial)
+        {
+            if (goldBoat.activeSelf) { if (player.GetAnyButtonDown()) { nPrompt++; NEXT_TEXT(); } }
+            if (evilBoat.activeSelf) { if (player.GetAnyButtonDown()) { nPrompt++; NEXT_TEXT(); } }
+        }
+        //* AT MAGIC ORB SPACE
+        else if (isAtMagicOrb) 
+        {
+            if (_animator.GetBool("IsWalking"))
+            {
+                _animator.speed = 1;
+                _animator.SetBool("IsWalking", false);
+            }
+            if (!magicOrbUI.activeSelf && !isViewingMap) { 
+                magicOrbUI.SetActive(true); 
+                nMovesLeft.gameObject.SetActive(false);
+                _mapMoves.text = _movesRemaining + " Moves Left";
+                manager.HIDE_UI();
+                if (coins < 20) { magicOrbUIPanel.color = new Color(1,0.1f,0.1f); }
+            }
+            UserAtMagicOrb();
+        }
+        //* RECIEVING FREE SPELL, DO NOTHING AND LET ANIMATION PLAY
+        else if (isAtFree) {}
+        //* GET THE NEXT NODE
+        else if (nextNode == null && _movesRemaining > 0) {
             // SINGULAR PATH
             if (currentNode.nexts[0] != null && currentNode.nexts.Length <= 1) {
                 nextNode = currentNode.nexts[0].node.GetComponent<Node>();
             }
             // PATH SPLITS/FORKS
             else {
-                isAtFork = true;
-                for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-                    if (currentNode.nexts[i].direction == Node.Directions.left) { arrowLeft.gameObject.SetActive(true); continue; }
-                    if (currentNode.nexts[i].direction == Node.Directions.right) { arrowRight.gameObject.SetActive(true); continue; }
-                    if (currentNode.nexts[i].direction == Node.Directions.up) { arrowUp.gameObject.SetActive(true); continue; }
-                    if (currentNode.nexts[i].direction == Node.Directions.down) { arrowDown.gameObject.SetActive(true); continue; }
-                }
+                AT_FORK();
             }
         }
-        //* MOVEMENT
+        //* MOVEMENT && SPECIAL SPACE EVENTS
         else {
             // SOUND EFFECT
             if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && 
@@ -1127,14 +1172,18 @@ public class PathFollower : MonoBehaviour
             }
             // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
             if (_movesRemaining != 1) {
-                if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && !player.GetButton('Y') && !moveDecremented &&
+                if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && !noMovementLoss && !moveDecremented &&
                     Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
                         moveDecremented = true;
-                        _movesRemaining--;  
+                        _movesRemaining--;
                 }
             }
             // MOVING TO NEXT NODE
             if (this.transform.position != nextNode.transform.position) {
+                if (!_animator.GetBool("IsWalking")) {
+                    _animator.SetBool("IsWalking", true);
+                    _animator.speed = _moveSpeed;
+                }
                 _timer += _moveSpeed * Time.deltaTime;
                 this.transform.position = Vector3.Lerp(this.transform.position, nextNode.transform.position, _timer);
             }
@@ -1144,33 +1193,64 @@ public class PathFollower : MonoBehaviour
                 currentNode = nextNode;
                 nextNode = null;
                 _timer = 0;
+
+                // todo SPECIAL NON-DECREMENTING SPACES
+                if (!currentNode.DOES_SPACE_DECREASE_MOVEMENT()) {
+                    //* IF IS A FREE SPELL SPACE, THEN RECEIVE FREE SPELL
+                    if (currentNode.TYPE_OF_SPECIAL_SPACE("free")) {
+                        isAtFree = true;
+                        StartCoroutine( GAIN_FREE_SPELL() );
+                    }
+                    //* SHOP/POTION SPACE
+                    else if (currentNode.TYPE_OF_SPECIAL_SPACE("shop") || currentNode.TYPE_OF_SPECIAL_SPACE("potion")) {
+                        shopSeller = currentNode.whoIsTheSeller;
+                        isAtShop = true;
+                        RESET_PURCHASES();
+                        PURCHASES_LEFT();
+                    }
+                    //* MAGIC ORB SPACE
+                    else if (currentNode.TYPE_OF_SPECIAL_SPACE("orb"))  // BUY A MAGIC ORB
+                    {
+                        isAtMagicOrb = true;
+                    }
+                    //* SPECIAL SPACE
+                    else if (currentNode.TYPE_OF_SPECIAL_SPACE("spec"))  // BUY A MAGIC ORB
+                    {
+                        if (!isBoat) MANAGER_EVENT();
+                    }
+                }
+
                 // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
+                // FINISHED MOVING
                 if (_movesRemaining == 1 && !moveDecremented) {
-                    if (currentNode.DOES_SPACE_DECREASE_MOVEMENT() && !player.GetButton('Y')) {
+                    if (currentNode.DOES_SPACE_DECREASE_MOVEMENT() && !noMovementLoss) {
                         moveDecremented = true;
                         _movesRemaining--;  
                     }
                 }
-                moveDecremented = false;
-
-                // SINGULAR PATH
-                if (currentNode.nexts.Length <= 1) {
-                    if (currentNode.nexts[0] != null) {
-                        nextNode = currentNode.nexts[0].node.GetComponent<Node>();
+                // HAVE NOT FINISHED MOVING
+                else 
+                {
+                    // SINGULAR PATH
+                    if (currentNode.nexts.Length <= 1) {
+                        if (currentNode.nexts[0] != null) {
+                            nextNode = currentNode.nexts[0].node.GetComponent<Node>();
+                        }
+                        if (_movesRemaining > 0) WHERE_TO_FACE();
                     }
-                    if (_movesRemaining > 0) WHERE_TO_FACE();
-                }
-                // PATH SPLITS/FORKS
-                else {
-                    isAtFork = true;
-                    _animator.SetBool("IsWalking", false);
-                    _animator.speed = 1;
-                    SHOW_ARROWS();
+                    // PATH SPLITS/FORKS
+                    else {
+                        isAtFork = true;
+                        _animator.SetBool("IsWalking", false);
+                        _animator.speed = 1;
+                        SHOW_ARROWS();
+                    }
+                    moveDecremented = false;
                 }
             }
         }
 
-
+        if (true) {     //! DELETE
         // // ONLY CHECK MAP AT FORK
         // if (isViewingMap)
         // {
@@ -1284,1143 +1364,17 @@ public class PathFollower : MonoBehaviour
         //         FORK_ARROW_VISUAL();
         //     }
         // }
-    }
-
-    // FLIP CHARACTER BASED ON DIRECTION MOVEMENT
-    private void WHERE_TO_FACE()
-    {
-        // FACE RIGHT
-        if (nextNode.transform.position.x > transform.position.x) { 
-            character.transform.localScale = new Vector3(-lScale, lScale, lScale); 
-        }
-        // FACE LEFT (STANDARD)
-        else  { 
-            character.transform.localScale = new Vector3(lScale, lScale, lScale); 
         }
     }
 
-    private void SHOW_ARROWS() 
+    //* ---------------- NODE/PATHING RELATED ---------------- *//
+
+    // AT FORK, MULTIPLE NEXT NODES
+    private void AT_FORK()
     {
-        for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-            if (currentNode.nexts[i].direction == Node.Directions.left) { arrowLeft.gameObject.SetActive(true); continue; }
-            if (currentNode.nexts[i].direction == Node.Directions.right) { arrowRight.gameObject.SetActive(true); continue; }
-            if (currentNode.nexts[i].direction == Node.Directions.up) { arrowUp.gameObject.SetActive(true); continue; }
-            if (currentNode.nexts[i].direction == Node.Directions.down) { arrowDown.gameObject.SetActive(true); continue; }
-        }
-    }
-
-    // DISPLAY SPACES AWAY
-    private void SHOW_NODE_DISTANCE()
-    {
-        for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-            currentNode.nexts[i].node.GetComponent<Node>().DISPLAY_MOVEMENT(1, _movesRemaining);
-        }
-    }
-
-    private void UserPathForkMenu()
-    {
-        if (isAtFork && !isViewingMap) mapViewmap.gameObject.SetActive(true);
-        if (player.GetButtonDown("X"))
-        {
-            SHOW_NODE_DISTANCE();   // DISPLAY SPACES AWAY
-
-            mapViewmap.gameObject.SetActive(false);
-            _cam.orthographicSize = camSizeLarge;
-            isViewingMap = true;
-            mapMapping.gameObject.SetActive(true);
-
-            arrowLeft.gameObject.SetActive(false);
-            arrowRight.gameObject.SetActive(false);
-            arrowUp.gameObject.SetActive(false);
-            arrowDown.gameObject.SetActive(false);
-            nMovesLeft.gameObject.SetActive(false); 
-            manager.HIDE_UI();
-
-            if (_movesRemaining > 0) { _mapMoves.text = _movesRemaining + " Moves Left"; }
-        }
-        else if (player.GetButtonDown("A"))
-        {
-            mapViewmap.gameObject.SetActive(false);
-            CHOOSING_PATH_AT_FORK();
-        }
-        else if (player.GetButtonDown("Up")    && arrowUp.IsActive())
-        {
-            arrowDirection      = Node.Directions.up;
-            arrowLeft.color     = new Color(1, 0.7f, 0, 0.4f);
-            arrowRight.color    = new Color(1, 0.7f, 0, 0.4f);
-            arrowUp.color       = new Color(1, 0.7f, 0, 1);
-            arrowDown.color     = new Color(1, 0.7f, 0, 0.4f);
-        }
-        else if (player.GetButtonDown("Down")  && arrowDown.IsActive())
-        {
-            arrowDirection      = Node.Directions.down;
-            arrowLeft.color     = new Color(1, 0.7f, 0, 0.4f);
-            arrowRight.color    = new Color(1, 0.7f, 0, 0.4f);
-            arrowUp.color       = new Color(1, 0.7f, 0, 0.4f);
-            arrowDown.color     = new Color(1, 0.7f, 0, 1);
-        }
-        else if (player.GetButtonDown("Left")  && arrowLeft.IsActive())
-        {
-            arrowDirection      = Node.Directions.left;
-            arrowLeft.color     = new Color(1, 0.7f, 0, 1);
-            arrowRight.color    = new Color(1, 0.7f, 0, 0.4f);
-            arrowUp.color       = new Color(1, 0.7f, 0, 0.4f);
-            arrowDown.color     = new Color(1, 0.7f, 0, 0.4f);
-        }
-        else if (player.GetButtonDown("Right") && arrowRight.IsActive())
-        {
-            arrowDirection      = Node.Directions.right;
-            arrowLeft.color     = new Color(1, 0.7f, 0, 0.4f);
-            arrowRight.color    = new Color(1, 0.7f, 0, 1);
-            arrowUp.color       = new Color(1, 0.7f, 0, 0.4f);
-            arrowDown.color     = new Color(1, 0.7f, 0, 0.4f);
-        }
-    }
-
-    private void UserAtShop()
-    {
-        // TALKING TO SELLER (INTRO)
-        if (shopKeeperUI.activeSelf && !shopSpellUI.activeSelf && !potionShop.confirmObj.activeSelf
-            && !playerPurchase.confirmObj.activeSelf && !playerPurchase.discardObj.activeSelf)
-        {
-            // TAKE A LOOK AT STOCK
-            if      (player.GetButtonDown("A")) { 
-                if (!shop4) { shopKeeperUI.SetActive(false); shopSpellUI.SetActive(true); } 
-                else        { shopKeeperUI.SetActive(false); shopItemUI.SetActive(true); }
-            }
-            // VIEW MAP
-            else if (player.GetButtonDown("X")) { 
-                if (!shop4) { shopKeeperUI.SetActive(false); shopSpellUI.SetActive(false); }
-                else        { shopKeeperUI.SetActive(false); shopItemUI.SetActive(false); }
-                isViewingMap = true;  _cam.orthographicSize = camSizeLarge;
-                mapMapping.gameObject.SetActive(true);
-            }
-            // ** LEAVE SHOP
-            else if (player.GetButtonDown("B")) { 
-                nMovesLeft.gameObject.SetActive(true); 
-                _cam.orthographicSize = camSizeNormal;
-                RESET_CAM();
-                _mapMoves.text = "";
-                manager.UNHIDE_UI();
-                shopUI.SetActive(false);
-                isAtShop = false;
-                shop1 = false; shop2 = false; shop3 = false; shop4 = false;
-                _animator.SetBool("IsWalking", true);
-                _animator.speed = _moveSpeed;
-                if (isAtSpecial)
-                {
-                    // manager.FADE_TO_BLACK();
-                    PLAYER_CAM_OFF(0);
-                    StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
-                }
-            }
-        }
-        // BUYING SPELLS ()
-        else if (!shopKeeperUI.activeSelf && shopSpellUI.activeSelf && !potionShop.confirmObj.activeSelf
-            && !playerPurchase.confirmObj.activeSelf && !playerPurchase.discardObj.activeSelf
-            || !shopKeeperUI.activeSelf && shopItemUI.activeSelf && !potionShop.confirmObj.activeSelf
-            && !playerPurchase.confirmObj.activeSelf && !playerPurchase.discardObj.activeSelf)
-        {
-            if (player.GetButtonDown("B"))
-            {
-                if (!shop4) { shopSpellUI.SetActive(false); shopKeeperUI.SetActive(true); }
-                else        { shopItemUI.SetActive(false);  shopKeeperUI.SetActive(true); }
-            }
-        }
-        // CONFIRM TO BUY SPELL
-        else if (playerPurchase.confirmObj.activeSelf && !shopKeeperUI.activeSelf && shopSpellUI.activeSelf) 
-        {
-            if      (player.GetButtonDown("A")) { playerPurchase.OnYes(); }
-            else if (player.GetButtonDown("B")) { playerPurchase.OnNo();  }
-        }
-        // CONFIRM TO BUY ITEM/POTION
-        else if (potionShop.confirmObj.activeSelf && !shopKeeperUI.activeSelf && shopItemUI.activeSelf) 
-        {
-            if      (player.GetButtonDown("A")) { potionShop.OnYes(); }
-            else if (player.GetButtonDown("B")) { potionShop.OnNo();  }
-        }
-    }
-
-    private void UserAtMagicOrb()
-    {
-        if (player.GetButtonDown("A") && coins >= 20)
-        {
-            magicOrbUI.SetActive(false);
-            _mapMoves.text = "";
-
-            StartCoroutine(UPDATE_PLAYER_COINS(-20));
-            StartCoroutine(BUYING_MAGIC_ORB()); // MUSIC
-        }
-        // VIEW MAP
-        else if (player.GetButtonDown("X")) { 
-            magicOrbUI.SetActive(false);
-            isViewingMap = true;  _cam.orthographicSize = camSizeLarge;
-            mapMapping.gameObject.SetActive(true);
-        }
-        else if (player.GetButtonDown("B"))
-        {
-            isAtMagicOrb = false;
-            _mapMoves.text = "";
-            nMovesLeft.gameObject.SetActive(true); 
-            manager.UNHIDE_UI();
-            magicOrbUI.SetActive(false);
-        }
-    }
-
-    //! DELETE
-    // GET THE NEXT NODE TO MOVE TO | FLIPS CHARACTER
-    private void CHECK_NODE()
-    {
-        _timer = 0;
-
-        if (_currentNode < _currentPath.Length)
-        {
-            _currentPositionHolder = _currentPath[_currentNode].transform.position;
-            WHERE_TO_FACE();
-        }
-    }
-
-    // TEXT SHOWING MOVES REMAINING
-    private void UPDATE_MOVEMENT(int movesLeft) { nMovesLeft.text = movesLeft.ToString(); }
-
-    // SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
-    private void SPACE_END()
-    {
-        isLanded = true;
-        _animator.SetBool("IsWalking", false);
-        _animator.speed = 1;
-        
-        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
-            StartCoroutine(fadeMovesLeft());
-        }
-
-        // LANDED ON BLUE | RED | EVENT (SO FAR)
-        if (_currentPath[_currentNode].SPACE_LANDED()) {
-            int coinsGained = _currentPath[_currentNode].COINS_RECEIVED_FROM_SPACE();
-            if (_currentPath[_currentNode].IS_BLUE())   { controller.blueOrb[playerID]++; }
-            if (_currentPath[_currentNode].IS_RED())    { controller.RED_ORB_UPDATE(playerID); }
-            if (_currentPath[_currentNode].IS_EVENT())  { controller.EVENT_ORB_UPDATE(playerID); }
-            StartCoroutine( UPDATE_PLAYER_COINS(coinsGained * controller.turnMultiplier) );
-        }
-        // GAIN SPELL FROM SPACE
-        else if (_currentPath[_currentNode].IS_SPELL()) {
-            StartCoroutine( GAIN_RANDOM_SPELL() );
-        }
-        // LANDED ON HAPPENING (TRIGGER)
-        else if (_currentPath[_currentNode].IS_HAPPEN()) {
-            if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
-            {
-                StartCoroutine( HAPPEN_NEW_BOAT() );
-            }
-        }
-        // LANDED ON ORB TRAP
-        else if (_currentPath[_currentNode].IS_ORB_TRAP()) {
-            Debug.Log("LANDED ON ORB TRAP");
-            int onesTrap = _currentPath[_currentNode].ORB_TRAP_SPACE_COST(characterName);
-            if (onesTrap == 5)
-            {
-                Debug.Log("-- " + onesTrap);
-                StartCoroutine( UPDATE_PLAYER_COINS(onesTrap * controller.turnMultiplier) );
-            } 
-            else 
-            {
-                Debug.Log("ORB BEING STOLEN");
-                if (!playerBarrier) StartCoroutine( ORB_STOLEN(-1) );
-                else { StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
-            }
-        }
-        // LANDED ON COIN TRAP
-        else {
-            int price = _currentPath[_currentNode].TRAP_SPACE_COST(characterName);
-            if (price > 0) // OWN TRAP
-            {
-                StartCoroutine( UPDATE_PLAYER_COINS(price * controller.turnMultiplier) );
-            }
-            else            // OPPONENT'S TRAP
-            {
-                if (!playerBarrier) {
-                    isPayingSomeone = true;
-                    StartCoroutine( UPDATE_PLAYER_COINS(price) );
-                }
-                else { Debug.Log("PROTECTED"); StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
-            }
-        }
-    }
-
-    // MOVE PLAYER ASIDE FOR VISUAL INDICATION OF WHO'S ON WHAT SPACE
-    private void MOVE_ASIDE()
-    {
-        if (!gotAsidePos)   // CALL ONCE
-        {
-            _timer = 0;
-            float scaleFactor = 1f;
-            float playerX = transform.position.x;
-            float playerY = transform.position.y;
-            float sin45 = 0.707f;
-            float trig1 = 0.5f * scaleFactor;
-            float trig2 = 0.866f * scaleFactor;
-            asidePos1 = new Vector3(playerX - 1, playerY + 0);
-            asidePos2 = new Vector3(playerX - sin45, playerY + sin45);
-            asidePos3 = new Vector3(playerX + 0, playerY + 1);
-            asidePos4 = new Vector3(playerX + sin45, playerY + sin45);
-            asidePos5 = new Vector3(playerX + 1, playerY - 0);
-            asidePos6 = new Vector3(playerX + sin45, playerY - sin45 - 0.5f);
-            asidePos7 = new Vector3(playerX - 0, playerY - 1 - 0.5f);
-            asidePos8 = new Vector3(playerX - sin45, playerY - sin45 - 0.5f);
-            gotAsidePos = true;
-        }
-
-        _moveSpeed = 7.5f;
-        _timer += _moveSpeed * Time.deltaTime;
-        if (transform.localScale.x > 0.25f) {
-            this.transform.localScale -= new Vector3(0.025f, 0.025f, 0.025f);    // STRINK
-        }
-
-        // MOVE TO ASIDE POSITION
-        switch (name)
-        {
-            case "Player_1":
-                if (this.transform.position != asidePos1) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos1, _timer); }
-                break;
-            case "Player_2":
-                if (this.transform.position != asidePos2) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos2, _timer); }
-                break;
-            case "Player_3":
-                if (this.transform.position != asidePos3) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos3, _timer); }
-                break;
-            case "Player_4":
-                if (this.transform.position != asidePos4) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos4, _timer); }
-                break;
-            case "Player_5":
-                if (this.transform.position != asidePos5) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos5, _timer); }
-                break;
-            case "Player_6":
-                if (this.transform.position != asidePos6) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos6, _timer); }
-                break;
-            case "Player_7":
-                if (this.transform.position != asidePos7) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos7, _timer); }
-                break;
-            case "Player_8":
-                if (this.transform.position != asidePos8) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos8, _timer); }
-                break;
-        }
-
-        // END TURN
-        switch (name)
-        {
-            case "Player_1":
-                if (this.transform.position == asidePos1) { TURN_FINISHED(); }     break;
-            case "Player_2":
-                if (this.transform.position == asidePos2) { TURN_FINISHED(); }     break;
-            case "Player_3":
-                if (this.transform.position == asidePos3) { TURN_FINISHED(); }     break;
-            case "Player_4":
-                if (this.transform.position == asidePos4) { TURN_FINISHED(); }     break;
-            case "Player_5":
-                if (this.transform.position == asidePos5) { TURN_FINISHED(); }     break;
-            case "Player_6":
-                if (this.transform.position == asidePos6) { TURN_FINISHED(); }     break;
-            case "Player_7":
-                if (this.transform.position == asidePos7) { TURN_FINISHED(); }     break;
-            case "Player_8":
-                if (this.transform.position == asidePos8) { TURN_FINISHED(); }     break;
-        }
-    }
-
-
-
-    /* --------------------------------------------- */
-    /* ------------ PLAYER'S TURN SETUP ------------ */
-
-
-    // CAMERA FOCUSES ON PLAYER, WAIT BEFORE STARTING TURN
-    public IEnumerator YOUR_TURN()
-    {
-        // CAMERA FOCUSES ON PLAYER
-        _cam.gameObject.SetActive(true);
-
-        // MOVE BACK (UNASIDE)
-        if (controller.hasStarted) { transform.position = data[0].pos; }
-        manager.CHECK_RANKINGS();
-        manager.UNHIDE_UI();
-        // manager.FADE_FROM_BLACK();
-        
-        // LOSE BARRIER
-        if (playerBarrier) {
-            playerBarrier = false;
-            controller.buffDatas[playerID][0].barrier = false;
-            barrier.SetActive(false);
-            hurtBox.SetActive(true);
-        }
-
-        yield return new WaitForSeconds(1);
-
-        // PLAYER CHOICES
-        startUi.gameObject.SetActive(true);
-        foreach (Sprite characterSprite in starts)
-        {
-            if (characterSprite.name.Contains(characterName))
-            {
-                startUi.sprite = characterSprite; break;
-            }
-        }
-        isPlayerTurn = true;           // THIS PLAYER'S TURN
-
-        // RESTORE 1 MP (EVERY ODD TURNS)     ( COMPETITIVE )
-        if (mpBar.value < 5 && controller.turnNumber % 2 == 1 && !controller.isCasual) 
-        { 
-            mpBar.value += 1; 
-            var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-            go.GetComponent<TextMeshPro>().text    = "+1";
-        }
-        // RESTORE 1 MP (EVERY TURN)        ( CASUAL )
-        else if (mpBar.value < 5 && controller.isCasual) 
-        { 
-            mpBar.value += 1; 
-            var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-            go.GetComponent<TextMeshPro>().text    = "+1";
-        }
-        mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
-
-        UPDATE_MOVEMENT(_movesRemaining);
-    }
-    
-    // ******** STORE INFORMATION ABOUT PLAYER TO GAME_CONTROLLER 
-    public void UPDATE_INFORMATION(bool updateSpells)
-    {
-        // STORE DATA ON THE PATH THE PLAYER IS CURRENTLY ON
-        string newPath = "";
-        if (_currentPath == _nodes0)        newPath = "Path_0";
-        else if (_currentPath == _nodes1)   newPath = "Path_1";
-        else if (_currentPath == _nodes2)   newPath = "Path_2";
-        else if (_currentPath == _nodes3)   newPath = "Path_3";
-        else if (_currentPath == _nodes4)   newPath = "Path_4";
-        else if (_currentPath == _nodes5)   newPath = "Path_5";
-        else if (_currentPath == _nodes6)   newPath = "Path_6";
-        else if (_currentPath == _nodes7)   newPath = "Path_7";
-        else if (_currentPath == _nodes8)   newPath = "Path_8";
-        else if (_currentPath == _nodes9)   newPath = "Path_9";
-        else if (_currentPath == _nodes10)   newPath = "Path_10";
-        else if (_currentPath == _nodes11)   newPath = "Path_11";
-        else if (_currentPath == _nodes12)   newPath = "Path_12";
-        else if (_currentPath == _nodes13)   newPath = "Path_13";
-        else if (_currentPath == _nodes14)   newPath = "Path_14";
-        else if (_currentPath == _nodes15)   newPath = "Path_15";
-        else if (_currentPath == _nodes16)   newPath = "Path_16";
-        else if (_currentPath == _nodes17)   newPath = "Path_17";
-        else if (_currentPath == _nodes18)   newPath = "Path_18";
-        else if (_currentPath == _nodes19)   newPath = "Path_19";
-        else if (_currentPath == _nodes20)   newPath = "Path_20";
-
-        // SET ALL VALUES OF PLAYER
-        controller.SET_PLAYER_DATA(playerID, newPath, _currentNode, _currentPositionHolder, transform.position,
-            coins, orbs, (int) mpBar.value);
-
-        // STORE DATA ON THE CURRENT PLAYER'S SPELLS
-        if (updateSpells) { controller.SET_SPELLS (playerID, spells); }
-        else { manager.CHECK_RANKINGS(); }
-
-        // STATUS EFFECTS
-        controller.SET_PLAYER_BUFFS(playerID, playerSlowed, playerBarrier, playerMove15, playerRange2, playerExtraBuy);
-
-        controller.RICH_ORB_UPDATE(playerID);
-    }
-
-    // CAMERA CHANGES, WAIT BEFORE ENDING TURN
-    private void TURN_FINISHED()
-    {
-        manager.CHECK_RANKINGS();
-        isAside = true;
-        _animator.SetBool("IsWalking", false);
-        isPlayerTurn = false;
-        isReadyToMove = false;
-
-        nMovesLeft.gameObject.SetActive(false);
-        buttonMove.gameObject.SetActive(false);
-        buttonSpells.gameObject.SetActive(false);
-        buttonMap.gameObject.SetActive(false);
-
-        if (playerSlowed) {
-            playerSlowed = false;
-            foreach (Transform child in character.transform)  
-            {  
-                if (child.name != "Shadow") {
-                    if (child.TryGetComponent(out SpriteRenderer cs)) { cs.color = new Color(1,1,1); }
-                }
-                foreach (Transform grandChild in child)
-                {
-                    if (grandChild.name != "Shadow") {
-                        if (grandChild.TryGetComponent(out SpriteRenderer gs)) { gs.color = new Color(1,1,1); }
-                    }
-                }
-            }
-        }
-        if (stealMode)  {stealMode = false; stealingAura.SetActive(false);}
-        if (!playerBarrier) { hurtBox.SetActive(true); }
-        StartCoroutine( PLAYER_CAM_OFF(transitionTime) );
-        if (!isPayingSomeone) { manager.StartCoroutine(manager.INCREMENT_TURN()); }
-    }
-
-    public void PLAYER_CAM_ON()
-    {
-        _cam.gameObject.SetActive(true);    // CAM TURNS ON
-    }
-    public IEnumerator PLAYER_CAM_OFF(float delayTime)
-    {
-        yield return new WaitForSeconds(delayTime);
-        _cam.gameObject.SetActive(false);   // CAM TURNS OFF
-    }
-
-    // ENABLE COLLIDER = SOUND EFFECT FOR WALKING OVER NODE
-    IEnumerator WALK_OVER_SOUND_ON()
-    {
-        yield return new WaitForSeconds(0.05f);
-        _collider.enabled = true;
-    }
-
-    public void HIDE_DATA_CANVAS() 
-    {
-        layout.SetActive(false);
-    }
-
-    public void UNHIDE_DATA_CANVAS() 
-    {
-        layout.SetActive(true);
-    }
-
-
-    /* --------------------------------------------------------- */
-    /* ------------ DURING THE START OF PLAYER TURN ------------ */
-
-
-    // AFTER ROLLING DICE, DELAY THEN MOVE PLAYER
-    IEnumerator DICE_ROLLED()
-    {
-        if (!pseudoMove) {
-            // int nMoves = (int)(moveBar.value + 10) / 10;
-            int nMoves;
-            if      (playerSlowed) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 5); }
-            else if (playerMove15) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 15); }
-            else                   { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 10); }
-            _movesRemaining = (nMoves+1);
-            controller.SLOW_ORB_UPDATE(playerID, _movesRemaining);
-            radialBar.GetComponent<Animator>().speed = 0;
-        }
-        nMovesLeft.text = _movesRemaining.ToString();
-        grimoireUI.gameObject.SetActive(false);
-
-        if (!pseudoMove) yield return new WaitForSeconds(1.6f);
-        // moveBar.gameObject.SetActive(false);
-        radialBar.gameObject.SetActive(false);
-
-        yield return new WaitForSeconds(0.1f);
-        _animator.SetBool("IsWalking", true);
-        _animator.speed = _moveSpeed;
-        isReadyToMove = true;
-
-        WHERE_TO_FACE();
-    }
-
-    private void RESET_PLAYER_UI()
-    {
-        RectTransform rt = layout.transform.GetComponent<RectTransform>();
-
-    // WHAT IS PLAYER ORDER IN TURN ROTATION
-        int xth = 0;
-        for (int i=0 ; i<controller.playerOrder.Length ; i++)
-        {
-            if (playerID == controller.playerOrder[i])
-            {
-                xth = i; break;
-            }
-        }
-
-        rt.localPosition -= new Vector3(0, (55*xth), 0);
-    }
-
-
-    public IEnumerator STEAL_COINS(int n, PathFollower p)
-    {
-        n = Mathf.Abs(n);
-        
-        int tempGold = coins;
-        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-
-        // NOT ENOUGH COINS TO LOSE
-        if (coins < n) {
-            go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
-            Color top = new Color(1, 0.7f, 0);
-            Color bot = new Color(1, 0.35f,0);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            StartCoroutine( p.UPDATE_PLAYER_COINS(coins) );
-        }
-        else {
-            go.GetComponent<TextMeshPro>().text    = "-" +  n.ToString();
-            Color top = new Color(1, 0.15f, 0.2f);
-            Color bot = new Color(0.8f, 0, 0.05f);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            StartCoroutine( p.UPDATE_PLAYER_COINS(n) );
-        }
-        // LOSE COINS
-        for (int i = 0; i < n; i++)
-        {
-            if (coins <= 0) { break; }  // NOT MORE GOLD TO LOSE
-
-            if (n<11) { yield return new WaitForSeconds(0.1f); }
-            else { yield return new WaitForSeconds(0.02f); }
-            coinLoss.Play();
-            coins--;
-        }
-    }
-
-    // GAIN OR LOSE COINS
-    public IEnumerator UPDATE_PLAYER_COINS(int n)
-    {
-        // FADE VISUAL NUMBER OF MOVES LEFT
-        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
-            StartCoroutine(fadeMovesLeft());
-        }
-        if (isAtSpecial && orbStolen.isPlaying) { orbStolen.Stop(); }
-        int tempGold = coins;
-        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-
-        // GAIN COINS
-        if (n > 0)
-        {
-            go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
-            Color top = new Color(0, 0.8f, 1);
-            Color bot = new Color(0, 0.3f, 1);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            // GAIN COINS
-            for (int i = 0; i < n; i++)
-            {
-                if (coins >= 999) { break; }
-
-                if (n<11) { yield return new WaitForSeconds(0.1f); }
-                else if (n >= 11 && n<101) { yield return new WaitForSeconds(0.02f); }
-                coinPickup.Play();
-                coins++;
-            }
-        }
-        else if (n == 0) { Destroy(go); }
-        // LOSE COINS
-        else
-        {
-            // NOT ENOUGH COINS TO LOSE
-            if (coins < -n ) {
-                go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
-                Color top = new Color(1, 0.7f, 0);
-                Color bot = new Color(1, 0.35f,0);
-                go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            }
-            else {
-                go.GetComponent<TextMeshPro>().text    = n.ToString();
-                Color top = new Color(1, 0.15f, 0.2f);
-                Color bot = new Color(0.8f, 0, 0.05f);
-                go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            }
-            // LOSE COINS
-            for (int i = 0; i > n; i--)
-            {
-                if (coins <= 0) { break; }
-
-                if (n<11) { yield return new WaitForSeconds(0.1f); }
-                else { yield return new WaitForSeconds(0.02f); }
-                coinLoss.Play();
-                coins--;
-            }
-        }
-
-
-        // PAY OPPONENT AFTER LOSING COINS
-        if (isPayingSomeone && tempGold != 0) {
-            if (n < 0) { n = Mathf.Abs(n); } // make positive
-
-            yield return new WaitForSeconds(1);
-            StartCoroutine( PLAYER_CAM_OFF(0) );
-            string toWhom = _currentPath[_currentNode].WHOS_TRAP();
-            if ( tempGold > n ) { // MORE THAN ENOUGH TO PAY BACK
-                manager.PAYING_SOMEONE(toWhom, n);
-            }
-            else {              // PAY WHAT YOU HAVE
-                manager.PAYING_SOMEONE(toWhom, tempGold);
-            }
-        }
-        // MOVE PLAYER TO THE SIDE
-        if (_movesRemaining == 0 && isPlayerTurn) {
-            yield return new WaitForSeconds(0.5f);
-            readyToMovedAside = true;
-        }
-        // OTHER PLAYER RECIEVING COINS INCREMENTS TURN ORDER
-        if (beingPayed) { 
-            beingPayed = false; StartCoroutine( PLAYER_CAM_OFF(transitionTime) ); 
-            manager.StartCoroutine(manager.INCREMENT_TURN()); 
-        }
-        
-        /* shogun seaport */
-        if (isAtSpecial && nPrompt > 0)
-        {
-            if (orbStolen.isPlaying) {
-                while (orbStolen.volume > 0)
-                {
-                    yield return new WaitForEndOfFrame();
-                    orbStolen.volume -= 0.01f;
-                }
-            }
-            PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
-        }
-        UPDATE_INFORMATION(false);
-    }
-
-    // LOSE COINS WITHOUT FROM EFFECTS OR BOARD
-    public IEnumerator LOSE_COINS(int n)
-    {
-        int tempGold = coins;
-        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-        // NOT ENOUGH COINS TO LOSE
-        if (coins < Mathf.Abs(n) ) {
-            go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
-            Color top = new Color(1, 0.7f, 0);
-            Color bot = new Color(1, 0.35f,0);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-        }
-        else {
-            go.GetComponent<TextMeshPro>().text    = n.ToString();
-            Color top = new Color(1, 0.15f, 0.2f);
-            Color bot = new Color(0.8f, 0, 0.05f);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-        }
-        // LOSE COINS
-        for (int i = 0; i > n; i--)
-        {
-            if (coins <= 0) { break; }
-
-            if (n<11) { yield return new WaitForSeconds(0.1f); }
-            else { yield return new WaitForSeconds(0.02f); }
-            coinLoss.Play();
-            coins--;
-        }
-        manager.CHECK_RANKINGS();
-    }
-    public void LOSE_MP(int n)
-    {
-        n = Mathf.Abs(n);
-        var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-        if (mpBar.value >= n) 
-        { 
-            mpBar.value -= n; 
-            go.GetComponent<TextMeshPro>().text    = "-" + n;
-            Color top = new Color(1, 0.15f, 0.2f);
-            Color bot = new Color(0.8f, 0, 0.05f);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-        }
-        // NOT ENOUGH MP TO LOSE
-        else {
-            go.GetComponent<TextMeshPro>().text    = "-" + mpBar.value;
-            mpBar.value = 0;
-            Color top = new Color(1, 0.7f, 0);
-            Color bot = new Color(1, 0.35f,0);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-        }
-        mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
-    }
-    public IEnumerator LOSE_SPELL(int n)
-    {
-        n = Mathf.Abs(n);
-        
-        for ( int i=0 ; i<n ; i++ )
-        {
-            if (spells.Count > 0) {
-                var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-                SpriteRenderer spellImg = go.GetComponentInChildren<SpriteRenderer>();
-                int rng = Random.Range(0,spells.Count);
-                switch (spells[rng].spellName)
-                {
-                    case "Spell_Trap_10" :          spellImg.sprite = spellTrap10;   break;
-                    case "Spell_Trap_20" :          spellImg.sprite = spellTrap20;   break;
-                    case "Spell_Trap_Orb" :         spellImg.sprite = spellTrapOrb;  break;
-                    
-                    case "Spell_Effect_10" :        spellImg.sprite = spellEffect10; break;
-                    case "Spell_Effect_Mana_3" :    spellImg.sprite = spellEffectMana3; break;
-                    case "Spell_Effect_Spell_1" :   spellImg.sprite = spellEffectSpell1; break;
-                    case "Spell_Effect_Slow_1" :    spellImg.sprite = spellEffectSlow1; break;
-                    case "Spell_Effect_Swap" :      spellImg.sprite = spellEffectSwap; break;
-                    
-                    case "Spell_Move_Dash_5" :      spellImg.sprite = spellMoveDash5; break;
-                    case "Spell_Move_Dash_8" :      spellImg.sprite = spellMoveDash8; break;
-                    case "Spell_Move_Slow" :        spellImg.sprite = spellMoveSlow; break;
-                    case "Spell_Move_Slowgo" :      spellImg.sprite = spellMoveSlowgo; break;
-                    case "Spell_Move_Steal" :       spellImg.sprite = spellMoveSteal; break;
-                    case "Spell_Move_Barrier" :     spellImg.sprite = spellMoveBarrier; break;
-                    case "Spell_Move_Orb" :         spellImg.sprite = spellMoveOrb; break;
-                    default :      break;
-                }
-                go.GetComponent<TextMeshPro>().text = "-1";
-                Color top = new Color(1, 0.15f, 0.2f);
-                Color bot = new Color(0.8f, 0, 0.05f);
-                go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-                spells.RemoveAt( rng );
-                yield return new WaitForSeconds(0.5f);
-            }
-        } 
-
-        UPDATE_SPELLS_UI();
-    }
-
-    public IEnumerator BOUGHT_AN_ORB(int n)
-    {
-        var eff = Instantiate(confettiPrefab, transform.position, transform.rotation);
-        Destroy(eff, 1);
-        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-        if (!isAtShop) controller.MagicOrbBoughtController();
-        if (n >= 0)
-        {
-            go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
-            Color top = new Color(0, 0.8f, 1);
-            Color bot = new Color(0, 0.3f, 1);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            // GAIN ORBS
-            for (int i = 0; i < n; i++)
-            {
-                if (n<11) { yield return new WaitForSeconds(0.1f); }
-                else { yield return new WaitForSeconds(0.02f); }
-                orbPickup.Play();
-                orbs++;
-            }
-        }
-        else
-        {
-            go.GetComponent<TextMeshPro>().text    = n.ToString();
-            Color top = new Color(1, 0.15f, 0.2f);
-            Color bot = new Color(0.8f, 0, 0.05f);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            // LOSE ORBS
-            for (int i = 0; i > n; i--)
-            {
-                if (n<11) { yield return new WaitForSeconds(0.1f); }
-                else { yield return new WaitForSeconds(0.02f); }
-                coinLoss.Play();    // CHANGE
-                orbs--;
-            }
-        }
-        manager.CHECK_RANKINGS();
-
-        yield return new WaitForSeconds(1.5f);
-        AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
-        bgMusic.volume = 0.2f;
-        controller.CHOOSE_MAGIC_ORB_SPACE(name);
-            
-        if (isAtMagicOrb) { nMovesLeft.gameObject.SetActive(true); }
-        manager.UNHIDE_UI();
-        isAtMagicOrb = false;
-        _animator.speed = _moveSpeed;
-        _animator.SetBool("IsWalking", true);
-        hasPurchased = false;
-    }
-    
-
-    public IEnumerator ORB_STOLEN(int n)
-    {
-        bool haveOrb = false;
-        if (orbs > 0) {haveOrb = true;}
-        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-            
-        // NO ORBS TO LOSE
-        if (!haveOrb) {
-            go.GetComponent<TextMeshPro>().text    = "-0";
-            Color top = new Color(1, 0.7f, 0);
-            Color bot = new Color(1, 0.35f,0);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            if (_movesRemaining == 0 && isPlayerTurn) {
-                yield return new WaitForSeconds(0.5f);
-                readyToMovedAside = true;
-            }
-        }
-        else {
-            go.GetComponent<TextMeshPro>().text    = n.ToString();
-            Color top = new Color(1, 0.15f, 0.2f);
-            Color bot = new Color(0.8f, 0, 0.05f);
-            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-            // LOSE ORB(S)
-            for (int i = 0; i > n; i--)
-            {
-                if (n<11) { yield return new WaitForSeconds(0.1f); }
-                else { yield return new WaitForSeconds(0.02f); }
-                orbLoss.Play();    
-                orbs--;
-            }
-            // PAY OPPONENT AFTER LOSING ORB(S)
-            if (n < 0) { n = Mathf.Abs(n); } // make positive
-
-            yield return new WaitForSeconds(1);
-            StartCoroutine( PLAYER_CAM_OFF(0) );
-            string toWhom = _currentPath[_currentNode].WHOS_TRAP();
-            manager.STEALING_ORB(toWhom, n);
-        }
-        manager.CHECK_RANKINGS();
-    }
-    
-    public IEnumerator ORB_GAINED(int n)
-    {
-        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-            
-        go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
-        Color top = new Color(0, 0.8f, 1);
-        Color bot = new Color(0, 0.3f, 1);
-        go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-        // GAIN ORB(S)
-        for (int i = 0; i < n; i++)
-        {
-            if (n<11) { yield return new WaitForSeconds(0.1f); }
-            else { yield return new WaitForSeconds(0.02f); }
-            orbPickup.Play();    
-            orbs++;
-        }
-
-        if (beingPayed) { 
-            yield return new WaitForSeconds(1);
-            beingPayed = false; StartCoroutine( PLAYER_CAM_OFF(0.5f) ); 
-            manager.StartCoroutine(manager.INCREMENT_TURN()); 
-        }
-    }
-    
-    private IEnumerator ORB_LOST_FROM_BOAT(int n)
-    {
-        if (orbStolen.isPlaying) orbStolen.Stop();
-
-        n = Mathf.Abs(n);
-        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-            
-        go.GetComponent<TextMeshPro>().text    = "-" + n.ToString();
-        Color top = new Color(1, 0.15f, 0.2f);
-        Color bot = new Color(0.8f, 0, 0.05f);
-        go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-        // LOSE ORB(S)
-        for (int i = 0; i < n; i++)
-        {
-            if (n<11) { yield return new WaitForSeconds(0.1f); }
-            else { yield return new WaitForSeconds(0.02f); }
-            orbLoss.Play();    
-            orbs--;
-        }
-        
-        if (isAtSpecial && nPrompt > 0)
-        {
-            PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
-        }
-        manager.CHECK_RANKINGS();
-    }
-
-    // DESTROY THE VISUAL REPRESENTATION OF MOVES LEFT
-    private IEnumerator fadeMovesLeft()
-    {
-        yield return new WaitForSeconds(0.5f);
-        nMovesLeft.gameObject.SetActive(false);
-    }
-
-
-    /* -------------------------------------------------------- */
-    /* -------------- PATHING WHICH NODE IS NEXT -------------- */
-
-
-    //! DELETE
-    // RETURN TRUE IF THERE IS A FORK AT THE END OF PATH (WHERE TO GO NEXT/CONJOIN),   FALSE OTHERWISE
-    private bool CHECK_FORK()
-    {
-        // "CRYSTAL CAVERNS" MAP
-        if (_currentScene == "Crystal_Caverns")
-        {
-            // STOP MOVING (AT FORK)
-            if (_currentPath == _nodes0 || _currentPath == _nodes1 || _currentPath == _nodes4 || _currentPath == _nodes5 ||
-                _currentPath == _nodes8 || _currentPath == _nodes9 || _currentPath == _nodes12) 
-            {
-                return true;
-            }
-            // END OF PATH 2 (NO FORK)
-            else if (_currentPath == _nodes2)
-            {
-                _choice.SetActive(false);
-                _currentNode = 2;  
-                _currentPath = _nodes0;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 3 (NO FORK)
-            else if (_currentPath == _nodes3)
-            {
-                _choice.SetActive(false);
-                _currentNode = 1;
-                _currentPath = _nodes4;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 6 (NO FORK)
-            else if (_currentPath == _nodes6)
-            {
-                _choice.SetActive(false);
-                _currentNode = 2;
-                _currentPath = _nodes3;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 7 (NO FORK)
-            else if (_currentPath == _nodes7)
-            {
-                _choice.SetActive(false);
-                _currentNode = 5;
-                _currentPath = _nodes9;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 10 (NO FORK)
-            else if (_currentPath == _nodes10)
-            {
-                _choice.SetActive(false);
-                _currentNode = 1;
-                _currentPath = _nodes12;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 11 (NO FORK)
-            else if (_currentPath == _nodes11)
-            {
-                _choice.SetActive(false);
-                _currentNode = 0;
-                _currentPath = _nodes14;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 13 (NO FORK)
-            else if (_currentPath == _nodes13)
-            {
-                _choice.SetActive(false);
-                _currentNode = 0;
-                _currentPath = _nodes14;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 14 (NO FORK)
-            else if (_currentPath == _nodes14)
-            {
-                _choice.SetActive(false);
-                _currentNode = 2;
-                _currentPath = _nodes0;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 15 (NO FORK)
-            else if (_currentPath == _nodes15)
-            {
-                _choice.SetActive(false);
-                _currentNode = 4;
-                _currentPath = _nodes0;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 16 (NO FORK)
-            else if (_currentPath == _nodes16)
-            {
-                _choice.SetActive(false);
-                _currentNode = 2;
-                _currentPath = _nodes14;
-                CHECK_NODE();
-                return false;
-            }
-        }
-
-        // "SHOGUN SEAPORT" MAP
-        if (_currentScene == "Shogun_Seaport")
-        {
-            // STOP MOVING (FORK)
-            if (_currentPath == _nodes0 || _currentPath == _nodes3 || _currentPath == _nodes4 || _currentPath == _nodes9) 
-            {
-                return true;
-            }
-            // END OF PATH 1 (NO FORK)
-            else if (_currentPath == _nodes1)
-            {
-                _choice.SetActive(false);
-                _currentNode = 0;  
-                _currentPath = _nodes3;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 2 (NO FORK)
-            else if (_currentPath == _nodes2)
-            {
-                _choice.SetActive(false);
-                _currentNode = 0;  
-                _currentPath = _nodes3;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 5 (NO FORK)
-            else if (_currentPath == _nodes5)
-            {
-                _choice.SetActive(false);
-                _currentNode = 0;
-                _currentPath = _nodes9;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 6 (NO FORK)
-            else if (_currentPath == _nodes6)
-            {
-                _choice.SetActive(false);
-                _currentNode = 0;
-                _currentPath = _nodes9;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 7 (NO FORK)
-            else if (_currentPath == _nodes7)
-            {
-                _choice.SetActive(false);
-                _currentNode = 2;
-                _currentPath = _nodes6;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 8 (NO FORK)
-            else if (_currentPath == _nodes8)
-            {
-                _choice.SetActive(false);
-                _currentNode = 1;
-                _currentPath = _nodes11;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 10 (NO FORK)
-            else if (_currentPath == _nodes10)
-            {
-                _choice.SetActive(false);
-                _currentNode = 4;
-                _currentPath = _nodes11;
-                CHECK_NODE();
-                return false;
-            }
-            // END OF PATH 11 (NO FORK)
-            else if (_currentPath == _nodes11)
-            {
-                _choice.SetActive(false);
-                _currentNode = 0;
-                _currentPath = _nodes0;
-                CHECK_NODE();
-                return false;
-            }
-        }
-        
-        return false;
+        isAtFork = true;
+        // if (_movesRemaining > 0) { SHOW_ARROWS(); }
+        SHOW_ARROWS();
     }
 
     //** WHICH PATH TO TAKE IN FORKS
@@ -2733,100 +1687,920 @@ public class PathFollower : MonoBehaviour
         }
     }
 
-    //! DELETE
-    // ARROWS POINTING AT DIRECTIONS TO TAKE IN A FORK IN PATHS
-    private void FORK_ARROW_VISUAL()
+    // FLIP CHARACTER BASED ON DIRECTION MOVEMENT
+    private void WHERE_TO_FACE()
     {
-        // CHOOSE A PATH (BASED ON MAP)
-        if (!isViewingMap)
-        {
-            // "CRYSTAL CAVERNS" MAP
-            if (_currentScene == "Crystal_Caverns")
-            {
-                // END OF PATH 0
-                if (_currentPath == _nodes0)
-                {
-                    arrowUp.gameObject.SetActive(true);
-                    arrowDown.gameObject.SetActive(true);
-                }
-                // END OF PATH 1
-                else if (_currentPath == _nodes1)
-                {
-                    arrowUp.gameObject.SetActive(true);
-                    arrowDown.gameObject.SetActive(true);
-                }
-                // END OF PATH 4
-                else if (_currentPath == _nodes4)
-                {
-                    arrowLeft.gameObject.SetActive(true);
-                    arrowRight.gameObject.SetActive(true);
-                }
-                // END OF PATH 5
-                else if (_currentPath == _nodes5)
-                {
-                    arrowLeft.gameObject.SetActive(true);
-                    arrowRight.gameObject.SetActive(true);
-                }
-                // END OF PATH 8
-                else if (_currentPath == _nodes8)
-                {
-                    arrowUp.gameObject.SetActive(true);
-                    arrowDown.gameObject.SetActive(true);
-                }
-                // END OF PATH 9
-                else if (_currentPath == _nodes9)
-                {
-                    arrowLeft.gameObject.SetActive(true);
-                    arrowDown.gameObject.SetActive(true);
-                    arrowRight.gameObject.SetActive(true);
-                }
-                // END OF PATH 12
-                else if (_currentPath == _nodes12)
-                {
-                    arrowLeft.gameObject.SetActive(true);
-                    arrowRight.gameObject.SetActive(true);
-                }
-                // NON-EXISTENT PATH
-                else {
-                    Debug.LogError("ERROR, PATH NON-EXISTANT");
-                }
+        if (nextNode != null) {
+            // FACE RIGHT
+            if (nextNode.transform.position.x > transform.position.x) { 
+                character.transform.localScale = new Vector3(-lScale, lScale, lScale); 
             }
-            // "CRYSTAL CAVERNS" MAP
-            else if (_currentScene == "Shogun_Seaport")
-            {
-                // END OF PATH 0
-                if (_currentPath == _nodes0)
-                {
-                    arrowUp.gameObject.SetActive(true);
-                    arrowLeft.gameObject.SetActive(true);
-                }
-                // END OF PATH 3
-                else if (_currentPath == _nodes3)
-                {
-                    arrowUp.gameObject.SetActive(true);
-                    arrowRight.gameObject.SetActive(true);
-                    arrowLeft.gameObject.SetActive(true);
-                }
-                // END OF PATH 4
-                else if (_currentPath == _nodes4)
-                {
-                    arrowLeft.gameObject.SetActive(true);
-                    arrowUp.gameObject.SetActive(true);
-                }
-                // END OF PATH 9
-                else if (_currentPath == _nodes9)
-                {
-                    arrowLeft.gameObject.SetActive(true);
-                    arrowRight.gameObject.SetActive(true);
-                }
-                // NON-EXISTENT PATH
-                else {
-                    Debug.LogError("ERROR, PATH NON-EXISTANT");
-                }
+            // FACE LEFT (STANDARD)
+            else  { 
+                character.transform.localScale = new Vector3(lScale, lScale, lScale); 
             }
         }
     }
 
+    private void SHOW_ARROWS() 
+    {
+        for (int i=0 ; i<currentNode.nexts.Length ; i++) {
+            if (currentNode.nexts[i].direction == Node.Directions.left)  { arrowLeft.gameObject.SetActive(true); continue; }
+            if (currentNode.nexts[i].direction == Node.Directions.right) { arrowRight.gameObject.SetActive(true); continue; }
+            if (currentNode.nexts[i].direction == Node.Directions.up)    { arrowUp.gameObject.SetActive(true); continue; }
+            if (currentNode.nexts[i].direction == Node.Directions.down)  { arrowDown.gameObject.SetActive(true); continue; }
+        }
+    }
+
+    // DISPLAY SPACES AWAY
+    private void SHOW_NODE_DISTANCE()
+    {
+        for (int i=0 ; i<currentNode.nexts.Length ; i++) {
+            currentNode.nexts[i].node.GetComponent<Node>().DISPLAY_MOVEMENT(1, _movesRemaining);
+        }
+    }
+    
+    //* -------------------------------------------------------- *//
+
+
+    private void UserPathForkMenu()
+    {
+        if (isAtFork && !isViewingMap) mapViewmap.gameObject.SetActive(true);
+        if (player.GetButtonDown("X"))
+        {
+            SHOW_NODE_DISTANCE();   // DISPLAY SPACES AWAY
+
+            mapViewmap.gameObject.SetActive(false);
+            _cam.orthographicSize = camSizeLarge;
+            isViewingMap = true;
+            mapMapping.gameObject.SetActive(true);
+
+            arrowLeft.gameObject.SetActive(false);
+            arrowRight.gameObject.SetActive(false);
+            arrowUp.gameObject.SetActive(false);
+            arrowDown.gameObject.SetActive(false);
+            nMovesLeft.gameObject.SetActive(false); 
+            manager.HIDE_UI();
+
+            if (_movesRemaining > 0) { _mapMoves.text = _movesRemaining + " Moves Left"; }
+        }
+        else if (player.GetButtonDown("A"))
+        {
+            mapViewmap.gameObject.SetActive(false);
+            CHOOSING_PATH_AT_FORK();
+        }
+        else if (player.GetButtonDown("Up")    && arrowUp.IsActive())
+        {
+            arrowDirection      = Node.Directions.up;
+            arrowLeft.color     = new Color(1, 0.7f, 0, 0.4f);
+            arrowRight.color    = new Color(1, 0.7f, 0, 0.4f);
+            arrowUp.color       = new Color(1, 0.7f, 0, 1);
+            arrowDown.color     = new Color(1, 0.7f, 0, 0.4f);
+        }
+        else if (player.GetButtonDown("Down")  && arrowDown.IsActive())
+        {
+            arrowDirection      = Node.Directions.down;
+            arrowLeft.color     = new Color(1, 0.7f, 0, 0.4f);
+            arrowRight.color    = new Color(1, 0.7f, 0, 0.4f);
+            arrowUp.color       = new Color(1, 0.7f, 0, 0.4f);
+            arrowDown.color     = new Color(1, 0.7f, 0, 1);
+        }
+        else if (player.GetButtonDown("Left")  && arrowLeft.IsActive())
+        {
+            arrowDirection      = Node.Directions.left;
+            arrowLeft.color     = new Color(1, 0.7f, 0, 1);
+            arrowRight.color    = new Color(1, 0.7f, 0, 0.4f);
+            arrowUp.color       = new Color(1, 0.7f, 0, 0.4f);
+            arrowDown.color     = new Color(1, 0.7f, 0, 0.4f);
+        }
+        else if (player.GetButtonDown("Right") && arrowRight.IsActive())
+        {
+            arrowDirection      = Node.Directions.right;
+            arrowLeft.color     = new Color(1, 0.7f, 0, 0.4f);
+            arrowRight.color    = new Color(1, 0.7f, 0, 1);
+            arrowUp.color       = new Color(1, 0.7f, 0, 0.4f);
+            arrowDown.color     = new Color(1, 0.7f, 0, 0.4f);
+        }
+    }
+
+    private void UserAtShop()
+    {
+        // TALKING TO SELLER (INTRO)
+        if (shopKeeperUI.activeSelf && !shopSpellUI.activeSelf && !potionShop.confirmObj.activeSelf
+            && !playerPurchase.confirmObj.activeSelf && !playerPurchase.discardObj.activeSelf)
+        {
+            // TAKE A LOOK AT STOCK
+            if      (player.GetButtonDown("A")) { 
+                if (!shop4) { shopKeeperUI.SetActive(false); shopSpellUI.SetActive(true); } 
+                else        { shopKeeperUI.SetActive(false); shopItemUI.SetActive(true); }
+            }
+            // VIEW MAP
+            else if (player.GetButtonDown("X")) { 
+                if (!shop4) { shopKeeperUI.SetActive(false); shopSpellUI.SetActive(false); }
+                else        { shopKeeperUI.SetActive(false); shopItemUI.SetActive(false); }
+                isViewingMap = true;  _cam.orthographicSize = camSizeLarge;
+                mapMapping.gameObject.SetActive(true);
+            }
+            // ** LEAVE SHOP
+            else if (player.GetButtonDown("B")) { 
+                nMovesLeft.gameObject.SetActive(true); 
+                _cam.orthographicSize = camSizeNormal;
+                RESET_CAM();
+                _mapMoves.text = "";
+                manager.UNHIDE_UI();
+                shopUI.SetActive(false);
+                isAtShop = false;
+                shop1 = false; shop2 = false; shop3 = false; shop4 = false;
+                _animator.SetBool("IsWalking", true);
+                _animator.speed = _moveSpeed;
+                if (isAtSpecial)
+                {
+                    // manager.FADE_TO_BLACK();
+                    PLAYER_CAM_OFF(0);
+                    StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+                }
+            }
+        }
+        // BUYING SPELLS ()
+        else if (!shopKeeperUI.activeSelf && shopSpellUI.activeSelf && !potionShop.confirmObj.activeSelf
+            && !playerPurchase.confirmObj.activeSelf && !playerPurchase.discardObj.activeSelf
+            || !shopKeeperUI.activeSelf && shopItemUI.activeSelf && !potionShop.confirmObj.activeSelf
+            && !playerPurchase.confirmObj.activeSelf && !playerPurchase.discardObj.activeSelf)
+        {
+            if (player.GetButtonDown("B"))
+            {
+                if (!shop4) { shopSpellUI.SetActive(false); shopKeeperUI.SetActive(true); }
+                else        { shopItemUI.SetActive(false);  shopKeeperUI.SetActive(true); }
+            }
+        }
+        // CONFIRM TO BUY SPELL
+        else if (playerPurchase.confirmObj.activeSelf && !shopKeeperUI.activeSelf && shopSpellUI.activeSelf) 
+        {
+            if      (player.GetButtonDown("A")) { playerPurchase.OnYes(); }
+            else if (player.GetButtonDown("B")) { playerPurchase.OnNo();  }
+        }
+        // CONFIRM TO BUY ITEM/POTION
+        else if (potionShop.confirmObj.activeSelf && !shopKeeperUI.activeSelf && shopItemUI.activeSelf) 
+        {
+            if      (player.GetButtonDown("A")) { potionShop.OnYes(); }
+            else if (player.GetButtonDown("B")) { potionShop.OnNo();  }
+        }
+    }
+
+    private void UserAtMagicOrb()
+    {
+        if (player.GetButtonDown("A") && coins >= 20)
+        {
+            magicOrbUI.SetActive(false);
+            _mapMoves.text = "";
+
+            StartCoroutine(UPDATE_PLAYER_COINS(-20));
+            StartCoroutine(BUYING_MAGIC_ORB()); // MUSIC
+        }
+        // VIEW MAP
+        else if (player.GetButtonDown("X")) { 
+            magicOrbUI.SetActive(false);
+            isViewingMap = true;  
+            _cam.orthographicSize = camSizeLarge;
+            mapMapping.gameObject.SetActive(true);
+        }
+        else if (player.GetButtonDown("B"))
+        {
+            isAtMagicOrb = false;
+            _mapMoves.text = "";
+            nMovesLeft.gameObject.SetActive(true); 
+            manager.UNHIDE_UI();
+            magicOrbUI.SetActive(false);
+        }
+    }
+
+
+    // TEXT SHOWING MOVES REMAINING
+    private void UPDATE_MOVEMENT(int movesLeft) { nMovesLeft.text = movesLeft.ToString(); }
+
+    // SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
+    private void SPACE_END()
+    {
+        isLanded = true;
+        _animator.SetBool("IsWalking", false);
+        _animator.speed = 1;
+        
+        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
+            StartCoroutine(fadeMovesLeft());
+        }
+
+        // LANDED ON BLUE | RED | EVENT (SO FAR)
+        if (currentNode.SPACE_LANDED()) {
+            int coinsGained = currentNode.COINS_RECEIVED_FROM_SPACE();
+            if (currentNode.IS_BLUE())   { controller.blueOrb[playerID]++; }
+            if (currentNode.IS_RED())    { controller.RED_ORB_UPDATE(playerID); }
+            if (currentNode.IS_EVENT())  { controller.EVENT_ORB_UPDATE(playerID); }
+            StartCoroutine( UPDATE_PLAYER_COINS(coinsGained * controller.turnMultiplier) );
+        }
+        // GAIN SPELL FROM SPACE
+        else if (currentNode.IS_SPELL()) {
+            StartCoroutine( GAIN_RANDOM_SPELL() );
+        }
+        // LANDED ON HAPPENING (TRIGGER)
+        else if (currentNode.IS_HAPPEN()) {
+            if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
+            {
+                StartCoroutine( HAPPEN_NEW_BOAT() );
+            }
+        }
+        // LANDED ON ORB TRAP
+        else if (currentNode.IS_ORB_TRAP()) {
+            Debug.Log("LANDED ON ORB TRAP");
+            int onesTrap = currentNode.ORB_TRAP_SPACE_COST(characterName);
+            if (onesTrap == 5)
+            {
+                Debug.Log("-- " + onesTrap);
+                StartCoroutine( UPDATE_PLAYER_COINS(onesTrap * controller.turnMultiplier) );
+            } 
+            else 
+            {
+                Debug.Log("ORB BEING STOLEN");
+                if (!playerBarrier) StartCoroutine( ORB_STOLEN(-1) );
+                else { StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
+            }
+        }
+        // LANDED ON COIN TRAP
+        else {
+            int price = currentNode.TRAP_SPACE_COST(characterName);
+            if (price > 0) // OWN TRAP
+            {
+                StartCoroutine( UPDATE_PLAYER_COINS(price * controller.turnMultiplier) );
+            }
+            else            // OPPONENT'S TRAP
+            {
+                if (!playerBarrier) {
+                    isPayingSomeone = true;
+                    StartCoroutine( UPDATE_PLAYER_COINS(price) );
+                }
+                else { Debug.Log("PROTECTED"); StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
+            }
+        }
+    }
+
+    // MOVE PLAYER ASIDE FOR VISUAL INDICATION OF WHO'S ON WHAT SPACE
+    private void MOVE_ASIDE()
+    {
+        if (!gotAsidePos)   // CALL ONCE
+        {
+            _timer = 0;
+            float scaleFactor = 1f;
+            float playerX = transform.position.x;
+            float playerY = transform.position.y;
+            float sin45 = 0.707f;
+            float trig1 = 0.5f * scaleFactor;
+            float trig2 = 0.866f * scaleFactor;
+            asidePos1 = new Vector3(playerX - 1, playerY + 0);
+            asidePos2 = new Vector3(playerX - sin45, playerY + sin45);
+            asidePos3 = new Vector3(playerX + 0, playerY + 1);
+            asidePos4 = new Vector3(playerX + sin45, playerY + sin45);
+            asidePos5 = new Vector3(playerX + 1, playerY - 0);
+            asidePos6 = new Vector3(playerX + sin45, playerY - sin45 - 0.5f);
+            asidePos7 = new Vector3(playerX - 0, playerY - 1 - 0.5f);
+            asidePos8 = new Vector3(playerX - sin45, playerY - sin45 - 0.5f);
+            gotAsidePos = true;
+        }
+
+        _moveSpeed = 7.5f;
+        _timer += _moveSpeed * Time.deltaTime;
+        if (transform.localScale.x > 0.25f) {
+            this.transform.localScale -= new Vector3(0.025f, 0.025f, 0.025f);    // STRINK
+        }
+
+        // MOVE TO ASIDE POSITION
+        switch (name)
+        {
+            case "Player_1":
+                if (this.transform.position != asidePos1) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos1, _timer); }
+                break;
+            case "Player_2":
+                if (this.transform.position != asidePos2) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos2, _timer); }
+                break;
+            case "Player_3":
+                if (this.transform.position != asidePos3) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos3, _timer); }
+                break;
+            case "Player_4":
+                if (this.transform.position != asidePos4) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos4, _timer); }
+                break;
+            case "Player_5":
+                if (this.transform.position != asidePos5) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos5, _timer); }
+                break;
+            case "Player_6":
+                if (this.transform.position != asidePos6) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos6, _timer); }
+                break;
+            case "Player_7":
+                if (this.transform.position != asidePos7) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos7, _timer); }
+                break;
+            case "Player_8":
+                if (this.transform.position != asidePos8) {
+                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos8, _timer); }
+                break;
+        }
+
+        // END TURN
+        switch (name)
+        {
+            case "Player_1":
+                if (this.transform.position == asidePos1) { TURN_FINISHED(); }     break;
+            case "Player_2":
+                if (this.transform.position == asidePos2) { TURN_FINISHED(); }     break;
+            case "Player_3":
+                if (this.transform.position == asidePos3) { TURN_FINISHED(); }     break;
+            case "Player_4":
+                if (this.transform.position == asidePos4) { TURN_FINISHED(); }     break;
+            case "Player_5":
+                if (this.transform.position == asidePos5) { TURN_FINISHED(); }     break;
+            case "Player_6":
+                if (this.transform.position == asidePos6) { TURN_FINISHED(); }     break;
+            case "Player_7":
+                if (this.transform.position == asidePos7) { TURN_FINISHED(); }     break;
+            case "Player_8":
+                if (this.transform.position == asidePos8) { TURN_FINISHED(); }     break;
+        }
+    }
+
+
+
+    /* --------------------------------------------- */
+    /* ------------ PLAYER'S TURN SETUP ------------ */
+
+
+    // CAMERA FOCUSES ON PLAYER, WAIT BEFORE STARTING TURN
+    public IEnumerator YOUR_TURN()
+    {
+        // CAMERA FOCUSES ON PLAYER
+        _cam.gameObject.SetActive(true);
+
+        // MOVE BACK (UNASIDE)
+        if (controller.hasStarted) { transform.position = data[0].pos; }
+        manager.CHECK_RANKINGS();
+        manager.UNHIDE_UI();
+        // manager.FADE_FROM_BLACK();
+        
+        // LOSE BARRIER
+        if (playerBarrier) {
+            playerBarrier = false;
+            controller.buffDatas[playerID][0].barrier = false;
+            barrier.SetActive(false);
+            hurtBox.SetActive(true);
+        }
+
+        yield return new WaitForSeconds(1);
+
+        // PLAYER CHOICES
+        startUi.gameObject.SetActive(true);
+        foreach (Sprite characterSprite in starts)
+        {
+            if (characterSprite.name.Contains(characterName))
+            {
+                startUi.sprite = characterSprite; break;
+            }
+        }
+        isPlayerTurn = true;           // THIS PLAYER'S TURN
+
+        // RESTORE 1 MP (EVERY ODD TURNS)     ( COMPETITIVE )
+        if (mpBar.value < 5 && controller.turnNumber % 2 == 1 && !controller.isCasual) 
+        { 
+            mpBar.value += 1; 
+            var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+            go.GetComponent<TextMeshPro>().text    = "+1";
+        }
+        // RESTORE 1 MP (EVERY TURN)        ( CASUAL )
+        else if (mpBar.value < 5 && controller.isCasual) 
+        { 
+            mpBar.value += 1; 
+            var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+            go.GetComponent<TextMeshPro>().text    = "+1";
+        }
+        mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
+
+        UPDATE_MOVEMENT(_movesRemaining);
+    }
+    
+    // ******** STORE INFORMATION ABOUT PLAYER TO GAME_CONTROLLER 
+    public void UPDATE_INFORMATION(bool updateSpells)
+    {
+        // STORE DATA ON THE PATH THE PLAYER IS CURRENTLY ON
+        string newPath = currentNode.transform.parent.name + "/" + currentNode.name;
+
+        // SET ALL VALUES OF PLAYER
+        controller.SET_PLAYER_DATA(playerID, newPath, 0, currentNode.transform.position, transform.position,
+            coins, orbs, (int) mpBar.value);
+
+        // STORE DATA ON THE CURRENT PLAYER'S SPELLS
+        if (updateSpells) { controller.SET_SPELLS (playerID, spells); }
+        else { manager.CHECK_RANKINGS(); }
+
+        // STATUS EFFECTS
+        controller.SET_PLAYER_BUFFS(playerID, playerSlowed, playerBarrier, playerMove15, playerRange2, playerExtraBuy);
+
+        controller.RICH_ORB_UPDATE(playerID);
+    }
+
+    // CAMERA CHANGES, WAIT BEFORE ENDING TURN
+    private void TURN_FINISHED()
+    {
+        manager.CHECK_RANKINGS();
+        isAside = true;
+        _animator.SetBool("IsWalking", false);
+        isPlayerTurn = false;
+        isReadyToMove = false;
+
+        nMovesLeft.gameObject.SetActive(false);
+        buttonMove.gameObject.SetActive(false);
+        buttonSpells.gameObject.SetActive(false);
+        buttonMap.gameObject.SetActive(false);
+
+        if (playerSlowed) {
+            playerSlowed = false;
+            foreach (Transform child in character.transform)  
+            {  
+                if (child.name != "Shadow") {
+                    if (child.TryGetComponent(out SpriteRenderer cs)) { cs.color = new Color(1,1,1); }
+                }
+                foreach (Transform grandChild in child)
+                {
+                    if (grandChild.name != "Shadow") {
+                        if (grandChild.TryGetComponent(out SpriteRenderer gs)) { gs.color = new Color(1,1,1); }
+                    }
+                }
+            }
+        }
+        if (stealMode)  {stealMode = false; stealingAura.SetActive(false);}
+        if (!playerBarrier) { hurtBox.SetActive(true); }
+        StartCoroutine( PLAYER_CAM_OFF(transitionTime) );
+        if (!isPayingSomeone) { manager.StartCoroutine(manager.INCREMENT_TURN()); }
+    }
+
+    public void PLAYER_CAM_ON()
+    {
+        _cam.gameObject.SetActive(true);    // CAM TURNS ON
+    }
+    public IEnumerator PLAYER_CAM_OFF(float delayTime)
+    {
+        yield return new WaitForSeconds(delayTime);
+        _cam.gameObject.SetActive(false);   // CAM TURNS OFF
+    }
+
+    // ENABLE COLLIDER = SOUND EFFECT FOR WALKING OVER NODE
+    IEnumerator WALK_OVER_SOUND_ON()
+    {
+        yield return new WaitForSeconds(0.05f);
+        _collider.enabled = true;
+    }
+
+    public void HIDE_DATA_CANVAS() 
+    {
+        layout.SetActive(false);
+    }
+
+    public void UNHIDE_DATA_CANVAS() 
+    {
+        layout.SetActive(true);
+    }
+
+
+    /* --------------------------------------------------------- */
+    /* ------------ DURING THE START OF PLAYER TURN ------------ */
+
+
+    // AFTER ROLLING DICE, DELAY THEN MOVE PLAYER
+    IEnumerator DICE_ROLLED()
+    {
+        if (!pseudoMove) {
+            // int nMoves = (int)(moveBar.value + 10) / 10;
+            int nMoves;
+            if      (playerSlowed) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 5); }
+            else if (playerMove15) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 15); }
+            else                   { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 10); }
+            _movesRemaining = (nMoves+1);
+            controller.SLOW_ORB_UPDATE(playerID, _movesRemaining);
+            radialBar.GetComponent<Animator>().speed = 0;
+        }
+        nMovesLeft.text = _movesRemaining.ToString();
+        grimoireUI.gameObject.SetActive(false);
+
+        if (!pseudoMove) yield return new WaitForSeconds(1.6f);
+        // moveBar.gameObject.SetActive(false);
+        radialBar.gameObject.SetActive(false);
+
+        yield return new WaitForSeconds(0.1f);
+        _animator.SetBool("IsWalking", true);
+        _animator.speed = _moveSpeed;
+        isReadyToMove = true;
+
+        WHERE_TO_FACE();
+    }
+
+    private void RESET_PLAYER_UI()
+    {
+        RectTransform rt = layout.transform.GetComponent<RectTransform>();
+
+    // WHAT IS PLAYER ORDER IN TURN ROTATION
+        int xth = 0;
+        for (int i=0 ; i<controller.playerOrder.Length ; i++)
+        {
+            if (playerID == controller.playerOrder[i])
+            {
+                xth = i; break;
+            }
+        }
+
+        rt.localPosition -= new Vector3(0, (55*xth), 0);
+    }
+
+
+    public IEnumerator STEAL_COINS(int n, PathFollower p)
+    {
+        n = Mathf.Abs(n);
+        
+        int tempGold = coins;
+        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+
+        // NOT ENOUGH COINS TO LOSE
+        if (coins < n) {
+            go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            StartCoroutine( p.UPDATE_PLAYER_COINS(coins) );
+        }
+        else {
+            go.GetComponent<TextMeshPro>().text    = "-" +  n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            StartCoroutine( p.UPDATE_PLAYER_COINS(n) );
+        }
+        // LOSE COINS
+        for (int i = 0; i < n; i++)
+        {
+            if (coins <= 0) { break; }  // NOT MORE GOLD TO LOSE
+
+            if (n<11) { yield return new WaitForSeconds(0.1f); }
+            else { yield return new WaitForSeconds(0.02f); }
+            coinLoss.Play();
+            coins--;
+        }
+    }
+
+    // GAIN OR LOSE COINS
+    public IEnumerator UPDATE_PLAYER_COINS(int n)
+    {
+        // FADE VISUAL NUMBER OF MOVES LEFT
+        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
+            StartCoroutine(fadeMovesLeft());
+        }
+        if (isAtSpecial && orbStolen.isPlaying) { orbStolen.Stop(); }
+        int tempGold = coins;
+        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+
+        // GAIN COINS
+        if (n > 0)
+        {
+            go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
+            Color top = new Color(0, 0.8f, 1);
+            Color bot = new Color(0, 0.3f, 1);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            // GAIN COINS
+            for (int i = 0; i < n; i++)
+            {
+                if (coins >= 999) { break; }
+
+                if (n<11) { yield return new WaitForSeconds(0.1f); }
+                else if (n >= 11 && n<101) { yield return new WaitForSeconds(0.02f); }
+                coinPickup.Play();
+                coins++;
+            }
+        }
+        else if (n == 0) { Destroy(go); }
+        // LOSE COINS
+        else
+        {
+            // NOT ENOUGH COINS TO LOSE
+            if (coins < -n ) {
+                go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
+                Color top = new Color(1, 0.7f, 0);
+                Color bot = new Color(1, 0.35f,0);
+                go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            }
+            else {
+                go.GetComponent<TextMeshPro>().text    = n.ToString();
+                Color top = new Color(1, 0.15f, 0.2f);
+                Color bot = new Color(0.8f, 0, 0.05f);
+                go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            }
+            // LOSE COINS
+            for (int i = 0; i > n; i--)
+            {
+                if (coins <= 0) { break; }
+
+                if (n<11) { yield return new WaitForSeconds(0.1f); }
+                else { yield return new WaitForSeconds(0.02f); }
+                coinLoss.Play();
+                coins--;
+            }
+        }
+
+
+        // PAY OPPONENT AFTER LOSING COINS
+        if (isPayingSomeone && tempGold != 0) {
+            if (n < 0) { n = Mathf.Abs(n); } // make positive
+
+            yield return new WaitForSeconds(1);
+            StartCoroutine( PLAYER_CAM_OFF(0) );
+            string toWhom = currentNode.WHOS_TRAP();
+            if ( tempGold > n ) { // MORE THAN ENOUGH TO PAY BACK
+                manager.PAYING_SOMEONE(toWhom, n);
+            }
+            else {              // PAY WHAT YOU HAVE
+                manager.PAYING_SOMEONE(toWhom, tempGold);
+            }
+        }
+        // MOVE PLAYER TO THE SIDE
+        if (_movesRemaining == 0 && isPlayerTurn) {
+            yield return new WaitForSeconds(0.5f);
+            readyToMovedAside = true;
+        }
+        // OTHER PLAYER RECIEVING COINS INCREMENTS TURN ORDER
+        if (beingPayed) { 
+            beingPayed = false; StartCoroutine( PLAYER_CAM_OFF(transitionTime) ); 
+            manager.StartCoroutine(manager.INCREMENT_TURN()); 
+        }
+        
+        /* shogun seaport */
+        if (isAtSpecial && nPrompt > 0)
+        {
+            if (orbStolen.isPlaying) {
+                while (orbStolen.volume > 0)
+                {
+                    yield return new WaitForEndOfFrame();
+                    orbStolen.volume -= 0.01f;
+                }
+            }
+            PLAYER_CAM_OFF(0);
+            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+        }
+        UPDATE_INFORMATION(false);
+    }
+
+    // LOSE COINS WITHOUT FROM EFFECTS OR BOARD
+    public IEnumerator LOSE_COINS(int n)
+    {
+        int tempGold = coins;
+        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+        // NOT ENOUGH COINS TO LOSE
+        if (coins < Mathf.Abs(n) ) {
+            go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        else {
+            go.GetComponent<TextMeshPro>().text    = n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        // LOSE COINS
+        for (int i = 0; i > n; i--)
+        {
+            if (coins <= 0) { break; }
+
+            if (n<11) { yield return new WaitForSeconds(0.1f); }
+            else { yield return new WaitForSeconds(0.02f); }
+            coinLoss.Play();
+            coins--;
+        }
+        manager.CHECK_RANKINGS();
+    }
+    public void LOSE_MP(int n)
+    {
+        n = Mathf.Abs(n);
+        var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+        if (mpBar.value >= n) 
+        { 
+            mpBar.value -= n; 
+            go.GetComponent<TextMeshPro>().text    = "-" + n;
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        // NOT ENOUGH MP TO LOSE
+        else {
+            go.GetComponent<TextMeshPro>().text    = "-" + mpBar.value;
+            mpBar.value = 0;
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
+    }
+    public IEnumerator LOSE_SPELL(int n)
+    {
+        n = Mathf.Abs(n);
+        
+        for ( int i=0 ; i<n ; i++ )
+        {
+            if (spells.Count > 0) {
+                var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+                SpriteRenderer spellImg = go.GetComponentInChildren<SpriteRenderer>();
+                int rng = Random.Range(0,spells.Count);
+                switch (spells[rng].spellName)
+                {
+                    case "Spell_Trap_10" :          spellImg.sprite = spellTrap10;   break;
+                    case "Spell_Trap_20" :          spellImg.sprite = spellTrap20;   break;
+                    case "Spell_Trap_Orb" :         spellImg.sprite = spellTrapOrb;  break;
+                    
+                    case "Spell_Effect_10" :        spellImg.sprite = spellEffect10; break;
+                    case "Spell_Effect_Mana_3" :    spellImg.sprite = spellEffectMana3; break;
+                    case "Spell_Effect_Spell_1" :   spellImg.sprite = spellEffectSpell1; break;
+                    case "Spell_Effect_Slow_1" :    spellImg.sprite = spellEffectSlow1; break;
+                    case "Spell_Effect_Swap" :      spellImg.sprite = spellEffectSwap; break;
+                    
+                    case "Spell_Move_Dash_5" :      spellImg.sprite = spellMoveDash5; break;
+                    case "Spell_Move_Dash_8" :      spellImg.sprite = spellMoveDash8; break;
+                    case "Spell_Move_Slow" :        spellImg.sprite = spellMoveSlow; break;
+                    case "Spell_Move_Slowgo" :      spellImg.sprite = spellMoveSlowgo; break;
+                    case "Spell_Move_Steal" :       spellImg.sprite = spellMoveSteal; break;
+                    case "Spell_Move_Barrier" :     spellImg.sprite = spellMoveBarrier; break;
+                    case "Spell_Move_Orb" :         spellImg.sprite = spellMoveOrb; break;
+                    default :      break;
+                }
+                go.GetComponent<TextMeshPro>().text = "-1";
+                Color top = new Color(1, 0.15f, 0.2f);
+                Color bot = new Color(0.8f, 0, 0.05f);
+                go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+                spells.RemoveAt( rng );
+                yield return new WaitForSeconds(0.5f);
+            }
+        } 
+
+        UPDATE_SPELLS_UI();
+    }
+
+    public IEnumerator BOUGHT_AN_ORB(int n)
+    {
+        var eff = Instantiate(confettiPrefab, transform.position, transform.rotation);
+        Destroy(eff, 1);
+        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+        if (!isAtShop) controller.MagicOrbBoughtController();
+        if (n >= 0)
+        {
+            go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
+            Color top = new Color(0, 0.8f, 1);
+            Color bot = new Color(0, 0.3f, 1);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            // GAIN ORBS
+            for (int i = 0; i < n; i++)
+            {
+                if (n<11) { yield return new WaitForSeconds(0.1f); }
+                else { yield return new WaitForSeconds(0.02f); }
+                orbPickup.Play();
+                orbs++;
+            }
+        }
+        else
+        {
+            go.GetComponent<TextMeshPro>().text    = n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            // LOSE ORBS
+            for (int i = 0; i > n; i--)
+            {
+                if (n<11) { yield return new WaitForSeconds(0.1f); }
+                else { yield return new WaitForSeconds(0.02f); }
+                coinLoss.Play();    // CHANGE
+                orbs--;
+            }
+        }
+        manager.CHECK_RANKINGS();
+
+        yield return new WaitForSeconds(1.5f);
+        AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+        bgMusic.volume = 0.2f;
+        controller.CHOOSE_MAGIC_ORB_SPACE(name);
+            
+        if (isAtMagicOrb) { nMovesLeft.gameObject.SetActive(true); }
+        manager.UNHIDE_UI();
+        isAtMagicOrb = false;
+        _animator.speed = _moveSpeed;
+        _animator.SetBool("IsWalking", true);
+        hasPurchased = false;
+    }
+    
+
+    public IEnumerator ORB_STOLEN(int n)
+    {
+        bool haveOrb = false;
+        if (orbs > 0) {haveOrb = true;}
+        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+            
+        // NO ORBS TO LOSE
+        if (!haveOrb) {
+            go.GetComponent<TextMeshPro>().text    = "-0";
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            if (_movesRemaining == 0 && isPlayerTurn) {
+                yield return new WaitForSeconds(0.5f);
+                readyToMovedAside = true;
+            }
+        }
+        else {
+            go.GetComponent<TextMeshPro>().text    = n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+            // LOSE ORB(S)
+            for (int i = 0; i > n; i--)
+            {
+                if (n<11) { yield return new WaitForSeconds(0.1f); }
+                else { yield return new WaitForSeconds(0.02f); }
+                orbLoss.Play();    
+                orbs--;
+            }
+            // PAY OPPONENT AFTER LOSING ORB(S)
+            if (n < 0) { n = Mathf.Abs(n); } // make positive
+
+            yield return new WaitForSeconds(1);
+            StartCoroutine( PLAYER_CAM_OFF(0) );
+            string toWhom = currentNode.WHOS_TRAP();
+            manager.STEALING_ORB(toWhom, n);
+        }
+        manager.CHECK_RANKINGS();
+    }
+    
+    public IEnumerator ORB_GAINED(int n)
+    {
+        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+            
+        go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
+        Color top = new Color(0, 0.8f, 1);
+        Color bot = new Color(0, 0.3f, 1);
+        go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        // GAIN ORB(S)
+        for (int i = 0; i < n; i++)
+        {
+            if (n<11) { yield return new WaitForSeconds(0.1f); }
+            else { yield return new WaitForSeconds(0.02f); }
+            orbPickup.Play();    
+            orbs++;
+        }
+
+        if (beingPayed) { 
+            yield return new WaitForSeconds(1);
+            beingPayed = false; StartCoroutine( PLAYER_CAM_OFF(0.5f) ); 
+            manager.StartCoroutine(manager.INCREMENT_TURN()); 
+        }
+    }
+    
+    private IEnumerator ORB_LOST_FROM_BOAT(int n)
+    {
+        if (orbStolen.isPlaying) orbStolen.Stop();
+
+        n = Mathf.Abs(n);
+        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+            
+        go.GetComponent<TextMeshPro>().text    = "-" + n.ToString();
+        Color top = new Color(1, 0.15f, 0.2f);
+        Color bot = new Color(0.8f, 0, 0.05f);
+        go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        // LOSE ORB(S)
+        for (int i = 0; i < n; i++)
+        {
+            if (n<11) { yield return new WaitForSeconds(0.1f); }
+            else { yield return new WaitForSeconds(0.02f); }
+            orbLoss.Play();    
+            orbs--;
+        }
+        
+        if (isAtSpecial && nPrompt > 0)
+        {
+            PLAYER_CAM_OFF(0);
+            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+        }
+        manager.CHECK_RANKINGS();
+    }
+
+    // DESTROY THE VISUAL REPRESENTATION OF MOVES LEFT
+    private IEnumerator fadeMovesLeft()
+    {
+        yield return new WaitForSeconds(0.5f);
+        nMovesLeft.gameObject.SetActive(false);
+    }
 
     /* ------------------------------------------------------------ */
     /* ----------------------- BUYING STUFF ----------------------- */
@@ -3641,32 +3415,10 @@ public class PathFollower : MonoBehaviour
         slowed.transform.parent = character.transform; 
     }
 
+    // TELEPORTATION
     public void SET_NEW_PATH(string newPath)
     {
-        switch (newPath)
-        {
-            case "Path_0":  _currentPath = _nodes0; break;
-            case "Path_1":  _currentPath = _nodes1; break;
-            case "Path_2":  _currentPath = _nodes2; break;
-            case "Path_3":  _currentPath = _nodes3; break;
-            case "Path_4":  _currentPath = _nodes4; break;
-            case "Path_5":  _currentPath = _nodes5; break;
-            case "Path_6":  _currentPath = _nodes6; break;
-            case "Path_7":  _currentPath = _nodes7; break;
-            case "Path_8":  _currentPath = _nodes8; break;
-            case "Path_9":  _currentPath = _nodes9; break;
-            case "Path_10": _currentPath = _nodes10; break;
-            case "Path_11": _currentPath = _nodes11; break;
-            case "Path_12": _currentPath = _nodes12; break;
-            case "Path_13": _currentPath = _nodes13; break;
-            case "Path_14": _currentPath = _nodes14; break;
-            case "Path_15": _currentPath = _nodes15; break;
-            case "Path_16": _currentPath = _nodes16; break;
-            case "Path_17": _currentPath = _nodes17; break;
-            case "Path_18": _currentPath = _nodes18; break;
-            case "Path_19": _currentPath = _nodes19; break;
-            case "Path_20": _currentPath = _nodes20; break;
-        }
+        currentNode = GameObject.Find(newPath).GetComponent<Node>();
     }
 
     public void RESET_TARGET_SPELL_CAM()

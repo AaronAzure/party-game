@@ -26,7 +26,7 @@ public class TrapSpell : MonoBehaviour
     private void OnTriggerStay2D(Collider2D other) {
         if (other.tag == "Node" && inRange)
         {
-            Node space = other.GetComponent<Node>();
+            Node space = other.transform.parent.GetComponent<Node>();
             if (space.VALID_NODE_TO_TRANSFORM())
             {
                 nodeLocked = true;
@@ -44,7 +44,7 @@ public class TrapSpell : MonoBehaviour
     {
         if (other.tag == "Node" && inRange)
         {
-            Node space = other.GetComponent<Node>();
+            Node space = other.transform.parent.GetComponent<Node>();
             if (space.VALID_NODE_TO_TRANSFORM())
             {
                 nodeLocked = true;

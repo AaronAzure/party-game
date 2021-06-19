@@ -102,26 +102,26 @@ public class EffectSpell : MonoBehaviour
         {
             Vector3 tempPos     = spellCasterPlayer.transform.position;
             string  tempPath    = spellCasterPlayer.data[0].path;
-            int     tempNode    = spellCasterPlayer._currentNode;
+            // int     tempNode    = spellCasterPlayer.currentNode;
             
             // SET CASTER'S NEW LOCATION
             string newPath                          = targetedPlayer.data[0].path;
 
             spellCasterPlayer.SET_NEW_PATH(newPath);
-            spellCasterPlayer._currentNode          = targetedPlayer._currentNode;
-            spellCasterPlayer.transform.position    = targetedPlayer._currentPositionHolder;
-            spellCasterPlayer._currentPositionHolder = spellCasterPlayer.transform.position;
+            spellCasterPlayer.currentNode          = targetedPlayer.currentNode;
+            spellCasterPlayer.transform.position    = targetedPlayer.currentNode.transform.position;
+            spellCasterPlayer.currentNode.transform.position = spellCasterPlayer.transform.position;
             spellCasterPlayer.RESET_TARGET_SPELL_CAM();
 
-            Vector3 asideDif = targetedPlayer.transform.position - targetedPlayer._currentPositionHolder; 
+            Vector3 asideDif = targetedPlayer.transform.position - targetedPlayer.currentNode.transform.position; 
 
             // SET TARGET'S NEW LOCATION
             string oldPath                      = tempPath; 
             targetedPlayer.SET_NEW_PATH(oldPath);
-            targetedPlayer._currentNode         = tempNode;
+            // targetedPlayer.currentNode          = tempNode;
             targetedPlayer.data[0].pos          = tempPos;
             targetedPlayer.transform.position   = tempPos + asideDif;
-            targetedPlayer._currentPositionHolder = targetedPlayer.data[0].pos;
+            targetedPlayer.currentNode.transform.position = targetedPlayer.data[0].pos;
 
 
             // spaceToCastEffect.EFFECT_SPELL(spellName);

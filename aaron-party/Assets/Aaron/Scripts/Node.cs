@@ -8,7 +8,7 @@ public class Node : MonoBehaviour
     private AudioSource _soundNode;                 // AUDIO FOR GOING OVER A NODE/SPACE
     [SerializeField] private GameObject nodeContainer;     // space containing sprite
     
-    [Tooltip("The shop keeper number")] public int whoIsTheSeller;
+    [Tooltip("The shop keeper number")] public int whoIsTheSeller;  // ** INSPECTOR
     [SerializeField] private SpriteRenderer lockedOn;
     [SerializeField] private GameObject magicOrb;
     private GameController controller;      // ** SCRIPT (RUN-TIME)
@@ -44,6 +44,7 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite potionSpace;    //
     [SerializeField] private Sprite specialSpace;   //
     [SerializeField] private HashSet<Sprite> noCostSpace = new HashSet<Sprite>();   // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
+    [SerializeField] private HashSet<Sprite> canTurnToTrap = new HashSet<Sprite>();   // SET THAT TURN INTO TRAP (COLLECTION)//! DELETE
 
 
 
@@ -113,6 +114,7 @@ public class Node : MonoBehaviour
         noCostSpace.Add(shopSpace);
         noCostSpace.Add(potionSpace);
         noCostSpace.Add(specialSpace);
+        // canTurnToTrap.Add(); //! DELETE
 
         _soundNode = this.GetComponentInChildren<AudioSource>();
         if (aaron != null) { 
@@ -196,6 +198,21 @@ public class Node : MonoBehaviour
     {
         return !noCostSpace.Contains(_spaceType.sprite);
     }
+    // todo WHEN CROSSING OVER A SPACE THAT DOES NOT DECREMENT MOVEMENT //? (SPECIAL SPACES)
+    public bool TYPE_OF_SPECIAL_SPACE(string space)
+    {
+        switch (space) 
+        {
+            case "free" :   return (_spaceType.sprite == freeSpace);
+            case "shop" :   return (_spaceType.sprite == shopSpace);
+            case "potion" : return (_spaceType.sprite == potionSpace);
+            case "orb" :    return (_spaceType.sprite == orbSpace);
+            case "spec" :    return (_spaceType.sprite == specialSpace);
+        }
+        Debug.LogError("ERROR: not a registered space");
+        return false;
+    }
+
 
     // NORMAL SPACE
     public bool SPACE_LANDED()
@@ -283,10 +300,10 @@ public class Node : MonoBehaviour
     // SPACES THAT CAN BE TURNED INTO TRAPS (ie NOT EVENTS, EMPTY, ORB, SHOP)
     public bool VALID_NODE_TO_TRANSFORM()
     {
-        // return (_spaceType.sprite == blueSpace || _spaceType.sprite == redSpace);
-        return (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace && _spaceType.sprite != eventSpace
-            && _spaceType.sprite != happenSpace && _spaceType.sprite != potionSpace && _spaceType.sprite != spellSpace
-            && _spaceType.sprite != specialSpace && _spaceType.sprite != shopSpace && _spaceType.sprite != freeSpace);
+        return (_spaceType.sprite == blueSpace || _spaceType.sprite == redSpace);
+        // return (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace && _spaceType.sprite != eventSpace
+        //     && _spaceType.sprite != happenSpace && _spaceType.sprite != potionSpace && _spaceType.sprite != spellSpace
+        //     && _spaceType.sprite != specialSpace && _spaceType.sprite != shopSpace && _spaceType.sprite != freeSpace);
     }
     
     public void SPELL_HIGHLIGHT() { lockedOn.gameObject.SetActive(true); }

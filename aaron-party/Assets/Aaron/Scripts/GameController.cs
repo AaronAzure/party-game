@@ -652,7 +652,8 @@ public class GameController : MonoBehaviour
     public void ResetCurrentMagicOrb()
     {
         int r = currentMagicOrbIndex;
-        Node node = GameObject.Find("/PATHS/" + magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
+        // Node node = GameObject.Find("/PATHS/" + magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
+        Node node = GameObject.Find(magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         camNode = node;
         node.TURN_INTO_ORB_SPACE();
     }
@@ -1427,7 +1428,7 @@ public class PlayerPrevData
             Vector3 newPosAside, int newCoins, int newOrbs, int newMp, int newPrize, bool first)
     {
         path        = newPath;
-        node        = newNode;
+        node        = newNode;  //! DELETE
         pos         = newPos;
         posAside    = newPosAside;
         coins       = newCoins;
