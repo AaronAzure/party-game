@@ -68,6 +68,14 @@ public class GameController : MonoBehaviour
     private int currentMagicOrbIndex = -1;
     private List<NodeSpace> magicOrbSpace;
 
+    [Header("Crystal Caverns")]
+    [SerializeField] private Camera[] cavingInCamera;   // CRYSTAL CAVERN SPECIFIC CAMERAS
+    [SerializeField] private GameObject collapsePrefab;   // 
+    private List<CavedSpace> cavedInSpace;
+    private HashSet<int> nCavedSection;
+
+
+    [Header("Magic Orb")]
     [SerializeField] public Camera orbCam;
     [SerializeField] private GameObject aaronOrb;   // THE NEXT MAGIC ORB LOCATION
     private float camSpeed;
@@ -617,7 +625,7 @@ public class GameController : MonoBehaviour
 
 
     // FILL LIST WITH THE NODE(S) THAT HAVE BEEN TURN INTO TRAPS
-    public void NewTrap(string parentName, string childName, string spaceType)
+    public void NewTrap(string parentName, string childName, Sprite spaceType)
     {
         foreach (NodeSpace node in changedSpaces)
         {
@@ -625,25 +633,32 @@ public class GameController : MonoBehaviour
         }
         changedSpaces.Add( new NodeSpace(parentName, childName, spaceType) );
     }
+    public void RemoveTrap(string parentName, string childName)
+    {
+        foreach (NodeSpace node in changedSpaces)
+        {
+            if (node.parentPath == parentName && node.childNode == childName) { changedSpaces.Remove(node); break; }
+        }
+    }
 
     public void ResetAllTraps()
     {
         foreach(NodeSpace space in changedSpaces)
         {
             // Debug.Log("Parent name = " + space.parentPath + ", Child name = " + space.childNode + ", Renderer = " + space.nodeType);
-            Node node = GameObject.Find("/PATHS/" + space.parentPath + "/" + space.childNode).GetComponent<Node>();
+            Node node = GameObject.Find(space.parentPath + "/" + space.childNode).GetComponent<Node>();
             node.CHANGE_SPACE_TYPE(space.nodeType);
         }
     }
 
 
-    /* --------------------------------------------------------------- */
-    /* ---------------------- MAGIC ORB RELATED ---------------------- */
+    // todo --------------------------------------------------------------- */
+    // todo ---------------------- MAGIC ORB RELATED ---------------------- */
 
 
 
     // FILL LIST WITH THE NODE(S) THAT ARE MAGIC ORB SPACES 
-    public void NewOrbSpace(string parentName, string childName, string spaceType)
+    public void NewOrbSpace(string parentName, string childName, Sprite spaceType)
     {
         magicOrbSpace.Add( new NodeSpace(parentName, childName, spaceType) );
     }
@@ -671,7 +686,7 @@ public class GameController : MonoBehaviour
         if (!firstMagicOrbShown) { r = 0; }
         currentMagicOrbIndex = r;
 
-        Debug.Log(magicOrbSpace[r].parentPath + "  -  " + magicOrbSpace[r].childNode);
+        // Debug.Log(magicOrbSpace[r].parentPath + "  -  " + magicOrbSpace[r].childNode);
         // Node node = GameObject.Find("/PATHS/" + magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         Node node = GameObject.Find(magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         camNode = node;
@@ -699,6 +714,75 @@ public class GameController : MonoBehaviour
         node.MAGIC_ORB_BOUGHT();
     }
 
+
+    /* ------------------------------------------------------------------ */
+    /* ------------------------ CRSYTAL CAVERNS ------------------------- */
+
+    // FILL LIST WITH NODE(S) THAT CAN BE BOULDERED (CAVED IN)
+    public void NewCavedInSpace(string parentName, string childName, int cavedSection)
+    {
+        if (cavedInSpace == null) cavedInSpace = new List<CavedSpace>();
+        cavedInSpace.Add( new CavedSpace(parentName, childName, cavedSection) );
+    }
+
+
+    public IEnumerator CAVING_IN()
+    {
+        // if (nCavedSection == null) {
+        //     nCavedSection = new HashSet<int>();
+
+        //     // GET UNIQUE CAVE SECTION(S)
+        //     foreach (var possibleCavedInSpace in cavedInSpace) {
+        //         if (!nCavedSection.Contains(possibleCavedInSpace.cavedSection)) {
+        //             nCavedSection.Add(possibleCavedInSpace.cavedSection);   // 0, 1, 2
+        //         }
+        //     }
+        // }
+
+        for (int i=0 ; i<cavingInCamera.Length ; i++) {
+            Debug.Log("Caving in camera " + (i+1));
+            cavingInCamera[i].gameObject.SetActive(true);
+
+            // GET THE POSSIBLE CAVE IN SPOTS IN CAMERA AREA
+            List<Node> nodes = new List<Node>();
+            foreach (var possibleCavedInSpace in cavedInSpace) {
+                if (possibleCavedInSpace.cavedSection == i) {
+                    string pathToObject = possibleCavedInSpace.parentPath + "/" + possibleCavedInSpace.childNode;
+                    nodes.Add( GameObject.Find(pathToObject).GetComponent<Node>() );
+                }
+            }
+
+            //* UNBLOCK ALREADY BLOCKED, AND BLOCK A NEW SPOT
+            yield return new WaitForSeconds(1f);
+            // UNBLOCK OLD SPOT (IF EXISTS)
+            int blocked = IS_THERE_ALREADY_ONE_CAVED_IN(nodes);
+            if (blocked >= 0 && nodes[blocked] != null) nodes[blocked].UNBLOCK();
+
+            List<int> temp = new List<int>();
+            for (int j=0 ; j<nodes.Count ; j++) temp.Add(j);
+            temp.Remove(blocked);
+
+            // BLOCK NEW SPOT
+            int r = temp[ Random.Range(0, temp.Count) ];
+            if (nodes[r] != null) {
+                Debug.Log("Collapse!!!");
+                nodes[r].BLOCK();
+                var quake = Instantiate(collapsePrefab, nodes[r].transform.position, Quaternion.identity);
+                Destroy(quake, 3);
+            }
+            
+            yield return new WaitForSeconds(2f);
+            cavingInCamera[i].gameObject.SetActive(false);
+        }
+    }
+
+    private int IS_THERE_ALREADY_ONE_CAVED_IN(List<Node> nodes)
+    {
+        for (int i=0 ; i<nodes.Count ; i++) {
+            if (nodes[i].IS_BLOCKED()) return i;
+        }
+        return -1;
+    }
 
     /* ---------------------------------------------------------------- */
     /* ---------------------------- SPELLS ---------------------------- */
@@ -1091,14 +1175,14 @@ public class GameController : MonoBehaviour
         trapOrb   = new int[nPlayers];
         foreach (NodeSpace trap in changedSpaces)
         {
-            if (nPlayers >= 1 && trap.nodeType.Contains(characterName1)) { trapOrb[0]++;   continue; }
-            if (nPlayers >= 2 && trap.nodeType.Contains(characterName2)) { trapOrb[1]++;   continue; }
-            if (nPlayers >= 3 && trap.nodeType.Contains(characterName3)) { trapOrb[2]++;   continue; }
-            if (nPlayers >= 4 && trap.nodeType.Contains(characterName4)) { trapOrb[3]++;   continue; }
-            if (nPlayers >= 5 && trap.nodeType.Contains(characterName5)) { trapOrb[4]++;   continue; }
-            if (nPlayers >= 6 && trap.nodeType.Contains(characterName6)) { trapOrb[5]++;   continue; }
-            if (nPlayers >= 7 && trap.nodeType.Contains(characterName7)) { trapOrb[6]++;   continue; }
-            if (nPlayers >= 8 && trap.nodeType.Contains(characterName8)) { trapOrb[7]++;   continue; }
+            if (nPlayers >= 1 && trap.nodeType.name.Contains(characterName1)) { trapOrb[0]++;   continue; }
+            if (nPlayers >= 2 && trap.nodeType.name.Contains(characterName2)) { trapOrb[1]++;   continue; }
+            if (nPlayers >= 3 && trap.nodeType.name.Contains(characterName3)) { trapOrb[2]++;   continue; }
+            if (nPlayers >= 4 && trap.nodeType.name.Contains(characterName4)) { trapOrb[3]++;   continue; }
+            if (nPlayers >= 5 && trap.nodeType.name.Contains(characterName5)) { trapOrb[4]++;   continue; }
+            if (nPlayers >= 6 && trap.nodeType.name.Contains(characterName6)) { trapOrb[5]++;   continue; }
+            if (nPlayers >= 7 && trap.nodeType.name.Contains(characterName7)) { trapOrb[6]++;   continue; }
+            if (nPlayers >= 8 && trap.nodeType.name.Contains(characterName8)) { trapOrb[7]++;   continue; }
         }
     }
 
@@ -1293,14 +1377,14 @@ public class GameController : MonoBehaviour
 
         foreach (NodeSpace trap in changedSpaces)
         {
-            if (trap.nodeType.Contains(characterName1)) { arr[0]++;   continue; }
-            if (trap.nodeType.Contains(characterName2)) { arr[1]++;   continue; }
-            if (trap.nodeType.Contains(characterName3)) { arr[2]++;   continue; }
-            if (trap.nodeType.Contains(characterName4)) { arr[3]++;   continue; }
-            if (trap.nodeType.Contains(characterName5)) { arr[4]++;   continue; }
-            if (trap.nodeType.Contains(characterName6)) { arr[5]++;   continue; }
-            if (trap.nodeType.Contains(characterName7)) { arr[6]++;   continue; }
-            if (trap.nodeType.Contains(characterName8)) { arr[7]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName1)) { arr[0]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName2)) { arr[1]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName3)) { arr[2]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName4)) { arr[3]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName5)) { arr[4]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName6)) { arr[5]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName7)) { arr[6]++;   continue; }
+            if (trap.nodeType.name.Contains(characterName8)) { arr[7]++;   continue; }
         }
 
         for ( int i=0 ; i<nPlayers ; i++)

@@ -1131,7 +1131,7 @@ public class PathFollower : MonoBehaviour
             if (evilBoat.activeSelf) { if (player.GetAnyButtonDown()) { nPrompt++; NEXT_TEXT(); } }
         }
         //* AT MAGIC ORB SPACE
-        else if (isAtMagicOrb) 
+        else if (isAtMagicOrb && currentNode.magicOrb.activeSelf) 
         {
             if (_animator.GetBool("IsWalking"))
             {
@@ -1155,10 +1155,12 @@ public class PathFollower : MonoBehaviour
             if (currentNode.nexts[0] != null && currentNode.nexts.Length <= 1) {
                 nextNode = currentNode.nexts[0].node.GetComponent<Node>();
                 PATH_BLOCKED_MOVE_TO_ALTERNATE();
+                WHERE_TO_FACE();
             }
             // PATH SPLITS/FORKS
             else {
                 AT_FORK();
+                WHERE_TO_FACE();
             }
         }
         //* MOVEMENT && SPECIAL SPACE EVENTS
@@ -1714,10 +1716,26 @@ public class PathFollower : MonoBehaviour
     private void SHOW_ARROWS() 
     {
         for (int i=0 ; i<currentNode.nexts.Length ; i++) {
-            if (currentNode.nexts[i].direction == Node.Directions.left)  { arrowLeft.gameObject.SetActive(true); continue; }
-            if (currentNode.nexts[i].direction == Node.Directions.right) { arrowRight.gameObject.SetActive(true); continue; }
-            if (currentNode.nexts[i].direction == Node.Directions.up)    { arrowUp.gameObject.SetActive(true); continue; }
-            if (currentNode.nexts[i].direction == Node.Directions.down)  { arrowDown.gameObject.SetActive(true); continue; }
+            if (currentNode.nexts[i].direction == Node.Directions.left && 
+                !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED())  
+            { 
+                arrowLeft.gameObject.SetActive(true); continue; 
+            }
+            if (currentNode.nexts[i].direction == Node.Directions.right && 
+                !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED()) 
+            { 
+                arrowRight.gameObject.SetActive(true); continue; 
+            }
+            if (currentNode.nexts[i].direction == Node.Directions.up && 
+                !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED())  
+            { 
+                arrowUp.gameObject.SetActive(true); continue; 
+            }
+            if (currentNode.nexts[i].direction == Node.Directions.down && 
+                !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED())  
+            { 
+                arrowDown.gameObject.SetActive(true); continue; 
+            }
         }
     }
 
@@ -1753,11 +1771,11 @@ public class PathFollower : MonoBehaviour
             StartCoroutine( GAIN_RANDOM_SPELL() );
         }
         // LANDED ON HAPPENING (TRIGGER)
-        else if (currentNode.IS_BOULDER()) {
+        else if (currentNode.IS_BOULDER_EVENT()) {
             if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
             {
                 Debug.Log("-- CAVING IN");
-                // StartCoroutine( HAPPEN_NEW_BOAT() );
+                StartCoroutine( PATHFOLLOWER_CAVING_IN() );
             }
         }
         // LANDED ON HAPPENING (TRIGGER)
@@ -3466,7 +3484,16 @@ public class PathFollower : MonoBehaviour
     
 
 
-    // ---------------------------------------------------------------
+    // todo ---------------------------------------------------------------
+
+    IEnumerator PATHFOLLOWER_CAVING_IN()
+    {
+        manager.SCREEN_TRANSITION("Happen_Transition", 0);
+        
+        yield return new WaitForSeconds(1);
+        StartCoroutine( manager.MANAGER_CAVING_IN(this) );
+        _cam.gameObject.SetActive(false);   // CAM TURNS OFF
+    }
 
     IEnumerator HAPPEN_NEW_BOAT()
     {

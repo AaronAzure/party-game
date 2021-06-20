@@ -562,8 +562,25 @@ public class GameManager : MonoBehaviour
     }
 
 
-    // ------------------------------------------------------------------ //
-    // --------------------- SHOGUN SEAPORT ----------------------------- //
+    // todo ------------------------------------------------------------------ //
+    // todo --------------------- CRYSTAL CAVERNS ---------------------------- //
+
+    public IEnumerator MANAGER_CAVING_IN(PathFollower playerToResume)
+    {
+        // FADE_FROM_BLACK();
+
+        StartCoroutine( controller.CAVING_IN() );
+        // yield return new WaitForSeconds(transitionTime);
+
+        yield return new WaitForSeconds(9);
+        playerToResume.PLAYER_CAM_ON();
+
+        StartCoroutine(playerToResume.UPDATE_PLAYER_COINS(0));
+    }
+
+
+    // todo ------------------------------------------------------------------ //
+    // todo --------------------- SHOGUN SEAPORT ----------------------------- //
 
     public string WHICH_BOAT_IS_IT() { return currentBoat; }
 
@@ -590,28 +607,6 @@ public class GameManager : MonoBehaviour
         if (playerToResume._movesRemaining > 0 || !playerToResume.diceRolled)
         {
             playerToResume.LEAVE_PORT();
-        }
-        else 
-        {
-            StartCoroutine(playerToResume.UPDATE_PLAYER_COINS(0));
-        }
-    }
-
-    public IEnumerator CAVE_IN(PathFollower playerToResume)
-    {
-        if (boats == null) { yield break; }
-        // FADE_FROM_BLACK();
-        mainCam.gameObject.SetActive(true);
-
-        yield return new WaitForSeconds(transitionTime);
-
-        yield return new WaitForSeconds(3.5f);
-        mainCam.gameObject.SetActive(false);
-        playerToResume.PLAYER_CAM_ON();
-
-        if (playerToResume._movesRemaining > 0 || !playerToResume.diceRolled)
-        {
-            // playerToResume.LEAVE_PORT();
         }
         else 
         {

@@ -10,7 +10,7 @@ public class Node : MonoBehaviour
     
     [Tooltip("The shop keeper number")] public int whoIsTheSeller;  // ** INSPECTOR
     [SerializeField] private SpriteRenderer lockedOn;
-    [SerializeField] private GameObject magicOrb;
+    [SerializeField] public GameObject magicOrb;
     private GameController controller;      // ** SCRIPT (RUN-TIME)
 
 
@@ -47,7 +47,13 @@ public class Node : MonoBehaviour
     
     //* map-exclusive spaces
     [SerializeField] private Sprite boulderSpace;   // cause cave in
+
+
+    [Header("Crystal Cavern boulder")]
     [SerializeField] private Sprite boulders;   // boulders
+    private Sprite originalNode;
+    public bool canBeCavedIn;
+    public int cavedSection;
 
     // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
     [SerializeField] private HashSet<Sprite> noCostSpace = new HashSet<Sprite>();   
@@ -123,6 +129,7 @@ public class Node : MonoBehaviour
         noCostSpace.Add(shopSpace);
         noCostSpace.Add(potionSpace);
         noCostSpace.Add(specialSpace);
+        noCostSpace.Add(boulders);
 
         // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
         greenSpaces.Add(happenSpace);
@@ -147,6 +154,8 @@ public class Node : MonoBehaviour
         _soundNode.Play();
     }
 
+
+    //! DELETE
     private void OnTriggerEnter2D(Collider2D other)
     {
         // if (other.tag == "hello")
@@ -238,15 +247,28 @@ public class Node : MonoBehaviour
     public bool IS_BLUE() { return (_spaceType.sprite == blueSpace); }
     public bool IS_RED() { return (_spaceType.sprite == redSpace); }
     public bool IS_HAPPEN() { return (_spaceType.sprite == happenSpace); }
-    public bool IS_BOULDER() { return (_spaceType.sprite == boulderSpace); }
+    public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
     public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
-
     public bool IS_ORB_TRAP()
     {
         return (_spaceType.sprite == felixOrb || _spaceType.sprite == jacobOrb || _spaceType.sprite == laurelOrb
             || _spaceType.sprite == mauriceOrb || _spaceType.sprite == mimiOrb || _spaceType.sprite == pinkinsOrb
             || _spaceType.sprite == sweeterellaOrb || _spaceType.sprite == thanatosOrb || _spaceType.sprite == charlotteOrb);
     }
+
+    // todo CRYSTAL CAVERNS 
+    public void BLOCK() { 
+        _spaceType.sprite = boulders; 
+        _anim.Rebind(); CHANGE_ANIMATION(); 
+        controller.NewTrap(transform.parent.name, this.name, _spaceType.sprite); 
+    }
+    public void UNBLOCK() { 
+        _spaceType.sprite = originalNode; 
+        _anim.Rebind(); CHANGE_ANIMATION(); 
+        controller.RemoveTrap(transform.parent.name, this.name); 
+    }
+
+
 
     // BLUE || RED || EVENT
     public int COINS_RECEIVED_FROM_SPACE()
@@ -292,13 +314,23 @@ public class Node : MonoBehaviour
             this._anim.SetBool("isOrb", true);
             this._anim.SetBool("isOrb", false);
 
-            // TURN 1 ONLY (REGISTER ORB SPACES OF MAP)
+            // TURN 1 ONLY (REGISTER ORB SPACES OF MAP ONCE)
             if (controller.hasStarted == false) {
-                controller.NewOrbSpace(transform.parent.name, this.name, _spaceType.sprite.ToString());
+                controller.NewOrbSpace(transform.parent.name, this.name, _spaceType.sprite);
             }
         }
         // TRAP SPACES
         else { this._anim.SetTrigger("isTrap"); }
+
+        if (canBeCavedIn) {
+            originalNode = _spaceType.sprite;
+            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+
+            // TURN 1 ONLY (REGISTER CAN BE CAVED-IN SPACES OF MAP)
+            if (controller.hasStarted == false) {
+                controller.NewCavedInSpace(transform.parent.name, this.name, cavedSection);
+            }
+        }
 
         // if (_spaceType.sprite != shopSpace) { _spaceType.color = new Color(1, 1, 1, 0.6f); }
     }
@@ -372,56 +404,58 @@ public class Node : MonoBehaviour
         {
             controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
         }
-        controller.NewTrap(transform.parent.name, this.name, _spaceType.sprite.ToString());
+        controller.NewTrap(transform.parent.name, this.name, _spaceType.sprite);
     }
 
     // PLAYER'S TRAP TO CARRY OVER (FROM GAME_CONTROLLER)
-    public void CHANGE_SPACE_TYPE(string spaceType)
+    public void CHANGE_SPACE_TYPE(Sprite spaceType)
     {
         if (_spaceType == null) { _spaceType = this.GetComponent<SpriteRenderer>(); }
-        Debug.Log(spaceType);
+        _spaceType.sprite = spaceType
+        // Debug.Log(spaceType);
 
-        switch (spaceType)
-        {
-            // SPELL NAMES FROM .png FILES (UNDER Player Spaces in INSPECTOR Node prefab)
-            case "Felix_10 (UnityEngine.Sprite)" :          _spaceType.sprite = felixCoin10; break;
-            case "Felix_20 (UnityEngine.Sprite)" :          _spaceType.sprite = felixCoin20; break;
-            case "Felix_Orb (UnityEngine.Sprite)" :         _spaceType.sprite = felixOrb; break;
+        //! DELETE
+        // switch (spaceType)
+        // {
+        //     // SPELL NAMES FROM .png FILES (UNDER Player Spaces in INSPECTOR Node prefab)
+        //     case "Felix_10 (UnityEngine.Sprite)" :          _spaceType.sprite = felixCoin10; break;
+        //     case "Felix_20 (UnityEngine.Sprite)" :          _spaceType.sprite = felixCoin20; break;
+        //     case "Felix_Orb (UnityEngine.Sprite)" :         _spaceType.sprite = felixOrb; break;
 
-            case "Jacob_10 (UnityEngine.Sprite)" :          _spaceType.sprite = jacobCoin10; break;
-            case "Jacob_20 (UnityEngine.Sprite)" :          _spaceType.sprite = jacobCoin20; break;
-            case "Jacob_Orb (UnityEngine.Sprite)" :         _spaceType.sprite = jacobOrb; break;
+        //     case "Jacob_10 (UnityEngine.Sprite)" :          _spaceType.sprite = jacobCoin10; break;
+        //     case "Jacob_20 (UnityEngine.Sprite)" :          _spaceType.sprite = jacobCoin20; break;
+        //     case "Jacob_Orb (UnityEngine.Sprite)" :         _spaceType.sprite = jacobOrb; break;
 
-            case "Laurel_10 (UnityEngine.Sprite)" :         _spaceType.sprite = laurelCoin10; break;
-            case "Laurel_20 (UnityEngine.Sprite)" :         _spaceType.sprite = laurelCoin20; break;
-            case "Laurel_Orb (UnityEngine.Sprite)" :        _spaceType.sprite = laurelOrb; break;
+        //     case "Laurel_10 (UnityEngine.Sprite)" :         _spaceType.sprite = laurelCoin10; break;
+        //     case "Laurel_20 (UnityEngine.Sprite)" :         _spaceType.sprite = laurelCoin20; break;
+        //     case "Laurel_Orb (UnityEngine.Sprite)" :        _spaceType.sprite = laurelOrb; break;
 
-            case "Maurice_10 (UnityEngine.Sprite)" :        _spaceType.sprite = mauriceCoin10; break;
-            case "Maurice_20 (UnityEngine.Sprite)" :        _spaceType.sprite = mauriceCoin20; break;
-            case "Maurice_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = mauriceOrb; break;
+        //     case "Maurice_10 (UnityEngine.Sprite)" :        _spaceType.sprite = mauriceCoin10; break;
+        //     case "Maurice_20 (UnityEngine.Sprite)" :        _spaceType.sprite = mauriceCoin20; break;
+        //     case "Maurice_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = mauriceOrb; break;
 
-            case "Mimi_10 (UnityEngine.Sprite)" :           _spaceType.sprite = mimiCoin10; break;
-            case "Mimi_20 (UnityEngine.Sprite)" :           _spaceType.sprite = mimiCoin20; break;
-            case "Mimi_Orb (UnityEngine.Sprite)" :          _spaceType.sprite = mimiOrb; break;
+        //     case "Mimi_10 (UnityEngine.Sprite)" :           _spaceType.sprite = mimiCoin10; break;
+        //     case "Mimi_20 (UnityEngine.Sprite)" :           _spaceType.sprite = mimiCoin20; break;
+        //     case "Mimi_Orb (UnityEngine.Sprite)" :          _spaceType.sprite = mimiOrb; break;
 
-            case "Pinkins_10 (UnityEngine.Sprite)" :        _spaceType.sprite = pinkinsCoin10; break;
-            case "Pinkins_20 (UnityEngine.Sprite)" :        _spaceType.sprite = pinkinsCoin20; break;
-            case "Pinkins_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = pinkinsOrb; break;
+        //     case "Pinkins_10 (UnityEngine.Sprite)" :        _spaceType.sprite = pinkinsCoin10; break;
+        //     case "Pinkins_20 (UnityEngine.Sprite)" :        _spaceType.sprite = pinkinsCoin20; break;
+        //     case "Pinkins_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = pinkinsOrb; break;
 
-            case "Sweeterella_10 (UnityEngine.Sprite)" :    _spaceType.sprite = sweeterellaCoin10; break;
-            case "Sweeterella_20 (UnityEngine.Sprite)" :    _spaceType.sprite = sweeterellaCoin20; break;
-            case "Sweeterella_Orb (UnityEngine.Sprite)" :   _spaceType.sprite = sweeterellaOrb; break;
+        //     case "Sweeterella_10 (UnityEngine.Sprite)" :    _spaceType.sprite = sweeterellaCoin10; break;
+        //     case "Sweeterella_20 (UnityEngine.Sprite)" :    _spaceType.sprite = sweeterellaCoin20; break;
+        //     case "Sweeterella_Orb (UnityEngine.Sprite)" :   _spaceType.sprite = sweeterellaOrb; break;
 
-            case "Thanatos_10 (UnityEngine.Sprite)" :        _spaceType.sprite = thanatosCoin10; break;
-            case "Thanatos_20 (UnityEngine.Sprite)" :        _spaceType.sprite = thanatosCoin20; break;
-            case "Thanatos_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = thanatosOrb; break;
+        //     case "Thanatos_10 (UnityEngine.Sprite)" :        _spaceType.sprite = thanatosCoin10; break;
+        //     case "Thanatos_20 (UnityEngine.Sprite)" :        _spaceType.sprite = thanatosCoin20; break;
+        //     case "Thanatos_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = thanatosOrb; break;
             
-            case "Charlotte_10 (UnityEngine.Sprite)" :       _spaceType.sprite = charlotteCoin10; break;
-            case "Charlotte_20 (UnityEngine.Sprite)" :       _spaceType.sprite = charlotteCoin20; break;
-            case "Charlotte_Orb (UnityEngine.Sprite)" :      _spaceType.sprite = charlotteOrb; break;
+        //     case "Charlotte_10 (UnityEngine.Sprite)" :       _spaceType.sprite = charlotteCoin10; break;
+        //     case "Charlotte_20 (UnityEngine.Sprite)" :       _spaceType.sprite = charlotteCoin20; break;
+        //     case "Charlotte_Orb (UnityEngine.Sprite)" :      _spaceType.sprite = charlotteOrb; break;
 
-            default : break;
-        }
+        //     default : break;
+        // }
 
         if (_anim == null) { _anim = this.GetComponentInChildren<Animator>(); }
         _anim.SetTrigger("isTrap");
@@ -610,7 +644,7 @@ public class Node : MonoBehaviour
         }
     }
 
-    private void STEALING_AURA(PathFollower p)
+    private void STEALING_MP(PathFollower p)
     {
         if (p.stealMode)
         {
@@ -633,8 +667,11 @@ public class Node : MonoBehaviour
                 nSpace.text = n.ToString();
                 if (n == moveLeft) { nSpace.color = new Color(0,1,0); } //* WHERE YOU'LL LAND
                 foreach (Nexts next in nexts) {
-                    Debug.Log(name);    //! DELETE
-                    if (next.node != null) next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
+                    // Debug.Log(name);    //! DELETE
+                    if (next.node != null) {
+                        Node checkNode = next.node.GetComponent<Node>();
+                        if (checkNode._spaceType.sprite != boulders) checkNode.DISPLAY_MOVEMENT(n + 1, moveLeft);
+                    }
                 }
             }
             // IF NUMBER ALREADY EXISTS, THEN DISPLAY THE SMALLER ONE //? DISPLAY MOVEMENT
@@ -646,8 +683,11 @@ public class Node : MonoBehaviour
                     nSpace.text = n.ToString();
                     if (n == moveLeft) { nSpace.color = new Color(0,1,0); } //* WHERE YOU'LL LAND
                     foreach (Nexts next in nexts) {
-                        Debug.Log(name + ", "  + n + ", " + number);    //! DELETE
-                        if (next.node != null) next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n + 1, moveLeft);
+                        // Debug.Log(name + ", "  + n + ", " + number);    //! DELETE
+                        if (next.node != null) {
+                            Node checkNode = next.node.GetComponent<Node>();
+                            if (checkNode._spaceType.sprite != boulders) checkNode.DISPLAY_MOVEMENT(n + 1, moveLeft);
+                        }
                     }
                 }
             }
@@ -655,7 +695,10 @@ public class Node : MonoBehaviour
         // SPACE DOES NOT DECREMENT MOVEMENT //? DON'T DISPLAY
         else {
             foreach (Nexts next in nexts) {
-                next.node.GetComponent<Node>().DISPLAY_MOVEMENT(n, moveLeft);
+                if (next.node != null) {
+                    Node checkNode = next.node.GetComponent<Node>();
+                    if (checkNode._spaceType.sprite != boulders) checkNode.DISPLAY_MOVEMENT(n, moveLeft);
+                }
             }
         }
     }
