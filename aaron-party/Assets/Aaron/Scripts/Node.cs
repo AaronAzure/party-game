@@ -20,11 +20,12 @@ public class Node : MonoBehaviour
 
 
     // TODO : which node each node connects to
-    public enum Directions { none, left, right, up, down }
+    public enum Directions { none, left, right, up, down, blocked }
     [System.Serializable] public class Nexts
     {
         public GameObject node;
         public Directions direction;
+        public GameObject alternative;
     }
     [Header("Paths - next node(s)")]
     public Nexts[] nexts;
@@ -43,8 +44,16 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite shopSpace;      //
     [SerializeField] private Sprite potionSpace;    //
     [SerializeField] private Sprite specialSpace;   //
-    [SerializeField] private HashSet<Sprite> noCostSpace = new HashSet<Sprite>();   // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
-    [SerializeField] private HashSet<Sprite> canTurnToTrap = new HashSet<Sprite>();   // SET THAT TURN INTO TRAP (COLLECTION)//! DELETE
+    
+    //* map-exclusive spaces
+    [SerializeField] private Sprite boulderSpace;   // cause cave in
+    [SerializeField] private Sprite boulders;   // boulders
+
+    // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
+    [SerializeField] private HashSet<Sprite> noCostSpace = new HashSet<Sprite>();   
+    
+    // SET THAT COUNT TOWARDS HAPPENING (COLLECTION)
+    [SerializeField] private HashSet<Sprite> greenSpaces = new HashSet<Sprite>();  
 
 
 
@@ -114,7 +123,10 @@ public class Node : MonoBehaviour
         noCostSpace.Add(shopSpace);
         noCostSpace.Add(potionSpace);
         noCostSpace.Add(specialSpace);
-        // canTurnToTrap.Add(); //! DELETE
+
+        // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
+        greenSpaces.Add(happenSpace);
+        greenSpaces.Add(boulderSpace);
 
         _soundNode = this.GetComponentInChildren<AudioSource>();
         if (aaron != null) { 
@@ -220,11 +232,14 @@ public class Node : MonoBehaviour
         return (_spaceType.sprite == blueSpace || _spaceType.sprite == redSpace || _spaceType.sprite == eventSpace);
     }
 
+    public bool IS_GREEN() { return (greenSpaces.Contains(_spaceType.sprite)); }    // BONUS
     public bool IS_SPELL() { return (_spaceType.sprite == spellSpace); }
-    public bool IS_EVENT() { return (_spaceType.sprite == eventSpace || _spaceType.sprite == happenSpace); }
+    // public bool IS_EVENT() { return (_spaceType.sprite == eventSpace || _spaceType.sprite == happenSpace); }
     public bool IS_BLUE() { return (_spaceType.sprite == blueSpace); }
     public bool IS_RED() { return (_spaceType.sprite == redSpace); }
     public bool IS_HAPPEN() { return (_spaceType.sprite == happenSpace); }
+    public bool IS_BOULDER() { return (_spaceType.sprite == boulderSpace); }
+    public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
 
     public bool IS_ORB_TRAP()
     {
@@ -266,7 +281,8 @@ public class Node : MonoBehaviour
         if (_spaceType.sprite == blueSpace)         { this._anim.SetTrigger("isBlue"); }
         else if (_spaceType.sprite == redSpace)     { this._anim.SetTrigger("isRed"); }
         else if (_spaceType.sprite == eventSpace)   { this._anim.SetTrigger("isEvent"); }
-        else if (_spaceType.sprite == happenSpace)  { this._anim.SetTrigger("isHappen"); }
+        else if (greenSpaces.Contains(_spaceType.sprite))  { this._anim.SetTrigger("isHappen"); }
+        //// else if (_spaceType.sprite == happenSpace)  { this._anim.SetTrigger("isHappen"); }
         else if (_spaceType.sprite == spellSpace)   { this._anim.SetTrigger("isSpell"); }
         else if (_spaceType.sprite == freeSpace)    { this._anim.SetTrigger("isFree"); }
         else if (_spaceType.sprite == shopSpace)    {}

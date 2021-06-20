@@ -24255,6 +24255,8 @@ MonoBehaviour:
   shopSpace: {fileID: 21300000, guid: b8856b46e499642959918630da9b97c2, type: 3}
   potionSpace: {fileID: 21300000, guid: f36f6f44274c049d2bb630feeefa502b, type: 3}
   specialSpace: {fileID: 21300000, guid: b8d92939491e64732a453dc3d53f81cb, type: 3}
+  boulderSpace: {fileID: 21300000, guid: 413b2ea64105844d6b792ddf065f4a9b, type: 3}
+  boulders: {fileID: 21300000, guid: 01507f253651e4938a798e6429c197f7, type: 3}
   felixCoin10: {fileID: 21300000, guid: cfaf60a47487a4ead83cc61aae9cc9c6, type: 3}
   felixCoin20: {fileID: 21300000, guid: e4ad9f103abab46b49862420247e8e7f, type: 3}
   felixOrb: {fileID: 21300000, guid: 6a7e3d6b1e78549f4a962ef02ebdb2ff, type: 3}

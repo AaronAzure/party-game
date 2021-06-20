@@ -597,5 +597,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public IEnumerator CAVE_IN(PathFollower playerToResume)
+    {
+        if (boats == null) { yield break; }
+        // FADE_FROM_BLACK();
+        mainCam.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(transitionTime);
+
+        yield return new WaitForSeconds(3.5f);
+        mainCam.gameObject.SetActive(false);
+        playerToResume.PLAYER_CAM_ON();
+
+        if (playerToResume._movesRemaining > 0 || !playerToResume.diceRolled)
+        {
+            // playerToResume.LEAVE_PORT();
+        }
+        else 
+        {
+            StartCoroutine(playerToResume.UPDATE_PLAYER_COINS(0));
+        }
+    }
 
 }

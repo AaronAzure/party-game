@@ -563,9 +563,6 @@ public class PathFollower : MonoBehaviour
             if (GameObject.Find("New-Node") != null) {
                 currentNode = GameObject.Find("New-Node").GetComponent<Node>();
             }
-            if (nextNode == null && currentNode.nexts.Length <= 1 && currentNode.nexts[0] != null) {
-                nextNode = currentNode.nexts[0].node.GetComponent<Node>();
-            }
 
             mpBar.value = mpBar.maxValue;
             coins = 10; // TO BE CHANGED // DELETE
@@ -1157,6 +1154,7 @@ public class PathFollower : MonoBehaviour
             // SINGULAR PATH
             if (currentNode.nexts[0] != null && currentNode.nexts.Length <= 1) {
                 nextNode = currentNode.nexts[0].node.GetComponent<Node>();
+                PATH_BLOCKED_MOVE_TO_ALTERNATE();
             }
             // PATH SPLITS/FORKS
             else {
@@ -1235,6 +1233,7 @@ public class PathFollower : MonoBehaviour
                     if (currentNode.nexts.Length <= 1) {
                         if (currentNode.nexts[0] != null) {
                             nextNode = currentNode.nexts[0].node.GetComponent<Node>();
+                            PATH_BLOCKED_MOVE_TO_ALTERNATE();
                         }
                         if (_movesRemaining > 0) WHERE_TO_FACE();
                     }
@@ -1367,7 +1366,7 @@ public class PathFollower : MonoBehaviour
         }
     }
 
-    //* ---------------- NODE/PATHING RELATED ---------------- *//
+    // todo ---------------- NODE/PATHING RELATED ---------------- *//
 
     // AT FORK, MULTIPLE NEXT NODES
     private void AT_FORK()
@@ -1384,6 +1383,8 @@ public class PathFollower : MonoBehaviour
             for (int i=0 ; i<currentNode.nexts.Length ; i++) {
                 if (arrowDirection == currentNode.nexts[i].direction) {
                     nextNode = currentNode.nexts[i].node.GetComponent<Node>();
+                    PATH_BLOCKED_MOVE_TO_ALTERNATE();
+
                     isAtFork = false;
                     _animator.SetBool("IsWalking", true);
                     _animator.speed = _moveSpeed;
@@ -1687,6 +1688,14 @@ public class PathFollower : MonoBehaviour
         }
     }
 
+    // IF NEXTNODE IS BLOCKED (BOULDER), THEN GO TO ALTERNATE NODE
+    private void PATH_BLOCKED_MOVE_TO_ALTERNATE()
+    {
+        if (nextNode.IS_BLOCKED()) {
+            nextNode = currentNode.nexts[0].alternative.GetComponent<Node>();
+        }
+    }
+
     // FLIP CHARACTER BASED ON DIRECTION MOVEMENT
     private void WHERE_TO_FACE()
     {
@@ -1720,7 +1729,80 @@ public class PathFollower : MonoBehaviour
         }
     }
     
-    //* -------------------------------------------------------- *//
+    // SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
+    private void SPACE_END()
+    {
+        isLanded = true;
+        _animator.SetBool("IsWalking", false);
+        _animator.speed = 1;
+        
+        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
+            StartCoroutine(fadeMovesLeft());
+        }
+
+        // LANDED ON BLUE | RED | EVENT (SO FAR)
+        if (currentNode.SPACE_LANDED()) {
+            int coinsGained = currentNode.COINS_RECEIVED_FROM_SPACE();
+            if (currentNode.IS_BLUE())   { controller.blueOrb[playerID]++; }
+            if (currentNode.IS_RED())    { controller.RED_ORB_UPDATE(playerID); }
+            if (currentNode.IS_GREEN())  { controller.EVENT_ORB_UPDATE(playerID); }
+            StartCoroutine( UPDATE_PLAYER_COINS(coinsGained * controller.turnMultiplier) );
+        }
+        // GAIN SPELL FROM SPACE
+        else if (currentNode.IS_SPELL()) {
+            StartCoroutine( GAIN_RANDOM_SPELL() );
+        }
+        // LANDED ON HAPPENING (TRIGGER)
+        else if (currentNode.IS_BOULDER()) {
+            if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
+            {
+                Debug.Log("-- CAVING IN");
+                // StartCoroutine( HAPPEN_NEW_BOAT() );
+            }
+        }
+        // LANDED ON HAPPENING (TRIGGER)
+        else if (currentNode.IS_HAPPEN()) {
+            if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
+            {
+                StartCoroutine( HAPPEN_NEW_BOAT() );
+            }
+        }
+        // LANDED ON ORB TRAP
+        else if (currentNode.IS_ORB_TRAP()) {
+            Debug.Log("LANDED ON ORB TRAP");
+            int onesTrap = currentNode.ORB_TRAP_SPACE_COST(characterName);
+            if (onesTrap == 5)
+            {
+                Debug.Log("-- " + onesTrap);
+                StartCoroutine( UPDATE_PLAYER_COINS(onesTrap * controller.turnMultiplier) );
+            } 
+            else 
+            {
+                Debug.Log("ORB BEING STOLEN");
+                if (!playerBarrier) StartCoroutine( ORB_STOLEN(-1) );
+                else { StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
+            }
+        }
+        // LANDED ON COIN TRAP
+        else {
+            int price = currentNode.TRAP_SPACE_COST(characterName);
+            if (price > 0) // OWN TRAP
+            {
+                StartCoroutine( UPDATE_PLAYER_COINS(price * controller.turnMultiplier) );
+            }
+            else            // OPPONENT'S TRAP
+            {
+                if (!playerBarrier) {
+                    isPayingSomeone = true;
+                    StartCoroutine( UPDATE_PLAYER_COINS(price) );
+                }
+                else { Debug.Log("PROTECTED"); StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
+            }
+        }
+    }
+    
+
+    // todo -------------------------------------------------------- *//
 
 
     private void UserPathForkMenu()
@@ -1877,70 +1959,6 @@ public class PathFollower : MonoBehaviour
 
     // TEXT SHOWING MOVES REMAINING
     private void UPDATE_MOVEMENT(int movesLeft) { nMovesLeft.text = movesLeft.ToString(); }
-
-    // SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
-    private void SPACE_END()
-    {
-        isLanded = true;
-        _animator.SetBool("IsWalking", false);
-        _animator.speed = 1;
-        
-        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
-            StartCoroutine(fadeMovesLeft());
-        }
-
-        // LANDED ON BLUE | RED | EVENT (SO FAR)
-        if (currentNode.SPACE_LANDED()) {
-            int coinsGained = currentNode.COINS_RECEIVED_FROM_SPACE();
-            if (currentNode.IS_BLUE())   { controller.blueOrb[playerID]++; }
-            if (currentNode.IS_RED())    { controller.RED_ORB_UPDATE(playerID); }
-            if (currentNode.IS_EVENT())  { controller.EVENT_ORB_UPDATE(playerID); }
-            StartCoroutine( UPDATE_PLAYER_COINS(coinsGained * controller.turnMultiplier) );
-        }
-        // GAIN SPELL FROM SPACE
-        else if (currentNode.IS_SPELL()) {
-            StartCoroutine( GAIN_RANDOM_SPELL() );
-        }
-        // LANDED ON HAPPENING (TRIGGER)
-        else if (currentNode.IS_HAPPEN()) {
-            if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
-            {
-                StartCoroutine( HAPPEN_NEW_BOAT() );
-            }
-        }
-        // LANDED ON ORB TRAP
-        else if (currentNode.IS_ORB_TRAP()) {
-            Debug.Log("LANDED ON ORB TRAP");
-            int onesTrap = currentNode.ORB_TRAP_SPACE_COST(characterName);
-            if (onesTrap == 5)
-            {
-                Debug.Log("-- " + onesTrap);
-                StartCoroutine( UPDATE_PLAYER_COINS(onesTrap * controller.turnMultiplier) );
-            } 
-            else 
-            {
-                Debug.Log("ORB BEING STOLEN");
-                if (!playerBarrier) StartCoroutine( ORB_STOLEN(-1) );
-                else { StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
-            }
-        }
-        // LANDED ON COIN TRAP
-        else {
-            int price = currentNode.TRAP_SPACE_COST(characterName);
-            if (price > 0) // OWN TRAP
-            {
-                StartCoroutine( UPDATE_PLAYER_COINS(price * controller.turnMultiplier) );
-            }
-            else            // OPPONENT'S TRAP
-            {
-                if (!playerBarrier) {
-                    isPayingSomeone = true;
-                    StartCoroutine( UPDATE_PLAYER_COINS(price) );
-                }
-                else { Debug.Log("PROTECTED"); StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
-            }
-        }
-    }
 
     // MOVE PLAYER ASIDE FOR VISUAL INDICATION OF WHO'S ON WHAT SPACE
     private void MOVE_ASIDE()
