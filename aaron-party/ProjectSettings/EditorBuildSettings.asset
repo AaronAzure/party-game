@@ -24,7 +24,7 @@ EditorBuildSettings:
     path: Assets/Aaron/Scenes/Minigames/0Prize_Money.unity
     guid: a7a92c46d0a5147898980ff71f1879db
   - enabled: 1
-    path: Assets/Aaron/Scenes/Minigames_Mini/Overlay.unity
+    path: Assets/Aaron/Scenes/1Startup/Overlay.unity
     guid: a7b3e1e96dbfb4ea28f078291401a944
   - enabled: 1
     path: Assets/Aaron/Scenes/Minigames/Sneak_And_Snore.unity

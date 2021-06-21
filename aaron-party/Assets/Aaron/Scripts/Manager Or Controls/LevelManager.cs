@@ -456,28 +456,35 @@ public class LevelManager : MonoBehaviour
         // COIN MINIGAME
         if (sceneName == "Sneak_And_Snore") 
         {
-            CALCULATE_MOST_POINTS();
+            Debug.Log("    GOLD QUEST");
+            for (int i=0 ; i<players.Length ; i++)
+            {
+                players[i].COIN_MINIGAME();
+            }
+            // CALCULATE_MOST_POINTS();
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);     // COINS WON IN MINIGAME (QUEST)
             winMusic.Play();
         }
         else if (sceneName == "Money_Belt")
         {
+            Debug.Log("    GOLD QUEST");
             for (int i=0 ; i<players.Length ; i++)
             {
                 players[i].COIN_MINIGAME();
             }
-            CALCULATE_MOST_POINTS();
+            // CALCULATE_MOST_POINTS();
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);
             winMusic.Play();
             DISPLAY_PLAYER_RANKINGS();
         }
         else if (sceneName == "Shocking-Situation")
         {
+            Debug.Log("    GOLD QUEST");
             for (int i=0 ; i<players.Length ; i++)
             {
                 players[i].COIN_MINIGAME();
             }
-            CALCULATE_MOST_POINTS();
+            // CALCULATE_MOST_POINTS();
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);
             winMusic.Play();
             DISPLAY_PLAYER_RANKINGS();

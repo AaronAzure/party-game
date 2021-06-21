@@ -723,6 +723,7 @@ public class GameController : MonoBehaviour
     {
         if (cavedInSpace == null) cavedInSpace = new List<CavedSpace>();
         cavedInSpace.Add( new CavedSpace(parentName, childName, cavedSection) );
+        cavedInSpace.Sort();
     }
 
 
@@ -744,24 +745,38 @@ public class GameController : MonoBehaviour
 
             //* UNBLOCK ALREADY BLOCKED, AND BLOCK A NEW SPOT
             yield return new WaitForSeconds(1f);
+
             // UNBLOCK OLD SPOT (IF EXISTS)
-            int blocked = IS_THERE_ALREADY_ONE_CAVED_IN(nodes);
-            if (blocked >= 0 && nodes[blocked] != null) nodes[blocked].UNBLOCK();
+            int blocked = -1;
+            for (int j=0 ; j<nodes.Count ; j++) {
+                if (nodes[j].IS_BLOCKED()) {
+                    blocked = j; break;
+                }
+            }
+            if (blocked >= 0) nodes[blocked].UNBLOCK();
 
             List<int> temp = new List<int>();
-            for (int j=0 ; j<nodes.Count ; j++) temp.Add(j);
-            temp.Remove(blocked);
+            for (int k=0 ; k<nodes.Count ; k++) { 
+                if (k == blocked) continue;
+                temp.Add(k);
+            }
+
+            string content = "";
+            foreach (int x in temp) content += x.ToString() + ", ";
 
             // BLOCK NEW SPOT
             int r = temp[ Random.Range(0, temp.Count) ];
             if (nodes[r] != null) {
-                Debug.Log("Collapse!!!");
+                content += "  -   " + r.ToString() + " was blocked";
+                Debug.Log(content);
                 nodes[r].BLOCK();
                 var quake = Instantiate(collapsePrefab, nodes[r].transform.position, Quaternion.identity);
                 Destroy(quake, 3);
             }
             
             yield return new WaitForSeconds(2f);
+            temp.Clear();
+            nodes.Clear();
             cavingInCamera[i].gameObject.SetActive(false);
         }
     }
@@ -771,6 +786,7 @@ public class GameController : MonoBehaviour
         for (int i=0 ; i<nodes.Count ; i++) {
             if (nodes[i].IS_BLOCKED()) return i;
         }
+        Debug.Log("    NONE BLOCKED!!!");
         return -1;
     }
 

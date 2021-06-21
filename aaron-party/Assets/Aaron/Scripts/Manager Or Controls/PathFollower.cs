@@ -565,7 +565,7 @@ public class PathFollower : MonoBehaviour
             }
 
             mpBar.value = mpBar.maxValue;
-            coins = 10; // TO BE CHANGED // DELETE
+            coins = 100; // TO BE CHANGED // DELETE
             orbs = 0;
             _collider.enabled = true;
             maxNPurchases = 1;
@@ -1092,6 +1092,7 @@ public class PathFollower : MonoBehaviour
         //* AT SHOP SPACE
         else if (isAtShop) 
         {
+            // GET SHOP KEEPER
             if (shopUI.activeSelf == false && !isViewingMap) { 
                 nMovesLeft.gameObject.SetActive(false); 
                 _mapMoves.text = _movesRemaining + " Moves Left";
@@ -1118,10 +1119,11 @@ public class PathFollower : MonoBehaviour
                     case 3 :  
                         shopKeeperImg.sprite = shopKeepers[3]; 
                         sellerGreetings.text = "One shall nev'r knoweth at which hour the tide shalt turneth.";
+                        shop4 = true;
                         break;
                 }
             }
-            //* User Input *//
+            // AFTER GETTING SHOP KEEPER //* User Input *//
             else { UserAtShop(); }
         }
         //* AT BOAT SPACE

@@ -70,6 +70,7 @@ MonoBehaviour:
   sweeterellaS: {fileID: 21300000, guid: af8f56834ab884534acdc6f9bb5b9d3e, type: 3}
   thanatosS: {fileID: 21300000, guid: 2f6e97cb27d5b4ef4b1cc77ed290c13c, type: 3}
   readyText: {fileID: 9110183905678722788}
+  others: []
 --- !u!1 &5163985592813836799
 GameObject:
   m_ObjectHideFlags: 0
@@ -209,7 +210,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Ready!
+  m_text: Accepted!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -236,8 +237,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

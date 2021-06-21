@@ -65,6 +65,9 @@ public class Node : MonoBehaviour
     
     // SET THAT COUNT TOWARDS HAPPENING (COLLECTION)
     [SerializeField] private HashSet<Sprite> greenSpaces = new HashSet<Sprite>();  
+    
+    // SET THAT CAN BE CONVERTED INTO TRAPS (COLLECTION)
+    [SerializeField] private HashSet<Sprite> trapSpaces = new HashSet<Sprite>();  
 
 
 
@@ -141,6 +144,40 @@ public class Node : MonoBehaviour
         // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
         greenSpaces.Add(happenSpace);
         greenSpaces.Add(boulderSpace);
+
+        // SET THAT CAN BE CONVERTED INTO TRAPS (COLLECTION)
+        if (true) {
+            trapSpaces.Add(blueSpace);
+            trapSpaces.Add(redSpace);
+            trapSpaces.Add(felixCoin10);
+            trapSpaces.Add(felixCoin20);
+            trapSpaces.Add(felixOrb);
+            trapSpaces.Add(jacobCoin10);
+            trapSpaces.Add(jacobCoin20);
+            trapSpaces.Add(jacobOrb);
+            trapSpaces.Add(laurelCoin10);
+            trapSpaces.Add(laurelCoin20);
+            trapSpaces.Add(laurelOrb);
+            trapSpaces.Add(mauriceCoin10);
+            trapSpaces.Add(mauriceCoin20);
+            trapSpaces.Add(mauriceOrb);
+            trapSpaces.Add(mimiCoin10);
+            trapSpaces.Add(mimiCoin20);
+            trapSpaces.Add(mimiOrb);
+            trapSpaces.Add(pinkinsCoin10);
+            trapSpaces.Add(pinkinsCoin20);
+            trapSpaces.Add(pinkinsOrb);
+            trapSpaces.Add(sweeterellaCoin10);
+            trapSpaces.Add(sweeterellaCoin20);
+            trapSpaces.Add(sweeterellaOrb);
+            trapSpaces.Add(thanatosCoin10);
+            trapSpaces.Add(thanatosCoin20);
+            trapSpaces.Add(thanatosOrb);
+            trapSpaces.Add(charlotteCoin10);
+            trapSpaces.Add(charlotteCoin20);
+            trapSpaces.Add(charlotteOrb);
+        }
+
 
         _soundNode = this.GetComponentInChildren<AudioSource>();
         if (aaron != null) { 
@@ -268,12 +305,13 @@ public class Node : MonoBehaviour
     // todo CRYSTAL CAVERNS 
     public void BLOCK() { 
         _spaceType.sprite = boulders; 
-        _anim.Rebind(); CHANGE_ANIMATION(); 
+        _anim.Play("Empty", -1 ,0); CHANGE_ANIMATION(); 
         controller.NewTrap(transform.parent.name, this.name, _spaceType.sprite); 
     }
     public void UNBLOCK() { 
-        _spaceType.sprite = originalNode; 
-        _anim.Rebind(); CHANGE_ANIMATION(); 
+        Debug.Log("         unblocked");
+        _spaceType.sprite = emptySpace; 
+        _anim.Play("Empty", -1 ,0); CHANGE_ANIMATION(); 
         controller.RemoveTrap(transform.parent.name, this.name); 
     }
 
@@ -365,7 +403,8 @@ public class Node : MonoBehaviour
     // SPACES THAT CAN BE TURNED INTO TRAPS (ie NOT EVENTS, EMPTY, ORB, SHOP)
     public bool VALID_NODE_TO_TRANSFORM()
     {
-        return (_spaceType.sprite == blueSpace || _spaceType.sprite == redSpace);
+        return trapSpaces.Contains(_spaceType.sprite);
+        // return (_spaceType.sprite == blueSpace || _spaceType.sprite == redSpace);
         // return (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace && _spaceType.sprite != eventSpace
         //     && _spaceType.sprite != happenSpace && _spaceType.sprite != potionSpace && _spaceType.sprite != spellSpace
         //     && _spaceType.sprite != specialSpace && _spaceType.sprite != shopSpace && _spaceType.sprite != freeSpace);
