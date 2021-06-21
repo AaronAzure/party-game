@@ -728,16 +728,6 @@ public class GameController : MonoBehaviour
 
     public IEnumerator CAVING_IN()
     {
-        // if (nCavedSection == null) {
-        //     nCavedSection = new HashSet<int>();
-
-        //     // GET UNIQUE CAVE SECTION(S)
-        //     foreach (var possibleCavedInSpace in cavedInSpace) {
-        //         if (!nCavedSection.Contains(possibleCavedInSpace.cavedSection)) {
-        //             nCavedSection.Add(possibleCavedInSpace.cavedSection);   // 0, 1, 2
-        //         }
-        //     }
-        // }
 
         for (int i=0 ; i<cavingInCamera.Length ; i++) {
             Debug.Log("Caving in camera " + (i+1));

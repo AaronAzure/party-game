@@ -24247,6 +24247,7 @@ MonoBehaviour:
   emptySpace: {fileID: 21300000, guid: e6e36cc42fd46491f8c3d8f81e9357d3, type: 3}
   blueSpace: {fileID: 21300000, guid: 27aac94e109c9834295990e95443b405, type: 3}
   redSpace: {fileID: 21300000, guid: 5d79994be1ee0c146933cba13474436a, type: 3}
+  goldSpace: {fileID: 21300000, guid: 87a3ef8acf6ed4f5b912c9e10b3a4cb5, type: 3}
   happenSpace: {fileID: 21300000, guid: a48329d1513774d58afed4ec594bd6c9, type: 3}
   eventSpace: {fileID: 21300000, guid: 05a3e23f608f9c2489bbc3d67125ec3f, type: 3}
   orbSpace: {fileID: 21300000, guid: 9c35c451036f84ec1ba3576c303ff03f, type: 3}
@@ -24257,6 +24258,8 @@ MonoBehaviour:
   specialSpace: {fileID: 21300000, guid: b8d92939491e64732a453dc3d53f81cb, type: 3}
   boulderSpace: {fileID: 21300000, guid: 413b2ea64105844d6b792ddf065f4a9b, type: 3}
   boulders: {fileID: 21300000, guid: 01507f253651e4938a798e6429c197f7, type: 3}
+  canBeCavedIn: 0
+  cavedSection: 0
   felixCoin10: {fileID: 21300000, guid: cfaf60a47487a4ead83cc61aae9cc9c6, type: 3}
   felixCoin20: {fileID: 21300000, guid: e4ad9f103abab46b49862420247e8e7f, type: 3}
   felixOrb: {fileID: 21300000, guid: 6a7e3d6b1e78549f4a962ef02ebdb2ff, type: 3}
@@ -24288,6 +24291,7 @@ MonoBehaviour:
   trapCreateEffect: {fileID: 188698, guid: d59453060233d2f49884f7de0b768335, type: 3}
   instanBlueEffect: {fileID: 164592, guid: 5423bfc84896575469c1270496ce5a32, type: 3}
   instanRedEffect: {fileID: 164592, guid: 6c5a1edc962704c64b9d2c92bd893337, type: 3}
+  instanGoldEffect: {fileID: 187180, guid: e70e1592d7f154edb9ad9557898c34b1, type: 3}
   instanGreenEffect: {fileID: 152882, guid: ee817f2a6f2d36f489f03cdf54902f0b, type: 3}
   instanTrap10Effect: {fileID: 1372241149341006, guid: 73dd52c851c98bc469685251a9046eb5,
     type: 3}

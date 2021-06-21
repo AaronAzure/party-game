@@ -31,7 +31,8 @@ public class EffectSpell : MonoBehaviour
         {
             if (other.tag == "Node" && inRange)
             {
-                Node space = other.GetComponent<Node>();
+                //// Node space = other.GetComponent<Node>();
+                Node space = other.transform.parent.GetComponent<Node>();
                 if (space.VALID_NODE_TO_CAST_EFFECT())
                 {
                     nodeLocked = true;
