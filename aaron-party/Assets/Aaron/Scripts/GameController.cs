@@ -723,7 +723,7 @@ public class GameController : MonoBehaviour
     {
         if (cavedInSpace == null) cavedInSpace = new List<CavedSpace>();
         cavedInSpace.Add( new CavedSpace(parentName, childName, cavedSection) );
-        cavedInSpace.Sort();
+        // cavedInSpace.Sort();
     }
 
 

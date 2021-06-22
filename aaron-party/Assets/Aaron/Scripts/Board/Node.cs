@@ -41,7 +41,6 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite blueSpace;      
     [SerializeField] private Sprite redSpace;       
     [SerializeField] private Sprite goldSpace;       
-    [SerializeField] private Sprite happenSpace;    //  BOAT
     [SerializeField] private Sprite eventSpace;     //
     [SerializeField] private Sprite orbSpace;       //
     [SerializeField] private Sprite freeSpace;      //  FREE SPELL (RANDOM = CASUAL) (FIXED = COMPETITIVE)
@@ -51,6 +50,7 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite specialSpace;   //
     
     //* map-exclusive spaces
+    [SerializeField] private Sprite boatSpace;    //  BOAT
     [SerializeField] private Sprite boulderSpace;   // cause cave in
 
 
@@ -63,7 +63,7 @@ public class Node : MonoBehaviour
     // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
     [SerializeField] private HashSet<Sprite> noCostSpace = new HashSet<Sprite>();   
     
-    // SET THAT COUNT TOWARDS HAPPENING (COLLECTION)
+    // SET THAT COUNTS TOWARDS HAPPENING BONUS (COLLECTION)
     [SerializeField] private HashSet<Sprite> greenSpaces = new HashSet<Sprite>();  
     
     // SET THAT CAN BE CONVERTED INTO TRAPS (COLLECTION)
@@ -141,8 +141,8 @@ public class Node : MonoBehaviour
         noCostSpace.Add(specialSpace);
         noCostSpace.Add(boulders);
 
-        // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
-        greenSpaces.Add(happenSpace);
+        // SET THAT COUNTS TOWARDS HAPPENING BONUS (COLLECTION)
+        greenSpaces.Add(boatSpace);
         greenSpaces.Add(boulderSpace);
 
         // SET THAT CAN BE CONVERTED INTO TRAPS (COLLECTION)
@@ -292,7 +292,7 @@ public class Node : MonoBehaviour
     public bool IS_BLUE() { return (_spaceType.sprite == blueSpace); }
     public bool IS_GOLD() { return (_spaceType.sprite == goldSpace); }
     public bool IS_RED() { return (_spaceType.sprite == redSpace); }
-    public bool IS_HAPPEN() { return (_spaceType.sprite == happenSpace); }
+    public bool IS_BOAT() { return (_spaceType.sprite == boatSpace); }
     public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
     public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
     public bool IS_ORB_TRAP()

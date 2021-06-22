@@ -24248,7 +24248,6 @@ MonoBehaviour:
   blueSpace: {fileID: 21300000, guid: 27aac94e109c9834295990e95443b405, type: 3}
   redSpace: {fileID: 21300000, guid: 5d79994be1ee0c146933cba13474436a, type: 3}
   goldSpace: {fileID: 21300000, guid: 87a3ef8acf6ed4f5b912c9e10b3a4cb5, type: 3}
-  happenSpace: {fileID: 21300000, guid: a48329d1513774d58afed4ec594bd6c9, type: 3}
   eventSpace: {fileID: 21300000, guid: 05a3e23f608f9c2489bbc3d67125ec3f, type: 3}
   orbSpace: {fileID: 21300000, guid: 9c35c451036f84ec1ba3576c303ff03f, type: 3}
   freeSpace: {fileID: 21300000, guid: 295532270e5a64fddb440756fca830d5, type: 3}
@@ -24256,6 +24255,7 @@ MonoBehaviour:
   shopSpace: {fileID: 21300000, guid: b8856b46e499642959918630da9b97c2, type: 3}
   potionSpace: {fileID: 21300000, guid: f36f6f44274c049d2bb630feeefa502b, type: 3}
   specialSpace: {fileID: 21300000, guid: b8d92939491e64732a453dc3d53f81cb, type: 3}
+  boatSpace: {fileID: 21300000, guid: ac8dfd7c522184a8fb9f3345aaf883e7, type: 3}
   boulderSpace: {fileID: 21300000, guid: 413b2ea64105844d6b792ddf065f4a9b, type: 3}
   boulders: {fileID: 21300000, guid: 01507f253651e4938a798e6429c197f7, type: 3}
   canBeCavedIn: 0
@@ -24335,7 +24335,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6945034686109693343}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.006, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.7027936, y: 0.7, z: 1}
   m_Children:
   - {fileID: 70103130357674653}

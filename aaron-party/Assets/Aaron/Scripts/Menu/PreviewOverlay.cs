@@ -283,7 +283,7 @@ public class PreviewOverlay : MonoBehaviour
 
     private IEnumerator LOAD_MINIGAME()
     {
-        readyText.text = "Side Quest Commencing!";
+        readyText.text = "Starting Side Quest!";
         yield return new WaitForSeconds(1);
         blackScreen.CrossFadeAlpha(1, transitionTime, false);
         if (bgMusic != null)

@@ -1781,7 +1781,7 @@ public class PathFollower : MonoBehaviour
             }
         }
         // LANDED ON HAPPENING (TRIGGER)
-        else if (currentNode.IS_HAPPEN()) {
+        else if (currentNode.IS_BOAT()) {
             if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
             {
                 StartCoroutine( HAPPEN_NEW_BOAT() );
