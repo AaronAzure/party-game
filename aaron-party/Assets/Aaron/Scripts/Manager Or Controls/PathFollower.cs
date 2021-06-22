@@ -779,7 +779,7 @@ public class PathFollower : MonoBehaviour
         // ROLLING DICE
         else if (isRollingDice && !diceRolled) 
         {
-            if (slowDice)           radialBar.value += 1;
+            if (slowDice)           radialBar.value += 1.5f;
             // else if (!diceRolled)   radialBar.value += Random.Range(6f,72f);
             else if (!diceRolled)   radialBar.value += 2;   // TODO : DELETE (DEBUG)
             if (radialBar.value >= radialBar.maxValue) radialBar.value -= radialBar.maxValue;
@@ -985,7 +985,7 @@ public class PathFollower : MonoBehaviour
             _cam.transform.Translate(direction * camSpeed * Time.deltaTime);
             spellEffectTarget.gameObject.transform.Translate(direction * camSpeed * Time.deltaTime);
         }
-        // EFFECT SPECIAL SPELLS 
+        // EFFECT SPECIAL SPELLS (TELEPORT)
         else if (specialSpellActive)
         {
             // CAST SPELL
@@ -2806,8 +2806,6 @@ public class PathFollower : MonoBehaviour
     }
 
 
-
-
     /* ---------------------------------------------------------------- */
     /* ------------------------ SPELLS RELATED ------------------------ */
 
@@ -3431,6 +3429,7 @@ public class PathFollower : MonoBehaviour
         }
     }
 
+    // FREEZING SPELL
     public void PLAYER_SLOWED()
     {
         playerSlowed = true;
@@ -3486,7 +3485,7 @@ public class PathFollower : MonoBehaviour
     
 
 
-    // todo ---------------------------------------------------------------
+    // todo : HAPPENING \ EVENT SPACES
 
     IEnumerator PATHFOLLOWER_CAVING_IN()
     {
@@ -3594,6 +3593,7 @@ public class PathFollower : MonoBehaviour
     {
         RESET_CAM();
         isAtSpecial = false; manager.UNHIDE_UI(); isPlayerTurn = true;
+        isBoat = false;
         nPrompt = 0;
         if (!diceRolled && _movesRemaining > 0)
         {

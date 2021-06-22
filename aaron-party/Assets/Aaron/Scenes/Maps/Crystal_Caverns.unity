@@ -17397,7 +17397,7 @@ PrefabInstance:
     - target: {fileID: 2192776773066948950, guid: a81ef3585f5284b8da9f9ab366de239b,
         type: 3}
       propertyPath: canBeCavedIn
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2192776773066948950, guid: a81ef3585f5284b8da9f9ab366de239b,
         type: 3}
@@ -17433,7 +17433,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: e6e36cc42fd46491f8c3d8f81e9357d3,
+      objectReference: {fileID: 21300000, guid: 27aac94e109c9834295990e95443b405,
         type: 3}
     - target: {fileID: 8160841973598207838, guid: a81ef3585f5284b8da9f9ab366de239b,
         type: 3}

@@ -272,7 +272,7 @@ public class Node : MonoBehaviour
             case "shop" :   return (_spaceType.sprite == shopSpace);
             case "potion" : return (_spaceType.sprite == potionSpace);
             case "orb" :    return (_spaceType.sprite == orbSpace);
-            case "spec" :    return (_spaceType.sprite == specialSpace);
+            case "spec" :   return (_spaceType.sprite == specialSpace);
         }
         Debug.LogError("ERROR: not a registered space");
         return false;

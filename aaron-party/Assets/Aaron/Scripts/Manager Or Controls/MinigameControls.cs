@@ -200,9 +200,15 @@ public class MinigameControls : MonoBehaviour
     private float nMask = 3;    // { 1, 2, 3, 4, 5}
 
 
-    [Header("Prefab Effects")]
+    [Header("Sound Effects")]
     [SerializeField] private AudioSource coinPickup;
     [SerializeField] private AudioSource electrocuted;
+    [SerializeField] private AudioSource fivePointSound;
+    [SerializeField] private AudioSource threePointSound;
+    [SerializeField] private AudioSource twpPointSound;
+    [SerializeField] private AudioSource onePointSound;
+    
+    [Header("Prefab Effects")]
     [SerializeField] private GameObject dizzyEffect;
     [SerializeField] private GameObject teleportEffect;
     [SerializeField] private GameObject teleBlueEffect;
@@ -2161,7 +2167,6 @@ public class MinigameControls : MonoBehaviour
     // ------------------------------------------------------------ //
     // ------------------------- BARRIER -------------------------- //
 
-
     void BARRIER()
     {
         if (mp > 0)
@@ -2520,6 +2525,7 @@ public class MinigameControls : MonoBehaviour
                     if (other.tag == "Safe") 
                     { 
                         points++;
+                        onePointSound.Play();
                         score.text = points.ToString();
                         scoreHead.text = points.ToString();
                         Destroy(other.gameObject);
@@ -2527,7 +2533,7 @@ public class MinigameControls : MonoBehaviour
                     else if (other.tag == "Gold")
                     { 
                         points += 3;
-                        coinPickup.Play();
+                        threePointSound.Play();
                         score.text = points.ToString();
                         scoreHead.text = points.ToString();
                         Destroy(other.gameObject);
