@@ -58,6 +58,7 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite boulders;   // boulders
     private Sprite originalNode;
     public bool canBeCavedIn;
+    public bool haveNotCalled;
     public int cavedSection;
 
     // SET THAT DOES NOT DECREASE MOVEMENT (COLLECTION)
@@ -306,13 +307,13 @@ public class Node : MonoBehaviour
     public void BLOCK() { 
         _spaceType.sprite = boulders; 
         _anim.Play("Empty", -1 ,0); CHANGE_ANIMATION(); 
-        controller.NewTrap(transform.parent.name, this.name, _spaceType.sprite); 
+        controller.NewBoulder(transform.parent.name, this.name, _spaceType.sprite); 
     }
     public void UNBLOCK() { 
         Debug.Log("         unblocked");
         _spaceType.sprite = emptySpace; 
         _anim.Play("Empty", -1 ,0); CHANGE_ANIMATION(); 
-        controller.RemoveTrap(transform.parent.name, this.name); 
+        controller.RemoveBoulder(transform.parent.name, this.name); 
     }
 
 
@@ -382,7 +383,8 @@ public class Node : MonoBehaviour
             controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
 
             // TURN 1 ONLY (REGISTER CAN BE CAVED-IN SPACES OF MAP)
-            if (controller.hasStarted == false) {
+            if (!controller.hasStarted && !haveNotCalled) {
+                haveNotCalled = true;
                 controller.NewCavedInSpace(transform.parent.name, this.name, cavedSection);
             }
         }

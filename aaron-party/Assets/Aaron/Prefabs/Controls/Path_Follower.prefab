@@ -37236,9 +37236,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerID: 0
-  _currentPath: []
-  _currentNode: 0
-  _currentPositionHolder: {x: 0, y: 0, z: 0}
   characterName: 
   _animator: {fileID: 0}
   characters:
@@ -37261,26 +37258,9 @@ MonoBehaviour:
   - {fileID: 4229010873353263891}
   - {fileID: 6611006806932997800}
   - {fileID: 5473537330779067036}
-  _Felix: {fileID: 8674346594757730376, guid: 60a1efed2087a49ff9714e168752d945, type: 3}
-  _Jacob: {fileID: 3874781978757927261, guid: 4e726824abebc46b69920c08cf9c180f, type: 3}
-  _Laurel: {fileID: 6425160146704651084, guid: a749a73e5562b4f7481c692f242beaaa, type: 3}
-  _Maurice: {fileID: 5049562405072237205, guid: ebb0f973890b8401b94b06ccd4bd6732,
-    type: 3}
-  _Mimi: {fileID: 2197907950519681983, guid: 982f8a85b00924880b3427235b83dde4, type: 3}
-  _Pinkins: {fileID: 4902048019526905371, guid: 16d686050dbda4c2bb8186fa635d50ce,
-    type: 3}
-  _Sweeterella: {fileID: 4153200535950004874, guid: 0e4dcafa0c8f648c399f6f06e0253a7b,
-    type: 3}
-  _Thanatos: {fileID: 9032536406645684323, guid: f0b275d53735645e091ec75e07f89170,
-    type: 3}
-  felixH: {fileID: 5946891085693604794}
-  jacobH: {fileID: 790261315602300010}
-  laurelH: {fileID: 5399956479807578539}
-  mauriceH: {fileID: 2304829519252071933}
-  mimiH: {fileID: 8438347381835368061}
-  pinkinsH: {fileID: 8252100662299211040}
-  sweeterellaH: {fileID: 4229010873353263891}
-  thanatosH: {fileID: 6611006806932997800}
+  currentNode: {fileID: 0}
+  nextNode: {fileID: 0}
+  noMovementLoss: 0
   nMovesLeft: {fileID: 128632730750110003}
   movesTextAnim: {fileID: 3727274148628764797}
   _mapMoves: {fileID: 5251237890885593603}
@@ -37289,8 +37269,11 @@ MonoBehaviour:
   _movesRemaining: 0
   _cam: {fileID: 549887713}
   camSpeed: 15
+  maxCamSpeed: 60
+  minCamSpeed: 15
   _choice: {fileID: 4004622684570770397}
   hurtBox: {fileID: 5265760681060100269}
+  isAtFork: 0
   isAtShop: 0
   isAtFree: 0
   isAtPotion: 0
@@ -60550,7 +60533,7 @@ MonoBehaviour:
   m_VerticalAxis: Move Vertical
   m_SubmitButton: A
   m_CancelButton: B
-  m_InputActionsPerSecond: 30
+  m_InputActionsPerSecond: 15
   m_RepeatDelay: 0.3
   m_allowMouseInput: 0
   m_allowMouseInputIfTouchSupported: 0
@@ -68245,6 +68228,11 @@ PrefabInstance:
       propertyPath: m_FirstSelected
       value: 
       objectReference: {fileID: 8283474332659024562}
+    - target: {fileID: 4170472195501367353, guid: 1f429da1549ae40d28722f6ce27d9d2e,
+        type: 3}
+      propertyPath: m_InputActionsPerSecond
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 6225662737856171138, guid: 1f429da1549ae40d28722f6ce27d9d2e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -69477,7 +69465,7 @@ PrefabInstance:
     - target: {fileID: 3703457348230648298, guid: 5933c68c031ff45e196c024e674347b1,
         type: 3}
       propertyPath: m_InputActionsPerSecond
-      value: 30
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3703457348230648298, guid: 5933c68c031ff45e196c024e674347b1,
         type: 3}

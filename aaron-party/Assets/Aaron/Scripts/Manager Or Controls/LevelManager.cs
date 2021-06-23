@@ -423,7 +423,7 @@ public class LevelManager : MonoBehaviour
     }
 
 
-    // LOAD VICTORY SCREEN
+    // todo : CALCULATES WINNER, GIVES REWARD, LOADS VICTORY SCREEN
     public IEnumerator GameOver()
     {
         if (timeUp) { yield break; }
@@ -461,7 +461,7 @@ public class LevelManager : MonoBehaviour
             {
                 players[i].COIN_MINIGAME();
             }
-            // CALCULATE_MOST_POINTS();
+            // CALCULATE_MOST_GOLD();
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);     // COINS WON IN MINIGAME (QUEST)
             winMusic.Play();
         }
@@ -472,7 +472,7 @@ public class LevelManager : MonoBehaviour
             {
                 players[i].COIN_MINIGAME();
             }
-            // CALCULATE_MOST_POINTS();
+            CALCULATE_MOST_GOLD();
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);
             winMusic.Play();
             DISPLAY_PLAYER_RANKINGS();
@@ -484,7 +484,7 @@ public class LevelManager : MonoBehaviour
             {
                 players[i].COIN_MINIGAME();
             }
-            // CALCULATE_MOST_POINTS();
+            CALCULATE_MOST_GOLD();
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);
             winMusic.Play();
             DISPLAY_PLAYER_RANKINGS();
@@ -729,6 +729,55 @@ public class LevelManager : MonoBehaviour
 
                     int prize = PLAYER_RANKING(i);
                     PLAYER_WON_N_COINS(prize, players[j].name);
+                }
+            }
+        }
+    }
+
+    private void CALCULATE_MOST_GOLD()
+    {
+        float[] arr = new float[controller.nPlayers];
+        // int[] pid = new int[controller.nPlayers];
+
+        // RANGE OF SCORES/POINTS
+        for (int i=0 ; i<controller.nPlayers ; i++)
+        {
+            arr[i] = players[i].points;
+        }
+
+        // SORT THE HIGHEST POINT VALUES (ASCENDING ORDER)
+        for ( int i=0 ; i<arr.Length ; i++ )
+        {
+            for ( int j=0 ; j<arr.Length ; j++ )
+            {
+                if (arr[i] < arr[j])
+                {
+                    float temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
+
+        // GET REWARD BASED ON SCORE
+        for ( int i=0 ; i<controller.nPlayers ; i++)
+        {
+            for ( int j=0 ; j<controller.nPlayers ; j++ )
+            {
+                if (players[j].points == arr[i])
+                {
+                    // FIRST PLAYER GETS AN EXTRA MP
+                    if (i == controller.nPlayers - 1) 
+                    { 
+                        FIRST_PLACE_PRIZE( players[j].name ); 
+
+                        // IF PLAYER IN FIRST ALSO GOT ELIMINATED AT THE SAME TIME
+                        if (players[j].points < 0) {
+                            if (bossBattle) winnerNames = "Too Bad!";
+                            else winnerNames = "Draw!";
+                            continue;
+                        }
+                    }
                 }
             }
         }

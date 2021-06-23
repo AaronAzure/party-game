@@ -111,6 +111,8 @@ public class PathFollower : MonoBehaviour
     private float camSizeLarge = 17.5f;
     private float camSizeNormal = 7.5f;
     [SerializeField] private float camSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
+    [SerializeField] private float maxCamSpeed = 60;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
+    [SerializeField] private float minCamSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
     private float transitionTime = 1;
     [SerializeField] private GameObject _choice;    // VISUAL INDICATING WHICH WAY TO GO
 
@@ -597,7 +599,7 @@ public class PathFollower : MonoBehaviour
 
         _choice.SetActive(false);
         nMovesLeft.gameObject.SetActive(false);
-        camSpeed = 15;
+        camSpeed = minCamSpeed;
     }
 
 
@@ -884,8 +886,8 @@ public class PathFollower : MonoBehaviour
             }
         }
         // SPEED UP CAMERA SCROLL SPEED
-        if (player.GetButtonDown("X")) { camSpeed = 45; }
-        if (player.GetButtonUp("X"))   { camSpeed = 15;}
+        if (player.GetButtonDown("X")) { camSpeed = maxCamSpeed; }
+        if (player.GetButtonUp("X"))   { camSpeed = minCamSpeed;}
 
         float moveHorizontal = player.GetAxis("Move Horizontal");
         float moveVertical   = player.GetAxis("Move Vertical");
@@ -932,8 +934,8 @@ public class PathFollower : MonoBehaviour
                 grimoireLeft.text = grimoireBar.value + "/" + grimoireBar.maxValue;
             }
             // SPEED UP CAMERA SCROLL SPEED
-            if (player.GetButtonDown("X")) { camSpeed = 45; }
-            if (player.GetButtonUp("X"))   { camSpeed = 15;}
+            if (player.GetButtonDown("X")) { camSpeed = maxCamSpeed; }
+            if (player.GetButtonUp("X"))   { camSpeed = minCamSpeed;}
 
             float moveHorizontal = player.GetAxis("Move Horizontal");
             float moveVertical   = player.GetAxis("Move Vertical");
@@ -976,8 +978,8 @@ public class PathFollower : MonoBehaviour
                 grimoireLeft.text = grimoireBar.value + "/" + grimoireBar.maxValue;
             }
             // SPEED UP CAMERA SCROLL SPEED
-            if (player.GetButtonDown("X")) { camSpeed = 45; }
-            if (player.GetButtonUp("X"))   { camSpeed = 15;}
+            if (player.GetButtonDown("X")) { camSpeed = maxCamSpeed; }
+            if (player.GetButtonUp("X"))   { camSpeed = minCamSpeed;}
 
             float moveHorizontal = player.GetAxis("Move Horizontal");
             float moveVertical   = player.GetAxis("Move Vertical");
@@ -1020,8 +1022,8 @@ public class PathFollower : MonoBehaviour
                 grimoireLeft.text = grimoireBar.value + "/" + grimoireBar.maxValue;
             }
             // SPEED UP CAMERA SCROLL SPEED
-            if (player.GetButtonDown("X")) { camSpeed = 45; }
-            if (player.GetButtonUp("X"))   { camSpeed = 15;}
+            if (player.GetButtonDown("X")) { camSpeed = maxCamSpeed; }
+            if (player.GetButtonUp("X"))   { camSpeed = minCamSpeed;}
 
             float moveHorizontal = player.GetAxis("Move Horizontal");
             float moveVertical   = player.GetAxis("Move Vertical");
@@ -1900,6 +1902,7 @@ public class PathFollower : MonoBehaviour
             else if (player.GetButtonDown("X")) { 
                 if (!shop4) { shopKeeperUI.SetActive(false); shopSpellUI.SetActive(false); }
                 else        { shopKeeperUI.SetActive(false); shopItemUI.SetActive(false); }
+                SHOW_NODE_DISTANCE();   // DISPLAY SPACES AWAY
                 isViewingMap = true;  _cam.orthographicSize = camSizeLarge;
                 mapMapping.gameObject.SetActive(true);
             }

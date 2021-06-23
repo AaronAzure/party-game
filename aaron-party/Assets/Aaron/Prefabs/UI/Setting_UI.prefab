@@ -3649,7 +3649,7 @@ MonoBehaviour:
   playerMice: []
   moveOneElementPerAxisPress: 0
   setActionsById: 0
-  horizontalActionId: -1
+  horizontalActionId: 0
   verticalActionId: 1
   submitActionId: 3
   cancelActionId: 9
@@ -3657,7 +3657,7 @@ MonoBehaviour:
   m_VerticalAxis: Move Vertical
   m_SubmitButton: A
   m_CancelButton: B
-  m_InputActionsPerSecond: 30
+  m_InputActionsPerSecond: 15
   m_RepeatDelay: 0.3
   m_allowMouseInput: 0
   m_allowMouseInputIfTouchSupported: 0
@@ -6271,7 +6271,7 @@ MonoBehaviour:
   playerMice: []
   moveOneElementPerAxisPress: 0
   setActionsById: 0
-  horizontalActionId: -1
+  horizontalActionId: 0
   verticalActionId: 1
   submitActionId: 3
   cancelActionId: 9
@@ -6279,7 +6279,7 @@ MonoBehaviour:
   m_VerticalAxis: Move Vertical
   m_SubmitButton: A
   m_CancelButton: B
-  m_InputActionsPerSecond: 30
+  m_InputActionsPerSecond: 15
   m_RepeatDelay: 0.3
   m_allowMouseInput: 0
   m_allowMouseInputIfTouchSupported: 0

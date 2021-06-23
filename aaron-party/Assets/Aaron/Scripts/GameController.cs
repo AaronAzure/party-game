@@ -644,7 +644,7 @@ public class GameController : MonoBehaviour
         }
         cavedInSpaces.Add( new NodeSpace(parentName, childName, spaceType) );
     }
-    public void RemoveTrap(string parentName, string childName)
+    public void RemoveBoulder(string parentName, string childName)
     {
         foreach (NodeSpace node in cavedInSpaces)
         {
@@ -746,7 +746,6 @@ public class GameController : MonoBehaviour
 
     public IEnumerator CAVING_IN()
     {
-
         for (int i=0 ; i<cavingInCamera.Length ; i++) {
             Debug.Log("Caving in camera " + (i+1));
             cavingInCamera[i].gameObject.SetActive(true);
@@ -767,32 +766,34 @@ public class GameController : MonoBehaviour
             int blocked = -1;
             for (int j=0 ; j<nodes.Count ; j++) {
                 if (nodes[j].IS_BLOCKED()) {
-                    blocked = j; break;
+                    Debug.LogError("--    " + j + " is blocked");
+                    blocked = j; 
+                    nodes[blocked].UNBLOCK();
+                    break;
                 }
             }
-            if (blocked >= 0) nodes[blocked].UNBLOCK();
 
-            List<int> temp = new List<int>();
-            for (int k=0 ; k<nodes.Count ; k++) { 
-                if (k == blocked) continue;
-                temp.Add(k);
+            int r = blocked;
+            // NONE BLOCKED
+            if (blocked < 0) {
+                r = Random.Range(0, nodes.Count);
+            }
+            // ALREADY BLOCKED
+            else {
+                while (r == blocked) {
+                    r = Random.Range(0, nodes.Count);
+                }
             }
 
-            string content = "";
-            foreach (int x in temp) content += x.ToString() + ", ";
-
             // BLOCK NEW SPOT
-            int r = temp[ Random.Range(0, temp.Count) ];
+            Debug.Log("      r  =  " + r + ",    nodes.Count  =  " + nodes.Count);
             if (nodes[r] != null) {
-                content += "  -   " + r.ToString() + " was blocked";
-                Debug.Log(content);
-                nodes[r].BLOCK();
+                nodes[r].BLOCK(); 
                 var quake = Instantiate(collapsePrefab, nodes[r].transform.position, Quaternion.identity);
                 Destroy(quake, 3);
             }
             
             yield return new WaitForSeconds(2f);
-            temp.Clear();
             nodes.Clear();
             cavingInCamera[i].gameObject.SetActive(false);
         }
