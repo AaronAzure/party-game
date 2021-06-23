@@ -11,18 +11,18 @@ public class GameController : MonoBehaviour
     public int nPlayers;
     public int nReady;
     public int turnNumber;  // WHAT TURN [1,2,...]
-    public int maxTurns = 15;       // ** SET BY PLAYER 1 (LobbyControls)
     public float pSpeed = 7.5f;       // ** PATHFOLLOWER SPEED
-    public bool isCasual = false;          // ** SET BY PLAYER 1 (LobbyControls) {true = casual | false = competitive}
-    // public string difficulty = "Gamer";    // ** SET BY PLAYER 1 (LobbyControls) { noob | gamer | pro | otherwise }
     public bool minigameMode;          // ** SET BY PLAYER 1 (LobbyControls) {true = in minigame tent}
     public string questToPlay;
 
 
-    [Header("MINIGAME DIFFICULTY")]
+    [Header("Board Settings")]
+    public int maxTurns = 15;       // ** SET BY PLAYER 1 (LobbyControls)
+    public bool isCasual = false;   // ** SET BY PLAYER 1 (LobbyControls) {true = casual | false = competitive}
     public bool easy;
     public bool norm = true;
     public bool hard;
+    public bool isSetOrder = true;    // ** SET BY PLAYER 1 (LobbyControls) {true = set player order | false = flex player order}
 
 
     [Header("Player Data")]
@@ -68,10 +68,12 @@ public class GameController : MonoBehaviour
     private int currentMagicOrbIndex = -1;
     private List<NodeSpace> magicOrbSpace;
 
+
     [Header("Crystal Caverns")]
     [SerializeField] private Camera[] cavingInCamera;   // CRYSTAL CAVERN SPECIFIC CAMERAS
     [SerializeField] private GameObject collapsePrefab;   // 
-    private List<CavedSpace> cavedInSpace;
+    private List<NodeSpace> cavedInSpaces;
+    private List<CavedSpace> canBeCavedSpaces;
     private HashSet<int> nCavedSection;
 
 
@@ -120,6 +122,7 @@ public class GameController : MonoBehaviour
 
         // SPACES THAT HAVE BEEN TRANSFORMED INTO TRAPS
         changedSpaces = new List<NodeSpace>();
+        cavedInSpaces = new List<NodeSpace>();
 
         // SPACES THAT ARE MAGIC ORB NODES
         magicOrbSpace = new List<NodeSpace>();
@@ -633,19 +636,34 @@ public class GameController : MonoBehaviour
         }
         changedSpaces.Add( new NodeSpace(parentName, childName, spaceType) );
     }
+    public void NewBoulder(string parentName, string childName, Sprite spaceType)
+    {
+        foreach (NodeSpace node in cavedInSpaces)
+        {
+            if (node.parentPath == parentName && node.childNode == childName) { cavedInSpaces.Remove(node); break; }
+        }
+        cavedInSpaces.Add( new NodeSpace(parentName, childName, spaceType) );
+    }
     public void RemoveTrap(string parentName, string childName)
     {
-        foreach (NodeSpace node in changedSpaces)
+        foreach (NodeSpace node in cavedInSpaces)
         {
-            if (node.parentPath == parentName && node.childNode == childName) { changedSpaces.Remove(node); break; }
+            if (node.parentPath == parentName && node.childNode == childName) { cavedInSpaces.Remove(node); break; }
         }
     }
 
     public void ResetAllTraps()
     {
+        //* ALL SPELL TRAPS
         foreach(NodeSpace space in changedSpaces)
         {
-            // Debug.Log("Parent name = " + space.parentPath + ", Child name = " + space.childNode + ", Renderer = " + space.nodeType);
+            //// Debug.Log("Parent name = " + space.parentPath + ", Child name = " + space.childNode + ", Renderer = " + space.nodeType);
+            Node node = GameObject.Find(space.parentPath + "/" + space.childNode).GetComponent<Node>();
+            node.CHANGE_SPACE_TYPE(space.nodeType);
+        }
+        //* ALL CAVED IN SPOTS
+        foreach(NodeSpace space in cavedInSpaces)
+        {
             Node node = GameObject.Find(space.parentPath + "/" + space.childNode).GetComponent<Node>();
             node.CHANGE_SPACE_TYPE(space.nodeType);
         }
@@ -709,7 +727,7 @@ public class GameController : MonoBehaviour
     public void MagicOrbBoughtController()
     {
         int r = currentMagicOrbIndex;
-        Node node = GameObject.Find("/PATHS/" + magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
+        Node node = GameObject.Find(magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         camNode = node;
         node.MAGIC_ORB_BOUGHT();
     }
@@ -721,9 +739,8 @@ public class GameController : MonoBehaviour
     // FILL LIST WITH NODE(S) THAT CAN BE BOULDERED (CAVED IN)
     public void NewCavedInSpace(string parentName, string childName, int cavedSection)
     {
-        if (cavedInSpace == null) cavedInSpace = new List<CavedSpace>();
-        cavedInSpace.Add( new CavedSpace(parentName, childName, cavedSection) );
-        // cavedInSpace.Sort();
+        if (canBeCavedSpaces == null) canBeCavedSpaces = new List<CavedSpace>();
+        canBeCavedSpaces.Add( new CavedSpace(parentName, childName, cavedSection) );
     }
 
 
@@ -736,7 +753,7 @@ public class GameController : MonoBehaviour
 
             // GET THE POSSIBLE CAVE IN SPOTS IN CAMERA AREA
             List<Node> nodes = new List<Node>();
-            foreach (var possibleCavedInSpace in cavedInSpace) {
+            foreach (var possibleCavedInSpace in canBeCavedSpaces) {
                 if (possibleCavedInSpace.cavedSection == i) {
                     string pathToObject = possibleCavedInSpace.parentPath + "/" + possibleCavedInSpace.childNode;
                     nodes.Add( GameObject.Find(pathToObject).GetComponent<Node>() );

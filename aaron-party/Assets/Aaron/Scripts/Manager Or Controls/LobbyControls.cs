@@ -22,14 +22,6 @@ public class LobbyControls : MonoBehaviour
     [Header("Character")]
     [SerializeField] private GameObject[] characters;
     [SerializeField] private string characterName;
-    [SerializeField] private GameObject _Sweeterella;
-    [SerializeField] private GameObject _Laurel;
-    [SerializeField] private GameObject _Thanatos;
-    [SerializeField] private GameObject _Mimi;
-    [SerializeField] private GameObject _Jacob;
-    [SerializeField] private GameObject _Maurice;
-    [SerializeField] private GameObject _Pinkins;
-    [SerializeField] private GameObject _Felix;
     private GameObject character;       // ** SCRIPT
     private float scaleX;
 
@@ -52,6 +44,7 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private TextMeshProUGUI maxTurns;
     [SerializeField] private TextMeshProUGUI gameStyle;
     [SerializeField] private TextMeshProUGUI gameDifficulty;
+    [SerializeField] private TextMeshProUGUI orderStyle;
     [SerializeField] private TextMeshPro backToCharacter;
 
     private int nSetting = 0;
@@ -186,7 +179,7 @@ public class LobbyControls : MonoBehaviour
             }
             else if (boardName != null && Application.CanStreamedLevelBeLoaded(boardName) && player.GetButtonDoublePressDown("X")) 
             {
-                StartCoroutine( manager.FADE(boardName) );
+                if (controller.noList.Count < controller.quests.Count) StartCoroutine( manager.FADE(boardName) );
             }
             // PLAY BOARD, OPEN SETTINGS
             else if (player.GetButtonDown("A") && touchingBoard && !boardSelected && boardToPlay != null
@@ -305,7 +298,8 @@ public class LobbyControls : MonoBehaviour
         }
     }
 
-    private void BOARD_SELECTED()
+    //* CALLED BY BUTTON
+    public void PLAY_BOARD()
     {
         if (controller.noList.Count < controller.quests.Count)
         {
@@ -319,6 +313,21 @@ public class LobbyControls : MonoBehaviour
             {
                 Debug.LogError("BOARD DOES NOT EXIST = (" + boardToPlay + ")");
             }
+        }
+    }
+
+    // CHOOSE WHICH SIDE QUEST SHOULD AND SHOULDN'T BE PLAYED
+    public void SELECT_QUESTS()
+    {
+        if (currentSetting[0].activeSelf)
+        {
+            currentSetting[0].SetActive(false); 
+            currentSetting[1].SetActive(true);
+        }
+        else 
+        {
+            currentSetting[0].SetActive(true); 
+            currentSetting[1].SetActive(false);
         }
     }
 
@@ -391,71 +400,33 @@ public class LobbyControls : MonoBehaviour
         // BOARD CUSTOMIZATION
         else if (currentSetting[0].activeSelf)
         {
-            // NAVIGATE
-            if (player.GetButtonDown("Right") && sceneName == "2Lobby") {
-                settings[nSetting].color = new Color(1,1,1,0.3f);
-                nSetting = settings.Length - 1;
-                if (nSetting >= settings.Length) { nSetting = 0; }
-                settings[nSetting].color = new Color(1,1,1,1);
-            }
-            else if (player.GetButtonDown("Left") && sceneName == "2Lobby" && nSetting >= settings.Length - 2) {
-                settings[nSetting].color = new Color(1,1,1,0.3f);
-                nSetting = 0;
-                settings[nSetting].color = new Color(1,1,1,1);
-            }
-            else if (player.GetButtonDown("Up")) {
-                settings[nSetting].color = new Color(1,1,1,0.3f);
-                nSetting--;
-                if (nSetting < 0) { nSetting = settings.Length - 2; }
-                settings[nSetting].color = new Color(1,1,1,1);
-            }
-            else if (player.GetButtonDown("Down")) {
-                settings[nSetting].color = new Color(1,1,1,0.3f);
-                nSetting++;
-                if (nSetting >= settings.Length - 1) { nSetting = 0; }
-                settings[nSetting].color = new Color(1,1,1,1);
-            }
             // ADJUST SETTING
-            else if (player.GetButtonDown("R")) {
-                switch (nSetting)
+            if (player.GetButtonDown("R")) {
+                switch (EventSystem.current.currentSelectedGameObject.name) 
                 {
-                    case 0 : controller.maxTurns++;     break;
-                    case 1 : CHANGE_GAME_STYLE();       break;
-                    case 2 : CHANGE_MINIGAME_DIFFICULTY(true);       break;
+                    case "Turn_Panel":          controller.maxTurns++; break;
+                    case "Style_Panel":         CHANGE_GAME_STYLE(); break;
+                    case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(true); break;
+                    case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
                 }
             }
             else if (player.GetButtonDown("L")) {
-                switch (nSetting)
+                switch (EventSystem.current.currentSelectedGameObject.name) 
                 {
-                    case 0 : if (controller.maxTurns>1) {controller.maxTurns--;} break;
-                    case 1 : CHANGE_GAME_STYLE();       break;
-                    case 2 : CHANGE_MINIGAME_DIFFICULTY(false);        break;
+                    case "Turn_Panel":          controller.maxTurns--; break;
+                    case "Style_Panel":         CHANGE_GAME_STYLE(); break;
+                    case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(false); break;
+                    case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
                 }
             }
             // LONG PRESS
-            else if (player.GetButton("R") && nSetting == 0)
+            else if (player.GetButton("R") && EventSystem.current.currentSelectedGameObject.name == "Turn_Panel")
             {
                 INCREMENT_TURN();
             }
-            else if (player.GetButton("L") && nSetting == 0)
+            else if (player.GetButton("L") && EventSystem.current.currentSelectedGameObject.name == "Turn_Panel")
             {
                 DECREMENT_TURN();
-            }
-            // CHOOSE CHARACTERS AGAIN
-            else if (player.GetButtonDown("A") && currentSetting[0].activeSelf) { 
-                switch (nSetting)
-                {
-                    // MAX TURNS
-                    case 0 : controller.maxTurns++;     break;
-                    // CASUAL || COMPETITIVE
-                    case 1 : CHANGE_GAME_STYLE();       break;
-                    // QUEST DIFFICULTY
-                    case 2 : CHANGE_MINIGAME_DIFFICULTY(true);       break;
-                    // SELECT/DESELECT SIDE QUESTS
-                    case 3 : currentSetting[0].SetActive(false); currentSetting[1].SetActive(true);       break;
-                    // PLAY BOARD
-                    default: BOARD_SELECTED(); break;
-                }
             }
             // NO LONGER LONG PRESS
             else if (!player.GetButton("L") && !player.GetButton("R"))
@@ -468,6 +439,7 @@ public class LobbyControls : MonoBehaviour
         DISPLAY_SETTINGS();
     }
 
+
     void ADJUST_QUEST_SETTINGS()
     {
         // STOP ADJUSTING SETTING
@@ -476,16 +448,16 @@ public class LobbyControls : MonoBehaviour
             _quests.gameObject.SetActive(false);
         }
         // ADJUST SETTING
-        else if (player.GetButtonDown("R")) {
-            CHANGE_MINIGAME_DIFFICULTY(true);
-        }
-        else if (player.GetButtonDown("L")) {
-            CHANGE_MINIGAME_DIFFICULTY(false);
-        }
-        // CHOOSE CHARACTERS AGAIN
-        else if (player.GetButtonDown("A")) { 
-            CHANGE_MINIGAME_DIFFICULTY(true); 
-        }
+        // else if (player.GetButtonDown("R")) {
+        //     CHANGE_MINIGAME_DIFFICULTY(true);
+        // }
+        // else if (player.GetButtonDown("L")) {
+        //     CHANGE_MINIGAME_DIFFICULTY(false);
+        // }
+        // // CHOOSE CHARACTERS AGAIN
+        // else if (player.GetButtonDown("A")) { 
+        //     CHANGE_MINIGAME_DIFFICULTY(true); 
+        // }
 
         DISPLAY_DIFFICULTY();
     }
@@ -530,12 +502,20 @@ public class LobbyControls : MonoBehaviour
         }
     }
 
-    private void CHANGE_GAME_STYLE()
+    public void CHANGE_GAME_STYLE()
     {
         controller.isCasual = !controller.isCasual;
 
         if (controller.isCasual)    { gameStyle.text = "Casual"; }
         else                        { gameStyle.text = "Competitive"; }
+    }
+    
+    public void CHANGE_PLAYER_ORDER_STYLE()
+    {
+        controller.isSetOrder = !controller.isSetOrder;
+
+        if (controller.isSetOrder)    { orderStyle.text = "Fixed"; }
+        else                          { orderStyle.text = "Flexible"; }
     }
 
     private void CHANGE_MINIGAME_DIFFICULTY(bool increase)
@@ -570,6 +550,10 @@ public class LobbyControls : MonoBehaviour
         if (controller.isCasual) { gameStyle.text = "Casual"; }
         else                     { gameStyle.text = "Competitive"; }
 
+        // PLAYER ORDER STYLE ( DETERMINED BY SIDE QUEST RANKING )
+        if (controller.isSetOrder) { orderStyle.text = "Fixed"; }
+        else                       { orderStyle.text = "Flexible"; }
+
         DISPLAY_DIFFICULTY();
     }
 
@@ -583,12 +567,14 @@ public class LobbyControls : MonoBehaviour
 
     void DISPLAY_QUEST_PREVIEW()
     {
-        if (EventSystem.current.currentSelectedGameObject.name != "Select All (Button)")
-        {
-            preview.sprite = EventSystem.current.currentSelectedGameObject.GetComponent<Image>().sprite;
-            questNameUi.text = EventSystem.current.currentSelectedGameObject.name;
+        if (EventSystem.current.currentSelectedGameObject != null) {
+            if (EventSystem.current.currentSelectedGameObject.name != "Select All (Button)")
+            {
+                preview.sprite = EventSystem.current.currentSelectedGameObject.GetComponent<Image>().sprite;
+                questNameUi.text = EventSystem.current.currentSelectedGameObject.name;
+            }
+            hightlight.transform.position = EventSystem.current.currentSelectedGameObject.transform.position;
         }
-        hightlight.transform.position = EventSystem.current.currentSelectedGameObject.transform.position;
     }
 
     // **************** BUTTONS **************** //

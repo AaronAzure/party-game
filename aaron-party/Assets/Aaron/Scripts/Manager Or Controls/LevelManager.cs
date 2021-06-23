@@ -507,13 +507,16 @@ public class LevelManager : MonoBehaviour
         blackScreen.CrossFadeAlpha(1, transitionTime, false);
 
         yield return new WaitForSeconds(transitionTime);
+        // RETURN TO MINIGAME TENT
         if (controller.minigameMode)
         {
             SceneManager.LoadScene("3Quests");
         }
+        // BOARD GAME OVER, GO TO FINAL RESULTS
         else if (controller.turnNumber > controller.maxTurns) {
             controller.LOAD_CUTAWAY();
         }
+        // RESUME BOARD
         else {
             for ( int i=0 ; i<controller.nPlayers ; i++)    { controller.RICH_ORB_UPDATE(i); }
             SceneManager.LoadScene("0Prize_Money");
@@ -541,9 +544,10 @@ public class LevelManager : MonoBehaviour
     private void DISPLAY_PLAYER_RANKINGS()
     {
         float[] arr = new float[controller.nPlayers];
+        int[] pid = new int[controller.nPlayers];
 
         // RANGE OF SCORES/POINTS
-        for (int i=0 ; i<controller.nPlayers ; i++) { arr[i] = players[i].points; }
+        for (int i=0 ; i<controller.nPlayers ; i++) { arr[i] = players[i].points; pid[i] = i; }
 
         // SORT EVERYONE'S SCORES
         if (sceneName != "Stop_Watchers") 
@@ -558,6 +562,12 @@ public class LevelManager : MonoBehaviour
                         float temp = arr[i];
                         arr[i] = arr[j];
                         arr[j] = temp;
+                    }
+                    if (pid[i] > pid[j])
+                    {
+                        int tempId = pid[i];
+                        pid[i] = pid[j];
+                        pid[j] = tempId;
                     }
                 }
             }
@@ -574,6 +584,12 @@ public class LevelManager : MonoBehaviour
                         float temp = arr[i];
                         arr[i] = arr[j];
                         arr[j] = temp;
+                    }
+                    if (pid[i] < pid[j])
+                    {
+                        int tempId = pid[i];
+                        pid[i] = pid[j];
+                        pid[j] = tempId;
                     }
                 }
             }
@@ -598,6 +614,11 @@ public class LevelManager : MonoBehaviour
                     players[j].DisplayRankPlacement_MANAGER(i);
                 }
             }
+        }
+
+        // IF THE PLAYER ORDER IS NOT SET, THEN SET NEW PLAYER ORDER BASED ON RANKINGS
+        if (!controller.isSetOrder) {
+            controller.playerOrder = pid;
         }
     }
 

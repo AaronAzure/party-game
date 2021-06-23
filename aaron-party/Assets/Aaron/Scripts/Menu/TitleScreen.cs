@@ -14,6 +14,7 @@ public class TitleScreen : MonoBehaviour
     void Start()
     {
         player = ReInput.players.GetPlayer(playerID);
+        StartCoroutine(TransitionOver());
     }
 
     void Update() {
@@ -21,5 +22,11 @@ public class TitleScreen : MonoBehaviour
             skipped = true;
             anim.Play("Logo_Anim", -1, 0.9306f);
         }
+    }
+
+    IEnumerator TransitionOver()
+    {
+        yield return new WaitForSeconds(12);
+        skipped = true;
     }
 }
