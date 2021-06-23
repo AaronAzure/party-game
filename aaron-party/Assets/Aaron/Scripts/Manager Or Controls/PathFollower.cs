@@ -847,12 +847,13 @@ public class PathFollower : MonoBehaviour
             }
 
             mapMapping.gameObject.SetActive(false);
-            isViewingMap = false;
+            if (!isAtShop) isViewingMap = false;
 
             _cam.orthographicSize = camSizeNormal;
             _cam.transform.position = 
                 new Vector3(this.transform.position.x, this.transform.position.y, _cam.transform.position.z);
             manager.UNHIDE_UI();
+
             if (isAtSpecial)
             {
                 _cam.orthographicSize = 20;
@@ -870,6 +871,7 @@ public class PathFollower : MonoBehaviour
                 manager.HIDE_UI();
                 shopUI.SetActive(true);
                 shopKeeperUI.SetActive(true);
+                isViewingMap = false;
             }
             else if (isAtMagicOrb)
             {
@@ -1088,7 +1090,7 @@ public class PathFollower : MonoBehaviour
             UserViewMap();
         }
         //* THERE IS A FORK IN THE PATH (SPLIT IN PATH)
-        if (isAtFork) {
+        else if (isAtFork) {
             UserPathForkMenu();
         }
         //* AT SHOP SPACE
@@ -1907,7 +1909,7 @@ public class PathFollower : MonoBehaviour
                 mapMapping.gameObject.SetActive(true);
             }
             // ** LEAVE SHOP
-            else if (player.GetButtonDown("B")) { 
+            else if (shopKeeperUI.activeSelf && !isViewingMap && player.GetButtonDown("B")) { 
                 nMovesLeft.gameObject.SetActive(true); 
                 _cam.orthographicSize = camSizeNormal;
                 RESET_CAM();

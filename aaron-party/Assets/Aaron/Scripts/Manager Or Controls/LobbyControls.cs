@@ -32,8 +32,8 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private Animator characterAnimator;
     [SerializeField] private Camera cam;
     public bool touchingBoard;
-    public string boardToPlay;
-    public string boardName;
+    public string boardToPlay;  // INTRO
+    public string boardName;    // BOARD
     private bool boardSelected;
 
     private bool sideQuest;

@@ -263,7 +263,6 @@ public class PlayerSetupMenu : MonoBehaviour
     }
 
     private void PRESS_START_TO_PLAY() {
-        Debug.Log("oianic");
         if (instruction != null) instruction.text = "Press +";
     }
     

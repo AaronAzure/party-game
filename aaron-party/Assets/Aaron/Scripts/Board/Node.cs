@@ -18,6 +18,7 @@ public class Node : MonoBehaviour
     private GameController controller;      // ** SCRIPT (RUN-TIME)
 
 
+    [SerializeField] private GameObject aaronPrefab;
     [SerializeField] private GameObject aaron;
     [SerializeField] private Animator aaronAnim;
     [SerializeField] private GameObject teleportEffect;
@@ -182,7 +183,9 @@ public class Node : MonoBehaviour
 
         _soundNode = this.GetComponentInChildren<AudioSource>();
         if (aaron != null) { 
-            aaron.SetActive(false); aaron.transform.parent = null; 
+            var orbHandler = Instantiate(aaronPrefab, aaronPrefab.transform.position, Quaternion.identity);
+            var aaron = orbHandler;
+            aaron.SetActive(false); aaron.transform.parent = this.transform; 
             aaronAnim = aaron.GetComponent<Animator>();
         }
 
