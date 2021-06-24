@@ -369,7 +369,9 @@ public class PathFollower : MonoBehaviour
         for (int i=0 ; i<characters.Length ; i++) {
             if (characterName == characters[i].name) {
                 var obj = Instantiate(characters[i], transform.position, Quaternion.identity, this.transform); 
-                character = obj.gameObject; obj.transform.parent = this.transform;  _animator = obj.GetComponent<Animator>();
+                character = obj.gameObject; 
+                obj.transform.parent = this.transform;  
+                _animator = obj.GetComponent<Animator>();
                 break;
             }
             if (i == characters.Length - 1) {
@@ -1764,12 +1766,12 @@ public class PathFollower : MonoBehaviour
             StartCoroutine(fadeMovesLeft());
         }
 
+        if (currentNode.IS_GREEN())  { controller.EVENT_ORB_UPDATE(playerID); }
         // LANDED ON BLUE | RED | EVENT (SO FAR)
         if (currentNode.SPACE_LANDED()) {
             int coinsGained = currentNode.COINS_RECEIVED_FROM_SPACE();
             if (currentNode.IS_BLUE())   { controller.blueOrb[playerID]++; }
             if (currentNode.IS_RED())    { controller.RED_ORB_UPDATE(playerID); }
-            if (currentNode.IS_GREEN())  { controller.EVENT_ORB_UPDATE(playerID); }
             StartCoroutine( UPDATE_PLAYER_COINS(coinsGained * controller.turnMultiplier) );
         }
         // GAIN SPELL FROM SPACE

@@ -164,6 +164,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Aaron/Scenes/BOSS/Dojo.unity
     guid: 0206e6f81924742e79245bf034ad0f04
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Maps/Plasma_Palace.unity
+    guid: 8515565a7768b473fa01b816843e3212
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: dafa5d874f13d4d68a7b2bfee57e933b,
       type: 2}

@@ -73,6 +73,7 @@ public class LobbyManager : MonoBehaviour
                 bgMusic.volume -= 0.01f;
             }
         }
+        yield return new WaitForSeconds(0.5f);
         controller.LOAD_BOARD(boardName);
     }
     

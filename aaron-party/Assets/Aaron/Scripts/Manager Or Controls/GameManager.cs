@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Player Info")]
     private int playerOrder;
+    [SerializeField] private Transform playerSpawn; //* INSPECTOR
     private PathFollower player1;
     private PathFollower player2;
     private PathFollower player3;
@@ -176,6 +177,14 @@ public class GameManager : MonoBehaviour
             // UPDATE_ALL_INFO();
             if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
             {
+                if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
+                controller.orbCam.gameObject.SetActive(true);
+                StartCoroutine( DelayChoosingMagicOrbSpace(0) );
+                SCREEN_TRANSITION("Oval_Transition", 0.5f);
+            }
+            else if (SceneManager.GetActiveScene().name == "Plasma_Palace")
+            {
+                if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
                 controller.orbCam.gameObject.SetActive(true);
                 StartCoroutine( DelayChoosingMagicOrbSpace(0) );
                 SCREEN_TRANSITION("Oval_Transition", 0.5f);

@@ -182,12 +182,13 @@ public class Node : MonoBehaviour
 
 
         _soundNode = this.GetComponentInChildren<AudioSource>();
-        if (aaron != null) { 
-            var orbHandler = Instantiate(aaronPrefab, aaronPrefab.transform.position, Quaternion.identity);
-            var aaron = orbHandler;
-            aaron.SetActive(false); aaron.transform.parent = this.transform; 
-            aaronAnim = aaron.GetComponent<Animator>();
-        }
+        // if (aaronPrefab != null && _spaceType.sprite == orbSpace) { 
+        //     var orbHandler = Instantiate(aaronPrefab, aaronPrefab.transform.position, Quaternion.identity);
+        //     var aaron = orbHandler;
+        //     aaronAnim = aaron.GetComponent<Animator>();
+        //     aaron.SetActive(false); 
+        //     aaron.transform.parent = this.transform; 
+        // }
 
         // ONLY ORB SPACES SHOULD HAVE AN AARON GAMEOBJ
         if (_spaceType.sprite != orbSpace) { Destroy(aaron); }
@@ -753,6 +754,18 @@ public class Node : MonoBehaviour
                 }
             }
         }
+        // else if (_spaceType.sprite == orbSpace && magicOrb.activeSelf) {
+        //     if (nSpace.text == "x") {
+        //         nSpace.gameObject.SetActive(true);
+        //         nSpace.text = n.ToString();
+        //         foreach (Nexts next in nexts) {
+        //             if (next.node != null) {
+        //                 Node checkNode = next.node.GetComponent<Node>();
+        //                 if (checkNode._spaceType.sprite != boulders) checkNode.DISPLAY_MOVEMENT(n, moveLeft);
+        //             }
+        //         }
+        //     }
+        // }
         // SPACE DOES NOT DECREMENT MOVEMENT //? DON'T DISPLAY
         else {
             foreach (Nexts next in nexts) {
@@ -793,11 +806,20 @@ public class Node : MonoBehaviour
     IEnumerator AARON_APPEARS()
     {
         yield return new WaitForSeconds(2);
+        // INSTANTIATE AARON
+        if (aaronPrefab != null) { 
+            Vector3 spawnPos = new Vector3(nodeContainer.transform.position.x, nodeContainer.transform.position.y );
+            spawnPos += new Vector3(-2, 2);
+            var orbHandler = Instantiate(aaronPrefab, spawnPos, Quaternion.identity, this.transform);
+            aaron = orbHandler.gameObject;
+            aaronAnim = aaron.GetComponent<Animator>();
+            aaron.SetActive(false); 
+        }
+        aaron.SetActive(true);
+        aaronAnim.Play("Aaron_Wave_Anim", -1, 0);
         var eff = Instantiate(teleportEffect, aaron.transform.position, teleportEffect.transform.rotation);
         eff.transform.parent = aaron.transform;
         Destroy(eff, 1);
-        aaron.SetActive(true);
-        aaronAnim.Play("Aaron_Wave_Anim", -1, 0);
     }
     IEnumerator AARON_DISSAPPEARS()
     {

@@ -332,6 +332,10 @@ public class GameController : MonoBehaviour
             boardSceneName = "Shogun_Seaport";
             introSceneName = "Shogun_Seaport Intro";
         }
+        else if (boardName == "Plasma_Palace" || boardName == "Plasma_Palace Intro" ) {
+            boardSceneName = "Plasma_Palace";
+            introSceneName = "Plasma_Palace Intro";
+        }
         else Debug.LogError("HAVEN'T ADDED MAP TO - GameController.LOAD_BOARD() ");
         SceneManager.LoadScene(boardName); 
     }
