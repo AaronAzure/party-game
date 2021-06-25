@@ -67,13 +67,13 @@ public class LobbyManager : MonoBehaviour
         blackScreen.CrossFadeAlpha(1, transitionTime, false);  // FADE OUT
         if (bgMusic != null)
         {
+            float decrease = bgMusic.volume / 8f;
             while (bgMusic.volume > 0) 
             {
                 yield return new WaitForSeconds(0.1f);
-                bgMusic.volume -= 0.01f;
+                bgMusic.volume -= decrease;
             }
         }
-        yield return new WaitForSeconds(0.5f);
         controller.LOAD_BOARD(boardName);
     }
     

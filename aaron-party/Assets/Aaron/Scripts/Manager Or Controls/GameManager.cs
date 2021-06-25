@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     // GLOBAL VARIABLES
 
     [SerializeField] private int nPlayers;
+    private string sceneName;
     //private Text textPlayer;
 
     [Header("Player Info")]
@@ -38,10 +39,17 @@ public class GameManager : MonoBehaviour
     private int maxTurn;       // CONST
     private GameController controller;
 
+
     [Header("Shogun Seaport")]
     [SerializeField] private GameObject boats;  // ** INSPECTOR
     private Animator boatAnim;
     [SerializeField] private string currentBoat;
+
+
+    [Header("Plasma Palace")]
+    [SerializeField] private LaserCannon turret;
+    [SerializeField] private int turretCount;
+    private bool turretOnCoolDown;
 
     // -------------------------------------------------------------------------------
     // RECEIVE INFO/DATA FROM GAME CONTROLLER
@@ -104,6 +112,7 @@ public class GameManager : MonoBehaviour
         // blackScreen.gameObject.SetActive(true);
 
         playerOrder = 0;
+        sceneName = SceneManager.GetActiveScene().name;
         mainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
         controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
         this.maxTurn = controller.maxTurns;
@@ -149,6 +158,13 @@ public class GameManager : MonoBehaviour
                 currentBoat = PlayerPrefs.GetString("CurrentBoat");
                 Debug.Log("manager.currentBoat = " + currentBoat);
             }
+            // ** Plasma Palace exclusive
+            if (sceneName == "Plasma_Palace")
+            {
+                turretCount = PlayerPrefs.GetInt("TurretCount");
+                if (turret == null) turret = GameObject.Find("TURRET").GetComponent<LaserCannon>();
+                turret.countDown.text = turretCount.ToString();
+            }
 
             currentTurn = controller.turnNumber;
             for (int i=0 ; i<nPlayers ; i++)
@@ -156,7 +172,7 @@ public class GameManager : MonoBehaviour
                 controller.RICH_ORB_UPDATE(i);
             }
             controller.ResetAllTraps();
-            if (SceneManager.GetActiveScene().name != "Shogun_Seaport") StartCoroutine( DelayChoosingMagicOrbSpace(1) );
+            if (sceneName != "Shogun_Seaport") StartCoroutine( DelayChoosingMagicOrbSpace(1) );
             gamers[ controller.playerOrder[playerOrder] ].BEGIN(); 
             StartCoroutine( CAMERA_TRANSITION(0.5f, 1f, false));
             // StartCoroutine(CAMERA_TRANSITION());
@@ -171,24 +187,33 @@ public class GameManager : MonoBehaviour
                 currentBoat = "Norm";
                 PlayerPrefs.SetString("CurrentBoat", currentBoat);
             }
+            // ** Plasma Palace exclusive
+            if (sceneName == "Plasma_Palace")
+            {
+                turretCount = 5;
+                PlayerPrefs.SetInt("TurretCount", turretCount);
+                if (turret == null) turret = GameObject.Find("TURRET").GetComponent<LaserCannon>();
+                turret.countDown.text = turretCount.ToString();
+            }
 
             HIDE_UI();
             currentTurn = 1;
             // UPDATE_ALL_INFO();
-            if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
+            if (sceneName == "Crystal_Caverns")
             {
                 if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
                 controller.orbCam.gameObject.SetActive(true);
                 StartCoroutine( DelayChoosingMagicOrbSpace(0) );
                 SCREEN_TRANSITION("Oval_Transition", 0.5f);
             }
-            else if (SceneManager.GetActiveScene().name == "Plasma_Palace")
+            else if (sceneName == "Plasma_Palace")
             {
                 if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
                 controller.orbCam.gameObject.SetActive(true);
                 StartCoroutine( DelayChoosingMagicOrbSpace(0) );
                 SCREEN_TRANSITION("Oval_Transition", 0.5f);
             }
+            //* SHOGUN_SEAPORT (HOPEFULLY)
             else 
             {
                 StartCoroutine( controller.START_THE_GAME(true) );
@@ -353,6 +378,12 @@ public class GameManager : MonoBehaviour
                 case 7:     Debug.Log("Player 8 turn");   StartCoroutine( player8.YOUR_TURN() );  break;
             }
         }
+        else if (sceneName == "Plasma_Palace" && !turretOnCoolDown && playerOrder >= nPlayers) {
+            turretOnCoolDown = true;
+            mainCam.gameObject.SetActive(true);
+            StartCoroutine( turret.CountDown(turretCount - 1) );
+            mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
+        }
         // ALL PLAYERS HAD THEIR TURN
         else
         {
@@ -467,7 +498,7 @@ public class GameManager : MonoBehaviour
         controller.GAME_START();
         controller.NEXT_TURN();
         PlayerPrefs.SetString("CurrentBoat", currentBoat);
-        PlayerPrefs.SetString("sceneName", SceneManager.GetActiveScene().name);
+        PlayerPrefs.SetString("sceneName", sceneName);
         PlayerPrefs.Save();
 
         // PLAYER TURN AGAIN
