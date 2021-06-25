@@ -709,7 +709,17 @@ public class GameController : MonoBehaviour
         while (currentMagicOrbIndex == r) {
             r = Random.Range(0, magicOrbSpace.Count);
         }
-        if (!firstMagicOrbShown) { r = 0; }
+        if (!firstMagicOrbShown) { 
+            r = 0; 
+            Node[] magicOrbs = new Node[magicOrbSpace.Count];
+            // DESIGNATED FIRST MAGIC ORB SPACE
+            for (int i=0 ; i<magicOrbs.Length ; i++) {
+                magicOrbs[i] = GameObject.Find(magicOrbSpace[i].parentPath + "/" + magicOrbSpace[i].childNode).GetComponent<Node>();
+                if (magicOrbs[i].firstMagicOrb) {
+                    r = i; break;
+                }
+            }
+        }
         currentMagicOrbIndex = r;
 
         // Debug.Log(magicOrbSpace[r].parentPath + "  -  " + magicOrbSpace[r].childNode);

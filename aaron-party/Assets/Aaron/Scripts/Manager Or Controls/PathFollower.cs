@@ -1997,28 +1997,28 @@ public class PathFollower : MonoBehaviour
         if (!gotAsidePos)   // CALL ONCE
         {
             _timer = 0;
-            float scaleFactor = 1f;
+            // // float scaleFactor = 1.3f;
+            // // float trig1 = 0.5f * scaleFactor;
+            // // float trig2 = 0.866f * scaleFactor;
             float playerX = transform.position.x;
             float playerY = transform.position.y;
-            float sin45 = 0.707f;
-            float trig1 = 0.5f * scaleFactor;
-            float trig2 = 0.866f * scaleFactor;
-            asidePos1 = new Vector3(playerX - 1, playerY + 0);
-            asidePos2 = new Vector3(playerX - sin45, playerY + sin45);
-            asidePos3 = new Vector3(playerX + 0, playerY + 1);
-            asidePos4 = new Vector3(playerX + sin45, playerY + sin45);
-            asidePos5 = new Vector3(playerX + 1, playerY - 0);
-            asidePos6 = new Vector3(playerX + sin45, playerY - sin45 - 0.5f);
-            asidePos7 = new Vector3(playerX - 0, playerY - 1 - 0.5f);
-            asidePos8 = new Vector3(playerX - sin45, playerY - sin45 - 0.5f);
+            float sin45 = 0.707f * 1.5f;
+            asidePos1 = new Vector3(playerX - 1.5f,     playerY + 0);
+            asidePos2 = new Vector3(playerX - sin45,    playerY + sin45);
+            asidePos3 = new Vector3(playerX + 0,        playerY + 1.5f);
+            asidePos4 = new Vector3(playerX + sin45,    playerY + sin45);
+            asidePos5 = new Vector3(playerX + 1.5f,     playerY - 0);
+            asidePos6 = new Vector3(playerX + sin45,    playerY - sin45 - 0.75f);
+            asidePos7 = new Vector3(playerX - 0,        playerY - 1.5f - 0.75f);
+            asidePos8 = new Vector3(playerX - sin45,    playerY - sin45 - 0.75f);
             gotAsidePos = true;
         }
 
         _moveSpeed = 7.5f;
         _timer += _moveSpeed * Time.deltaTime;
-        if (transform.localScale.x > 0.25f) {
-            this.transform.localScale -= new Vector3(0.025f, 0.025f, 0.025f);    // STRINK
-        }
+        // if (transform.localScale.x > 0.25f) {
+        //     this.transform.localScale -= new Vector3(0.025f, 0.025f, 0.025f);    // STRINK
+        // }
 
         // MOVE TO ASIDE POSITION
         switch (name)
@@ -2459,7 +2459,7 @@ public class PathFollower : MonoBehaviour
         for (int i = 0; i > n; i--)
         {
             if (coins <= 0) { break; }
-
+            if (n < 125) yield return new WaitForSeconds(0.01f);
             coinLoss.Play();
             coins--;
         }

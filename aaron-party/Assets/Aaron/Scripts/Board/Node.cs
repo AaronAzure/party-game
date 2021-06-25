@@ -12,9 +12,11 @@ public class Node : MonoBehaviour
     [Header("Spell Keeper / Potion Master")]
     [Tooltip("The shop keeper number")] public int whoIsTheSeller;  // ** INSPECTOR
 
+
     [Header("Spell Related")]
     [SerializeField] private SpriteRenderer lockedOn;
     [SerializeField] public GameObject magicOrb;
+    [SerializeField] public bool firstMagicOrb;
     private GameController controller;      // ** SCRIPT (RUN-TIME)
 
 

@@ -16,6 +16,7 @@ public class LaserCannon : MonoBehaviour
     [SerializeField] private GameObject hurtbox;
     [SerializeField] private Transform shotAngle;
     [SerializeField] private GameObject projectile;
+    [SerializeField] private GameObject chargingEffect;
 
     private bool firing;
     private float timer;
@@ -48,11 +49,14 @@ public class LaserCannon : MonoBehaviour
         // LAUNCH CANNON
         if (x == 0)
         {
+            yield return new WaitForSeconds(0.25f);
             firing = true;
             laserSound.Play();
+            chargingEffect.SetActive(true);
 
             yield return new WaitForSeconds(4.5f);
             // if (hurtbox != null) hurtbox.SetActive(true);
+            chargingEffect.SetActive(false);
             for (int i=0 ; i<90 ; i++) {
                 var atk = Instantiate(projectile, transform.position, Quaternion.Euler( new Vector3(0,0,180 + i) ));
                 Destroy(atk, 5);

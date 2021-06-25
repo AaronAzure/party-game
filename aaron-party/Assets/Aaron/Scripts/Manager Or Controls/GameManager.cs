@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LaserCannon turret;
     [SerializeField] private GameObject turretShot;
     [SerializeField] private int turretCount;
+    private int startingCharge = 5;
     private bool turretOnCoolDown;
 
     // -------------------------------------------------------------------------------
@@ -191,7 +192,7 @@ public class GameManager : MonoBehaviour
             // ** Plasma Palace exclusive
             if (sceneName == "Plasma_Palace")
             {
-                turretCount = 5;
+                turretCount = startingCharge;
                 PlayerPrefs.SetInt("TurretCount", turretCount);
                 if (turret == null) turret = GameObject.Find("TURRET").GetComponent<LaserCannon>();
                 turret.countDown.text = turretCount.ToString();
@@ -389,7 +390,7 @@ public class GameManager : MonoBehaviour
             StartCoroutine( turret.CountDown(turretCount) );
             // LAUNCHED, RELOAD FROM START
             if (turretCount == 0) {
-                PlayerPrefs.SetInt("TurretCount", 5);
+                PlayerPrefs.SetInt("TurretCount", startingCharge);
                 AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
                 bgMusic.volume = 0;
                 mainCam.orthographicSize *= 1.5f;

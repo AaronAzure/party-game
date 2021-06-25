@@ -24435,6 +24435,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2192776773066948950, guid: a81ef3585f5284b8da9f9ab366de239b,
         type: 3}
+      propertyPath: firstMagicOrb
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2192776773066948950, guid: a81ef3585f5284b8da9f9ab366de239b,
+        type: 3}
       propertyPath: nexts.Array.size
       value: 1
       objectReference: {fileID: 0}
