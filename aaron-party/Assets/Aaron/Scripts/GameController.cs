@@ -16,6 +16,10 @@ public class GameController : MonoBehaviour
     public string questToPlay;
 
 
+    [Header("Debugging")]
+    public bool skipSideQuest;  //* DEBUGGING ONLY, INSPECTOR
+
+
     [Header("Board Settings")]
     public int maxTurns = 15;       // ** SET BY PLAYER 1 (LobbyControls)
     public bool isCasual = false;   // ** SET BY PLAYER 1 (LobbyControls) {true = casual | false = competitive}

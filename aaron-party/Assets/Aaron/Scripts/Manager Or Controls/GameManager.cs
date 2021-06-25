@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     private PathFollower[] gamers;  // ** SCRIPT
     [SerializeField] private GameObject UIcanvas;
 
-    private Camera mainCam;
+    public Camera mainCam;
     [SerializeField] private GameObject sideQuest;
     [SerializeField] private FadeCamera transitionCam;
     private float transitionTime = 1;
@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Plasma Palace")]
     [SerializeField] private LaserCannon turret;
+    [SerializeField] private GameObject turretShot;
     [SerializeField] private int turretCount;
     private bool turretOnCoolDown;
 
@@ -338,6 +339,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // todo ------------------------------------------------------------------------
     public void NEXT_PLAYER_TURN()
     {
         if (playerOrder < nPlayers)
@@ -378,16 +380,35 @@ public class GameManager : MonoBehaviour
                 case 7:     Debug.Log("Player 8 turn");   StartCoroutine( player8.YOUR_TURN() );  break;
             }
         }
+        //* PLASMA PALACE, TURRET'S TURN
         else if (sceneName == "Plasma_Palace" && !turretOnCoolDown && playerOrder >= nPlayers) {
+            turretCount = PlayerPrefs.GetInt("TurretCount") - 1;
+            PlayerPrefs.SetInt("TurretCount", turretCount);
             turretOnCoolDown = true;
             mainCam.gameObject.SetActive(true);
-            StartCoroutine( turret.CountDown(turretCount - 1) );
-            mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
+            StartCoroutine( turret.CountDown(turretCount) );
+            // LAUNCHED, RELOAD FROM START
+            if (turretCount == 0) {
+                PlayerPrefs.SetInt("TurretCount", 5);
+                AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+                bgMusic.volume = 0;
+                mainCam.orthographicSize *= 1.5f;
+                mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
+            }
+            // CHARGING UP
+            else {
+                mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
+            }
         }
         // ALL PLAYERS HAD THEIR TURN
         else
         {
-            StartCoroutine( SIDE_QUEST_TIME() );
+            if (controller.skipSideQuest) {
+                StartCoroutine( SKIP_SIDE_QUEST() );
+            }
+            else {
+                StartCoroutine( SIDE_QUEST_TIME() );
+            }
             // UPDATE_ALL_INFO();
 
             // // MINIGAME TIME!
@@ -497,7 +518,7 @@ public class GameManager : MonoBehaviour
         // MINIGAME TIME!
         controller.GAME_START();
         controller.NEXT_TURN();
-        PlayerPrefs.SetString("CurrentBoat", currentBoat);
+        if (boats != null) PlayerPrefs.SetString("CurrentBoat", currentBoat);
         PlayerPrefs.SetString("sceneName", sceneName);
         PlayerPrefs.Save();
 
@@ -507,6 +528,52 @@ public class GameManager : MonoBehaviour
 
         // MINIGAME TIME
         controller.LOAD_MINIGAME();
+    }
+    private IEnumerator SKIP_SIDE_QUEST() 
+    {
+        // HIDE UI STUFF
+        UPDATE_ALL_INFO();
+        HIDE_UI();
+        for (int i=0 ; i<gamers.Length ; i++) { gamers[ i ].HIDE_DATA_CANVAS(); }
+
+        // CAMERA STEUP AND MUTE BACKGROUND MUSIC
+        if (GameObject.Find("quest-board") != null) {
+            Transform questBoard = GameObject.Find("quest-board").GetComponent<Transform>();
+            mainCam.transform.position = questBoard.position + new Vector3(0,3,-30);
+            mainCam.orthographicSize = 7.5f;
+        }
+        if (GameObject.Find("BACKGROUND_MUSIC") != null) {
+            AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+            bgMusic.volume = 0;
+        }
+        mainCam.gameObject.SetActive(true);
+        SCREEN_TRANSITION("Oval_Transition", 0.5f);
+
+        // SIDE QUEST TIME! UI 
+        yield return new WaitForSeconds(transitionTime);
+        sideQuest.SetActive(true);
+        StartCoroutine(CAMERA_ZOOM());
+
+        // SCREEN FADES FROM BLACK
+        yield return new WaitForSeconds(2);
+        SCREEN_TRANSITION("Fade_Transition", 0);
+
+        yield return new WaitForSeconds(0.5f);
+
+        // MINIGAME TIME!
+        controller.GAME_START();
+        controller.NEXT_TURN();
+        PlayerPrefs.SetString("CurrentBoat", currentBoat);
+        PlayerPrefs.SetString("sceneName", sceneName);
+        PlayerPrefs.Save();
+
+        // PLAYER TURN AGAIN
+        // playerOrder = 0;
+        ENDING_TRANSITION();
+
+        // SKIPPED
+        string mySavedScene = PlayerPrefs.GetString("sceneName");
+        SceneManager.LoadScene(mySavedScene);
     }
 
     IEnumerator CAMERA_ZOOM() 

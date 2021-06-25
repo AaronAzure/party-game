@@ -305,6 +305,10 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private Image magicOrbUIPanel;
 
 
+    [Header("Shogun Seaport")]
+    [SerializeField] private bool losingAll;
+
+
     [Header("Images Spell")]
     [SerializeField] public Sprite spellSlotEmpty;
     [SerializeField] public Sprite spellNone;
@@ -2428,6 +2432,38 @@ public class PathFollower : MonoBehaviour
             coinLoss.Play();
             coins--;
         }
+        manager.CHECK_RANKINGS();
+    }
+    public IEnumerator LOSE_ALL_COINS()
+    {
+        if (!losingAll) {losingAll = true;}
+        else yield break;
+
+        int n = -coins;
+        int tempGold = coins;
+        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+        // NOT ENOUGH COINS TO LOSE
+        if (coins < Mathf.Abs(n) ) {
+            go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        else {
+            go.GetComponent<TextMeshPro>().text    = n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        // LOSE COINS
+        for (int i = 0; i > n; i--)
+        {
+            if (coins <= 0) { break; }
+
+            coinLoss.Play();
+            coins--;
+        }
+        UPDATE_INFORMATION(false);
         manager.CHECK_RANKINGS();
     }
     public void LOSE_MP(int n)
