@@ -7,8 +7,9 @@ using TMPro;
 public class LaserCannon : MonoBehaviour
 {
     public TextMeshPro countDown;
+    private GameController ctr;
     private GameManager manager;
-    private GameObject turret;
+    [SerializeField] private GameObject turret;
     [SerializeField] private Image startUi;
     [SerializeField] private Animator startUiAnim;
     [SerializeField] private AudioSource beep;
@@ -17,12 +18,24 @@ public class LaserCannon : MonoBehaviour
     [SerializeField] private Transform shotAngle;
     [SerializeField] private GameObject projectile;
     [SerializeField] private GameObject chargingEffect;
+    [SerializeField] private Transform barrelPos;
 
+    private float rotateZ;
+    private float rotateSpeed = 5f;
     private bool firing;
     private float timer;
 
+
     private void Start() {
         if (GameObject.Find("Game_Manager") != null) manager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        if (GameObject.Find("Game_Controller") != null) ctr = GameObject.Find("Game_Controller").GetComponent<GameController>();
+        if (ctr.turnNumber == 1) {
+            PlayerPrefs.SetFloat("TurretRotation", 0);
+        }
+        else {
+            rotateZ = PlayerPrefs.GetFloat("TurretRotation");
+            turret.transform.Rotate(0, 0, rotateZ);
+        }
     }
 
     private void Update() {
@@ -34,7 +47,7 @@ public class LaserCannon : MonoBehaviour
         }
     }
 
-    public IEnumerator CountDown(int x) {
+    public IEnumerator CountDown(int x, bool endOfTurn) {
         yield return new WaitForSeconds(0.5f);
         startUi.gameObject.SetActive(true);
 
@@ -58,21 +71,43 @@ public class LaserCannon : MonoBehaviour
             // if (hurtbox != null) hurtbox.SetActive(true);
             chargingEffect.SetActive(false);
             for (int i=0 ; i<90 ; i++) {
-                var atk = Instantiate(projectile, transform.position, Quaternion.Euler( new Vector3(0,0,180 + i) ));
+                var atk = Instantiate(projectile, barrelPos.position, Quaternion.Euler( new Vector3(0,0,270 - i + rotateZ) ));
                 Destroy(atk, 5);
             }
 
             yield return new WaitForSeconds(3f);
             firing = false;
-            manager.StartCoroutine(manager.INCREMENT_TURN());
+            AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+            bgMusic.volume *= 6;
+
+            if (endOfTurn)  StartCoroutine( manager.INCREMENT_TURN() );
+            else            manager.EVENT_OVER_RETURN_TO_PLAYER();
         }
         // CHARGING UP
         else {
             yield return new WaitForSeconds(0.75f);
-            manager.StartCoroutine(manager.INCREMENT_TURN());
+            if (endOfTurn)  StartCoroutine( manager.INCREMENT_TURN() );
+            else            manager.EVENT_OVER_RETURN_TO_PLAYER();
         }
         //// manager.NEXT_PLAYER_TURN();        
     }
 
+    public IEnumerator ROTATE_TURRET() {
+        float totalRotation = 0; 
+        float rotationAmt = rotateSpeed * Time.deltaTime;
+        while(Mathf.Abs(totalRotation) < 90) 
+        {
+            yield return new WaitForSeconds(0.01f);
+            turret.transform.Rotate(0, 0, -rotationAmt * 7.5f);
+            totalRotation += (-rotationAmt * 7.5f);
+        }
+        rotateZ = PlayerPrefs.GetFloat("TurretRotation");
+        Debug.Log("  " + rotateZ + "  ,  " + totalRotation);
+        PlayerPrefs.SetFloat("TurretRotation", rotateZ - 90);
+        rotateZ = PlayerPrefs.GetFloat("TurretRotation");
+
+        yield return new WaitForSeconds(1.5f);
+        manager.EVENT_OVER_RETURN_TO_PLAYER();
+    }
 
 }

@@ -259,6 +259,7 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private TextMeshProUGUI sellerGreetings;
     [SerializeField] private TextMeshProUGUI purchaseLeftText;
     [SerializeField] private TextMeshProUGUI purchaseLeftText2;
+    private float bgMusicVol = 0.2f;
 
     [SerializeField] private GameObject discardSpellUI;   // GRIMOIRE FULL
     [SerializeField] private Image[] discardSpellImg;
@@ -573,7 +574,7 @@ public class PathFollower : MonoBehaviour
             }
 
             mpBar.value = mpBar.maxValue;
-            coins = 100; // TO BE CHANGED // DELETE
+            coins = 10; // TO BE CHANGED // DELETE
             orbs = 0;
             _collider.enabled = true;
             maxNPurchases = 1;
@@ -788,8 +789,8 @@ public class PathFollower : MonoBehaviour
         else if (isRollingDice && !diceRolled) 
         {
             if (slowDice)           radialBar.value += 1.5f;
-            // else if (!diceRolled)   radialBar.value += Random.Range(6f,72f);
-            else if (!diceRolled)   radialBar.value += 2;   // TODO : DELETE (DEBUG)
+            else if (!diceRolled)   radialBar.value += Random.Range(6f,72f);
+            // else if (!diceRolled)   radialBar.value += 2;   // TODO : DELETE (DEBUG)
             if (radialBar.value >= radialBar.maxValue) radialBar.value -= radialBar.maxValue;
             if (radialBar.value >= radialBar.maxValue) radialBar.value = 0; // ** NOT GONNA ROLL A ONE
 
@@ -1782,21 +1783,38 @@ public class PathFollower : MonoBehaviour
         else if (currentNode.IS_SPELL()) {
             StartCoroutine( GAIN_RANDOM_SPELL() );
         }
-        // LANDED ON HAPPENING (TRIGGER)
+        
+        // todo - EVENT RELATED
+        // LANDED ON EVENT (caving in)
         else if (currentNode.IS_BOULDER_EVENT()) {
             if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
             {
-                Debug.Log("-- CAVING IN");
                 StartCoroutine( PATHFOLLOWER_CAVING_IN() );
             }
         }
-        // LANDED ON HAPPENING (TRIGGER)
+        // LANDED ON EVENT (changing boat)
         else if (currentNode.IS_BOAT()) {
             if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
             {
                 StartCoroutine( HAPPEN_NEW_BOAT() );
             }
         }
+        // LANDED ON EVENT (rotate laser)
+        else if (currentNode.IS_ROTATE()) {
+            if (SceneManager.GetActiveScene().name == "Plasma_Palace")
+            {
+                StartCoroutine( PATHFOLLOWER_TURRET_ROTATE() );
+            }
+        }
+        // LANDED ON EVENT (laser speed up countdown)
+        else if (currentNode.IS_SPEED_UP()) {
+            if (SceneManager.GetActiveScene().name == "Plasma_Palace")
+            {
+                StartCoroutine( PATHFOLLOWER_TURRET_SPEED_UP() );
+            }
+        }
+       
+       
         // LANDED ON ORB TRAP
         else if (currentNode.IS_ORB_TRAP()) {
             Debug.Log("LANDED ON ORB TRAP");
@@ -1930,7 +1948,7 @@ public class PathFollower : MonoBehaviour
                 {
                     // manager.FADE_TO_BLACK();
                     PLAYER_CAM_OFF(0);
-                    StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+                    StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
                 }
             }
         }
@@ -2399,7 +2417,7 @@ public class PathFollower : MonoBehaviour
                 }
             }
             PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+            StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
         }
         UPDATE_INFORMATION(false);
     }
@@ -2571,7 +2589,7 @@ public class PathFollower : MonoBehaviour
 
         yield return new WaitForSeconds(1.5f);
         AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
-        bgMusic.volume = 0.2f;
+        bgMusic.volume = bgMusicVol;
         controller.CHOOSE_MAGIC_ORB_SPACE(name);
             
         if (isAtMagicOrb) { nMovesLeft.gameObject.SetActive(true); }
@@ -2671,7 +2689,7 @@ public class PathFollower : MonoBehaviour
         if (isAtSpecial && nPrompt > 0)
         {
             PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+            StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
         }
         manager.CHECK_RANKINGS();
     }
@@ -2779,6 +2797,7 @@ public class PathFollower : MonoBehaviour
 
         yield return new WaitForSeconds(2.5f);  // PAYING MONEY TIME
         AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+        bgMusicVol = bgMusic.volume;
         bgMusic.volume = 0;
         gotAnOrb.Play();
 
@@ -2795,6 +2814,7 @@ public class PathFollower : MonoBehaviour
 
         yield return new WaitForEndOfFrame();
         AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+        bgMusicVol = bgMusic.volume;
         bgMusic.volume = 0;
         gotAnOrb.Play();
 
@@ -2826,13 +2846,13 @@ public class PathFollower : MonoBehaviour
             shopItemUIdesc.SetActive(true); 
         }
         isPlayerTurn = true;
-        bgMusic.volume = 0.2f;
+        bgMusic.volume = bgMusicVol;
 
         // gold boat
         if (isAtSpecial && nPrompt > 0)
         {
             PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+            StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
         }
     }
 
@@ -3468,7 +3488,7 @@ public class PathFollower : MonoBehaviour
         else 
         {
             PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+            StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
         }
     }
 
@@ -3544,9 +3564,29 @@ public class PathFollower : MonoBehaviour
         manager.SCREEN_TRANSITION("Happen_Transition", 0);
         
         yield return new WaitForSeconds(1);
-        StartCoroutine( manager.HAPPEN_TRIGGERED(this) );
+        StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
         _cam.gameObject.SetActive(false);   // CAM TURNS OFF
     }
+
+    IEnumerator PATHFOLLOWER_TURRET_ROTATE()
+    {
+        manager.SCREEN_TRANSITION("Happen_Transition", 0);
+        
+        yield return new WaitForSeconds(1);
+        manager.MANAGER_TURRET_ROTATE(this);
+        _cam.gameObject.SetActive(false);   // CAM TURNS OFF
+    }
+    
+    IEnumerator PATHFOLLOWER_TURRET_SPEED_UP()
+    {
+        manager.SCREEN_TRANSITION("Happen_Transition", 0);
+        
+        yield return new WaitForSeconds(1);
+        manager.MANAGER_TURRET_SPEED_UP(this);
+        _cam.gameObject.SetActive(false);   // CAM TURNS OFF
+    }
+
+
 
     // PLAYER MOVED TO SPECIAL SPACE
     public void MANAGER_EVENT()
@@ -3660,6 +3700,7 @@ public class PathFollower : MonoBehaviour
 
             yield return new WaitForEndOfFrame();
             AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+            bgMusicVol = bgMusic.volume;
             bgMusic.volume = 0;
             orbStolen.Play();
 
@@ -3669,7 +3710,7 @@ public class PathFollower : MonoBehaviour
                 yield return new WaitForEndOfFrame();
                 orbStolen.volume -= 0.01f;
             }
-            bgMusic.volume = 0.2f;
+            bgMusic.volume = bgMusicVol;
             StartCoroutine( ORB_LOST_FROM_BOAT(-1) );
         }
         else
@@ -3680,6 +3721,7 @@ public class PathFollower : MonoBehaviour
 
             yield return new WaitForEndOfFrame();
             AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+            bgMusicVol = bgMusic.volume;
             bgMusic.volume = 0;
             orbStolen.Play();
 
@@ -3689,7 +3731,7 @@ public class PathFollower : MonoBehaviour
                 yield return new WaitForEndOfFrame();
                 orbStolen.volume -= 0.01f;
             }
-            bgMusic.volume = 0.2f;
+            bgMusic.volume = bgMusicVol;
             StartCoroutine( UPDATE_PLAYER_COINS(-20) );
         }
     }

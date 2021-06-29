@@ -53,8 +53,11 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite specialSpace;   //
     
     //* map-exclusive spaces
-    [SerializeField] private Sprite boatSpace;    //  BOAT
+    [Header("Event Spaces")]
     [SerializeField] private Sprite boulderSpace;   // cause cave in
+    [SerializeField] private Sprite boatSpace;    //  BOAT
+    [SerializeField] private Sprite rotateSpace;   // laser rotate 90˚ anti-clockwise
+    [SerializeField] private Sprite speedUpSpace;   // laser countdown faster
 
 
     [Header("Crystal Cavern boulder")]
@@ -148,6 +151,8 @@ public class Node : MonoBehaviour
         // SET THAT COUNTS TOWARDS HAPPENING BONUS (COLLECTION)
         greenSpaces.Add(boatSpace);
         greenSpaces.Add(boulderSpace);
+        greenSpaces.Add(rotateSpace);
+        greenSpaces.Add(speedUpSpace);
 
         // SET THAT CAN BE CONVERTED INTO TRAPS (COLLECTION)
         if (true) {
@@ -299,15 +304,21 @@ public class Node : MonoBehaviour
     public bool IS_BLUE() { return (_spaceType.sprite == blueSpace); }
     public bool IS_GOLD() { return (_spaceType.sprite == goldSpace); }
     public bool IS_RED() { return (_spaceType.sprite == redSpace); }
-    public bool IS_BOAT() { return (_spaceType.sprite == boatSpace); }
-    public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
-    public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
     public bool IS_ORB_TRAP()
     {
         return (_spaceType.sprite == felixOrb || _spaceType.sprite == jacobOrb || _spaceType.sprite == laurelOrb
             || _spaceType.sprite == mauriceOrb || _spaceType.sprite == mimiOrb || _spaceType.sprite == pinkinsOrb
             || _spaceType.sprite == sweeterellaOrb || _spaceType.sprite == thanatosOrb || _spaceType.sprite == charlotteOrb);
     }
+    public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
+    
+
+    //* EVENT SPACES
+    public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
+    public bool IS_BOAT() { return (_spaceType.sprite == boatSpace); }
+    public bool IS_ROTATE() { return (_spaceType.sprite == rotateSpace); }
+    public bool IS_SPEED_UP() { return (_spaceType.sprite == speedUpSpace); }
+
 
     // todo CRYSTAL CAVERNS 
     public void BLOCK() { 

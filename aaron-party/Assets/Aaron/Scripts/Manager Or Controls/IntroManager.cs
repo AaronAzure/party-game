@@ -80,6 +80,8 @@ public class IntroManager : MonoBehaviour
             case "Crystal_Caverns_Intro" :      sceneName = "Crystal Caverns"; break;
             case "Shogun_Seaport Intro" :       sceneName = "Shogun Seaport"; break;
             case "Shogun Seaport_Intro" :       sceneName = "Shogun Seaport"; break;
+            case "Plasma_Palace Intro" :       sceneName = "Plasma Palace"; break;
+            case "Plasma_Palace_Intro" :       sceneName = "Plasma Palace"; break;
             default : Debug.LogError("ADD -sceneName- to IntroManager!!"); break;
         }
 
@@ -119,6 +121,7 @@ public class IntroManager : MonoBehaviour
         // SPAWN ALL PLAYERS
         // if (isBonus || isOutro) { SpawnAtNodes(); }
         if (SceneManager.GetActiveScene().name == "Crystal_Caverns Intro") { SpawnInCircle(4); }
+        else if (SceneManager.GetActiveScene().name == "Plasma_Palace Intro") { SpawnInCircle(4); }
         else { SpawnInLine(); }
         
         SCREEN_TRANSITION("Oval_Transition", 0.5f);

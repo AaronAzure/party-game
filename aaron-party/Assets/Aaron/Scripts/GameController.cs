@@ -10,7 +10,7 @@ public class GameController : MonoBehaviour
     public List<int> charactersChosen;  // ENSURE NO TWO PLAYERS HAVE THE SAME CHARACTER
     public int nPlayers;
     public int nReady;
-    public int turnNumber;  // WHAT TURN [1,2,...]
+    [Tooltip("Current turn")] public int turnNumber;  // WHAT TURN [1,2,...]
     public float pSpeed = 7.5f;       // ** PATHFOLLOWER SPEED
     public bool minigameMode;          // ** SET BY PLAYER 1 (LobbyControls) {true = in minigame tent}
     public string questToPlay;
@@ -716,6 +716,7 @@ public class GameController : MonoBehaviour
             for (int i=0 ; i<magicOrbs.Length ; i++) {
                 magicOrbs[i] = GameObject.Find(magicOrbSpace[i].parentPath + "/" + magicOrbSpace[i].childNode).GetComponent<Node>();
                 if (magicOrbs[i].firstMagicOrb) {
+                    Debug.Log("  FIRST MAGIC ORB LOCATION FOUND!!!");
                     r = i; break;
                 }
             }

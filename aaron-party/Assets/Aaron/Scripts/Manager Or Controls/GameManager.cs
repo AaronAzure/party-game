@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     private PathFollower player7;
     private PathFollower player8;
     private PathFollower[] gamers;  // ** SCRIPT
+    private PathFollower playerThatTriggeredEvent;
     [SerializeField] private GameObject UIcanvas;
 
     public Camera mainCam;
@@ -387,12 +388,12 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("TurretCount", turretCount);
             turretOnCoolDown = true;
             mainCam.gameObject.SetActive(true);
-            StartCoroutine( turret.CountDown(turretCount) );
+            StartCoroutine( turret.CountDown(turretCount, true) );
             // LAUNCHED, RELOAD FROM START
             if (turretCount == 0) {
                 PlayerPrefs.SetInt("TurretCount", startingCharge);
                 AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
-                bgMusic.volume = 0;
+                bgMusic.volume /= 6;
                 mainCam.orthographicSize *= 1.5f;
                 mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
             }
@@ -427,6 +428,7 @@ public class GameManager : MonoBehaviour
             // controller.LOAD_MINIGAME();
         }
     }
+    // todo ------------------------------------------------------------------------
 
     public void SCREEN_TRANSITION(string transitionName, float normTime)
     {
@@ -675,10 +677,7 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator MANAGER_CAVING_IN(PathFollower playerToResume)
     {
-        // FADE_FROM_BLACK();
-
         StartCoroutine( controller.CAVING_IN() );
-        // yield return new WaitForSeconds(transitionTime);
 
         yield return new WaitForSeconds(9);
         playerToResume.PLAYER_CAM_ON();
@@ -692,7 +691,7 @@ public class GameManager : MonoBehaviour
 
     public string WHICH_BOAT_IS_IT() { return currentBoat; }
 
-    public IEnumerator HAPPEN_TRIGGERED(PathFollower playerToResume)
+    public IEnumerator MANAGER_BOAT_ALTERNATE(PathFollower playerToResume)
     {
         if (boats == null) { yield break; }
         // FADE_FROM_BLACK();
@@ -720,6 +719,52 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(playerToResume.UPDATE_PLAYER_COINS(0));
         }
+    }
+
+    // todo ------------------------------------------------------------------ //
+    // todo ---------------------= PLASMA PALACE ----------------------------- //
+
+
+    public void MANAGER_TURRET_ROTATE(PathFollower playerToResume)
+    {
+        if (turret == null) turret = GameObject.Find("TURRET").GetComponent<LaserCannon>();
+        playerThatTriggeredEvent = playerToResume;
+
+        StartCoroutine( turret.ROTATE_TURRET() );
+        mainCam.gameObject.SetActive(true);
+        mainCam.orthographicSize *= 2;
+        mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
+    }
+
+    public void MANAGER_TURRET_SPEED_UP(PathFollower playerToResume)
+    {
+        if (turret == null) turret = GameObject.Find("TURRET").GetComponent<LaserCannon>();
+        playerThatTriggeredEvent = playerToResume;
+
+        turretCount = PlayerPrefs.GetInt("TurretCount") - 1;
+        PlayerPrefs.SetInt("TurretCount", turretCount);
+        mainCam.gameObject.SetActive(true);
+        StartCoroutine( turret.CountDown(turretCount, false) );
+        // LAUNCHED, RELOAD FROM START
+        if (turretCount == 0) {
+            PlayerPrefs.SetInt("TurretCount", startingCharge);
+            AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+            bgMusic.volume /= 6;
+            mainCam.orthographicSize *= 1.5f;
+            mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
+        }
+        // CHARGING UP
+        else {
+            mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
+        }
+    }
+
+    public void EVENT_OVER_RETURN_TO_PLAYER()
+    {
+        if (playerThatTriggeredEvent == null) Debug.LogError("  ERROR: Did not register any PathFollower");
+        mainCam.orthographicSize /= 2;
+        playerThatTriggeredEvent.PLAYER_CAM_ON();
+        StartCoroutine(playerThatTriggeredEvent.UPDATE_PLAYER_COINS(0));
     }
 
 }

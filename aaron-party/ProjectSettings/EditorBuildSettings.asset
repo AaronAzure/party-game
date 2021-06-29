@@ -167,6 +167,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Aaron/Scenes/Maps/Plasma_Palace.unity
     guid: 8515565a7768b473fa01b816843e3212
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Maps/Plasma_Palace Intro.unity
+    guid: 3dc574db2f5884ab595cd9ad94b2948f
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: dafa5d874f13d4d68a7b2bfee57e933b,
       type: 2}
