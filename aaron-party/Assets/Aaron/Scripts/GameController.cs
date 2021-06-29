@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour
 
     [Header("Debugging")]
     public bool skipSideQuest;  //* DEBUGGING ONLY, INSPECTOR
+    public bool slowerDice;  //* DEBUGGING ONLY, INSPECTOR
 
 
     [Header("Board Settings")]

@@ -789,8 +789,8 @@ public class PathFollower : MonoBehaviour
         else if (isRollingDice && !diceRolled) 
         {
             if (slowDice)           radialBar.value += 1.5f;
+            else if (controller.slowerDice)   radialBar.value += 1.75f;   // TODO : DELETE (DEBUG)
             else if (!diceRolled)   radialBar.value += Random.Range(6f,72f);
-            // else if (!diceRolled)   radialBar.value += 2;   // TODO : DELETE (DEBUG)
             if (radialBar.value >= radialBar.maxValue) radialBar.value -= radialBar.maxValue;
             if (radialBar.value >= radialBar.maxValue) radialBar.value = 0; // ** NOT GONNA ROLL A ONE
 

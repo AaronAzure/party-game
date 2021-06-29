@@ -50,11 +50,13 @@ public class LaserCannon : MonoBehaviour
     public IEnumerator CountDown(int x, bool endOfTurn) {
         yield return new WaitForSeconds(0.5f);
         startUi.gameObject.SetActive(true);
+        startUiAnim.Play("Character_Circle_Anim", -1, 0);
 
         yield return new WaitForSeconds(1f);
         startUiAnim.Play("Character_Circle_End_Anim", -1, 0);
 
         yield return new WaitForSeconds(0.75f);
+        startUiAnim.Rebind();
         startUi.gameObject.SetActive(false);
         beep.Play();
         countDown.text = x.ToString();
@@ -81,13 +83,16 @@ public class LaserCannon : MonoBehaviour
             bgMusic.volume *= 6;
 
             if (endOfTurn)  StartCoroutine( manager.INCREMENT_TURN() );
-            else            manager.EVENT_OVER_RETURN_TO_PLAYER();
+            else {
+                StartCoroutine( manager.EVENT_OVER_RETURN_TO_PLAYER("Laser Countdown") ); 
+                countDown.text = manager.startingCharge.ToString();
+            }
         }
         // CHARGING UP
         else {
             yield return new WaitForSeconds(0.75f);
             if (endOfTurn)  StartCoroutine( manager.INCREMENT_TURN() );
-            else            manager.EVENT_OVER_RETURN_TO_PLAYER();
+            else            StartCoroutine( manager.EVENT_OVER_RETURN_TO_PLAYER("Laser Countdown") );
         }
         //// manager.NEXT_PLAYER_TURN();        
     }
@@ -107,7 +112,7 @@ public class LaserCannon : MonoBehaviour
         rotateZ = PlayerPrefs.GetFloat("TurretRotation");
 
         yield return new WaitForSeconds(1.5f);
-        manager.EVENT_OVER_RETURN_TO_PLAYER();
+        StartCoroutine( manager.EVENT_OVER_RETURN_TO_PLAYER("Laser Countdown") );
     }
 
 }

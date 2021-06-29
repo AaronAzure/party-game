@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LaserCannon turret;
     [SerializeField] private GameObject turretShot;
     [SerializeField] private int turretCount;
-    private int startingCharge = 5;
+    public int startingCharge = 5;
     private bool turretOnCoolDown;
 
     // -------------------------------------------------------------------------------
@@ -759,12 +759,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void EVENT_OVER_RETURN_TO_PLAYER()
+    public IEnumerator EVENT_OVER_RETURN_TO_PLAYER(string eventName)
     {
-        if (playerThatTriggeredEvent == null) Debug.LogError("  ERROR: Did not register any PathFollower");
-        mainCam.orthographicSize /= 2;
+        SCREEN_TRANSITION("Happen_Transition", 0);
+
+        yield return new WaitForSeconds(1);
+        if (eventName == "Laser Countdown") mainCam.gameObject.SetActive(false);
         playerThatTriggeredEvent.PLAYER_CAM_ON();
-        StartCoroutine(playerThatTriggeredEvent.UPDATE_PLAYER_COINS(0));
+
+        yield return new WaitForSeconds(1);
+        if (playerThatTriggeredEvent == null) Debug.LogError("  ERROR: Did not register any PathFollower");
+
+        StartCoroutine( playerThatTriggeredEvent.UPDATE_PLAYER_COINS(0) );
     }
 
 }
