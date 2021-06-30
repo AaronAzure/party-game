@@ -170,6 +170,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Aaron/Scenes/Maps/Plasma_Palace Intro.unity
     guid: 3dc574db2f5884ab595cd9ad94b2948f
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames/Pinpoint-The-Endpoint.unity
+    guid: e6e3813d2e45c4078aca52c7053c9a3c
+  - enabled: 1
+    path: Assets/Aaron/Scenes/Minigames_Mini/Pinpoint The Endpoint.unity
+    guid: 7ee5306b6dafd4a0b91b739c984f3453
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: dafa5d874f13d4d68a7b2bfee57e933b,
       type: 2}

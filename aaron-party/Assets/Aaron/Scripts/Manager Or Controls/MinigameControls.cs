@@ -20,8 +20,11 @@ public class MinigameControls : MonoBehaviour
     private float jumpSpeed;
     [SerializeField] private GameObject crystalised;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Collider2D _collider;
-    [SerializeField] private Collider2D cursorCollider;
+
+    [Header("Colliders")]
+    [SerializeField] private Collider2D _collider;              // CHARACTER COLLIDERS
+    [SerializeField] private Collider2D cursorCollider;         // CURSOR COLLIDER
+    [SerializeField] private CircleCollider2D shooterCollider;  // CURSOR COLLIDER
     private bool clicked;
     private float scaleX;
 
@@ -47,6 +50,7 @@ public class MinigameControls : MonoBehaviour
     private SpriteRenderer cursorSprite;
     [SerializeField] private GameObject character;   // UNIVERSAL REFERENCE TO CHARACTER GAMEOBJECT (ANY)
     [SerializeField] private GameObject[] characters;   // ** INSPECTOR (ALL CHARACTER PREFABS)
+    [SerializeField] private GameObject[] shooters;   // ** INSPECTOR (ALL CHARACTER PREFABS)
     // [SerializeField] private GameObject[] heads;        // ** INSPECTOR (ALL CHARACTER HEADS)
     [SerializeField] private GameObject[] cursors;      // ** INSPECTOR (ALL CHARACTER CURSORS)
 
@@ -245,7 +249,7 @@ public class MinigameControls : MonoBehaviour
         controller  = GameObject.Find("Game_Controller").GetComponent<GameController>();
         layout.SetActive(false);
 
-        // CHANGE CHARACTER
+        // GET CHARACTER NAME
         switch (name)
         {
             case "Player_1" : characterName = controller.characterName1;    playerID = 0; break;
@@ -257,36 +261,18 @@ public class MinigameControls : MonoBehaviour
             case "Player_7" : characterName = controller.characterName7;    playerID = 6; break;
             case "Player_8" : characterName = controller.characterName8;    playerID = 7; break;
         }
-        // Gameobject character
-        if (!cursorMode)
+        if (sceneName == "Card_Collectors" || sceneName == "Card Collectors") 
         {
-            dashDirection.gameObject.SetActive(false);
-            for (int i=0 ; i<characters.Length ; i++) {
-                if (characterName == characters[i].name) {
-                    var obj = Instantiate(characters[i], transform.position, Quaternion.identity, this.transform); 
-                    character = obj.gameObject; obj.transform.parent = instances.transform;  _anim = obj.GetComponent<Animator>();
-                    break;
-                }
-                if (i == characters.Length - 1) {
-                    Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
-                }
-            }
-            scaleX = character.transform.localScale.x;
+            cursorMode = true;
+            CREATE_CHARACTER("Cursor");
         }
-        // CHANGE CURSOR
+        else if (sceneName == "Pinpoint The Endpoint" || sceneName == "Pinpoint-The-Endpoint") 
+        {
+            CREATE_CHARACTER("Shooter");
+        }
         else 
         {
-            for (int i=0 ; i<cursors.Length ; i++) {
-                if (cursors[i].name.Contains(characterName)) {
-                    var obj = Instantiate(cursors[i], transform.position + new Vector3(0.75f, -0.75f), Quaternion.identity, this.transform); 
-                    character = obj.gameObject; obj.transform.parent = instances.transform;
-                    cursorSprite = obj.GetComponent<SpriteRenderer>();
-                    break;
-                }
-                if (i == cursors.Length - 1) {
-                    Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
-                }
-            }
+            CREATE_CHARACTER("");
         }
         // UI SCORE CHARACTER FACE
         switch (characterName)
@@ -308,7 +294,7 @@ public class MinigameControls : MonoBehaviour
 
         player = ReInput.players.GetPlayer(playerID);
 
-        // PLAYER SPEED, etc
+        // todo - GAME MODE SETUP  (PLAYER SPEED, etc)
         if (sceneName == "Sneak_And_Snore" || sceneName == "Sneak And Snore")
         {
             GAME_SETUP();
@@ -519,6 +505,13 @@ public class MinigameControls : MonoBehaviour
             ts = GameObject.Find("TREASURE_SPAWNER").GetComponent<TreasureSpawner>();
             if (ts == null) Debug.LogError("-- COULDN'T FIND TREASURE SP");
         }
+        else if (sceneName == "Pinpoint-The-Endpoint" || sceneName == "Pinpoint The Endpoint")
+        {
+            _collider.enabled = false;
+            shooterCollider.enabled = true;
+            moveSpeed = 7;
+            points = 0;
+        }
        
        
        else if (sceneName == "Aaron Boss Battle" || sceneName == "Aaron-Boss-Battle" || sceneName == "Dojo")
@@ -557,18 +550,58 @@ public class MinigameControls : MonoBehaviour
         }
     }
 
-    void DISPLAY_CHARACTER_HEAD()
+    public void CREATE_CHARACTER(string characterStyle)
     {
-        foreach(GameObject head in heads)
+        // SHOOTER
+        if (characterStyle == "Shooter")
         {
-            if (head.name.Contains(characterName))
-            {
-                var obj = Instantiate(head, mask.transform.position, Quaternion.identity);
-                obj.transform.parent = mask.transform;
-                obj.GetComponent<HeadCollector>().player = this.GetComponent<MinigameControls>();
+            dashDirection.gameObject.SetActive(false);
+            for (int i=0 ; i<shooters.Length ; i++) {
+                if (shooters[i].name.Contains(characterName)) {
+                    var obj = Instantiate(shooters[i], transform.position, Quaternion.identity, this.transform); 
+                    character = obj.gameObject; obj.transform.parent = instances.transform;  _anim = obj.GetComponent<Animator>();
+                    break;
+                }
+                if (i == shooters.Length - 1) {
+                    Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
+                }
+            }
+            scaleX = character.transform.localScale.x;
+        }
+        // CHANGE CURSOR
+        else if (cursorMode && characterStyle == "Cursor")
+        {
+            for (int i=0 ; i<cursors.Length ; i++) {
+                if (cursors[i].name.Contains(characterName)) {
+                    var obj = Instantiate(cursors[i], transform.position + new Vector3(0.75f, -0.75f), Quaternion.identity, this.transform); 
+                    character = obj.gameObject; obj.transform.parent = instances.transform;
+                    cursorSprite = obj.GetComponent<SpriteRenderer>();
+                    break;
+                }
+                if (i == cursors.Length - 1) {
+                    Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
+                }
             }
         }
+        // Gameobject character
+        else
+        {
+            dashDirection.gameObject.SetActive(false);
+            for (int i=0 ; i<characters.Length ; i++) {
+                if (characterName == characters[i].name) {
+                    var obj = Instantiate(characters[i], transform.position, Quaternion.identity, this.transform); 
+                    character = obj.gameObject; obj.transform.parent = instances.transform;  _anim = obj.GetComponent<Animator>();
+                    break;
+                }
+                if (i == characters.Length - 1) {
+                    Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
+                }
+            }
+            scaleX = character.transform.localScale.x;
+        }
     }
+
+
 
     // SPAWN OBJECTS (based on map)
     private void GAME_SETUP()
@@ -865,6 +898,8 @@ public class MinigameControls : MonoBehaviour
         }
     }
 
+
+    // PLAYER'S SCORE UI
     private void RESET_PLAYER_UI()
     {
         if (manager != null)
@@ -894,6 +929,20 @@ public class MinigameControls : MonoBehaviour
         {
             layout.SetActive(false);
             scoreHead.gameObject.SetActive(true);
+        }
+    }
+
+    // PLAYER'S SCORE UI (GET PLAYER'S FACE)
+    void DISPLAY_CHARACTER_HEAD()
+    {
+        foreach(GameObject head in heads)
+        {
+            if (head.name.Contains(characterName))
+            {
+                var obj = Instantiate(head, mask.transform.position, Quaternion.identity);
+                obj.transform.parent = mask.transform;
+                obj.GetComponent<HeadCollector>().player = this.GetComponent<MinigameControls>();
+            }
         }
     }
 
@@ -1122,6 +1171,18 @@ public class MinigameControls : MonoBehaviour
             MOVEMENT();
             CHANGE_MASK();
         }
+
+        else if (sceneName == "Pinpoint-The-Endpoint" && manager.canPlay && !manager.timeUp && !isOut ) 
+        {
+            TRANSLATION();
+            BOUNDARIES();
+        }
+        else if (sceneName == "Pinpoint The Endpoint" && pw.canPlay && !pw.timeUp && !isOut ) 
+        {
+            TRANSLATION();
+            BOUNDARIES();
+        }
+
 
 
         // BOSS BATTLE
@@ -1414,20 +1475,21 @@ public class MinigameControls : MonoBehaviour
 
 
         // FLIP CHARACTER WHEN MOVING RIGHT
-        if (moveHorizontal > 0 && !cursorMode)
+        if (_anim != null && moveHorizontal > 0 && !cursorMode)
         {
             character.transform.localScale = new Vector3(-scaleX, scaleX, scaleX);
         }
-        else if (moveHorizontal < 0 && !cursorMode)
+        else if (_anim != null && moveHorizontal < 0 && !cursorMode)
         {
             character.transform.localScale = new Vector3(scaleX, scaleX, scaleX);
         }
         Vector3 direction = new Vector3(moveHorizontal, moveVertical);
         //// rb.MovePosition(transform.position + direction * moveSpeed * Time.fixedDeltaTime);
+        Debug.Log(direction.ToString());
         transform.Translate(direction * moveSpeed * Time.deltaTime);
 
         // ANIMATION
-        if (!cursorMode)
+        if (!cursorMode && _anim != null)
         {
             if (moveHorizontal != 0 || moveVertical != 0)
             {
@@ -2607,6 +2669,31 @@ public class MinigameControls : MonoBehaviour
             }
         }
     
+        else if (sceneName == "Pinpoint-The-Endpoint" || sceneName == "Pinpoint The Endpoint")
+        {
+            if (other.tag == "Safe" && !isFinished) 
+            {
+                isFinished = true;
+                respawnPoint = other.gameObject;
+                var obj = Instantiate(checkpointEffect, transform.position, Quaternion.identity);
+                Destroy(obj, 0.5f);
+                if (manager != null)
+                {
+                    points = controller.nPlayers - manager.nPlayersOut;
+                    manager.nPlayersOut++;
+                    DisplayRankPlacement("race");
+                    manager.CheckIfEveyoneIsOut(1);
+                }
+                else if (pw != null)
+                {
+                    points = controller.nPlayers - pw.nPlayersOut;
+                    pw.nPlayersOut++;
+                    pw.CheckIfEveyoneIsOut(1);
+                }
+            }
+        }
+
+
         else if (manager != null && manager.bossBattle)
         {
             if (manager.bossBattle && other.tag == "Hurtbox" && !manager.timeUp && !isOut)

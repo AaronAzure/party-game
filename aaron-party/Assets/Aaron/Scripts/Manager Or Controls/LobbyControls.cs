@@ -175,7 +175,8 @@ public class LobbyControls : MonoBehaviour
             // QUICK MINIGAME (TEST)    //! DELETE 
             else if (player.GetButtonDoublePressDown("Minus")) 
             {
-                controller.LOAD_MINIGAME();
+                if (controller.playLatestQuest) controller.QUICK_PLAY();
+                else controller.LOAD_MINIGAME();
             }
             else if (boardName != null && Application.CanStreamedLevelBeLoaded(boardName) && player.GetButtonDoublePressDown("X")) 
             {

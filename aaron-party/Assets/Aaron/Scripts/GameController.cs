@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour
     [Header("Debugging")]
     public bool skipSideQuest;  //* DEBUGGING ONLY, INSPECTOR
     public bool slowerDice;  //* DEBUGGING ONLY, INSPECTOR
+    public bool playLatestQuest;  //* DEBUGGING ONLY, INSPECTOR
 
 
     [Header("Board Settings")]
@@ -271,6 +272,7 @@ public class GameController : MonoBehaviour
         quests.Add( new Quest("Don't Be A Zombie", "Don't-Be-A-Zombie") );
         quests.Add( new Quest("Barrier Bearers", "Barrier_Bearers") );
         quests.Add( new Quest("Plunder Ground", "Plunder-Ground") );
+        quests.Add( new Quest("Pinpoint The Endpoint", "Pinpoint-The-Endpoint") );
         // CATCHY TUNES
         // TIDAL FOOLS
         // SPEEDY SERVERS
@@ -857,6 +859,11 @@ public class GameController : MonoBehaviour
         // TESTING MINIGAMES BEFORE ADDING TO quests (List<>)
         // SceneManager.LoadScene("Darkness"); 
         // SceneManager.LoadScene("Colour_Chaos"); 
+    }
+    
+    public void QUICK_PLAY()
+    {
+        SceneManager.LoadScene( quests[quests.Count - 1].questReal ); 
     }
 
     public void MINIGAME_PRIZE(int coin1, int coin2, int coin3, int coin4, int coin5, int coin6, int coin7, int coin8)

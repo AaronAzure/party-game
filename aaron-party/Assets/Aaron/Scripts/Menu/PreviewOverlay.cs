@@ -56,7 +56,6 @@ public class PreviewOverlay : MonoBehaviour
             controller.SET_AVAILABLE_QUEST();
         }
 
-        // int questIndex = controller.quests.Count - 1;  // ** RECENTLY ADDED MINIGAME ** //
         int questIndex = 0; // ** DEFAULT ** //
 
         // MINIGAME MODE 
@@ -79,6 +78,8 @@ public class PreviewOverlay : MonoBehaviour
         {
             questIndex = Random.Range(0, controller.quests.Count);  
         }
+        
+        if (controller.playLatestQuest) questIndex = controller.quests.Count - 1;  // ** RECENTLY ADDED MINIGAME ** //
 
         SceneMiniName  = controller.quests[questIndex].questMini;
         SceneRealName  = controller.quests[questIndex].questReal;
@@ -270,6 +271,15 @@ public class PreviewOverlay : MonoBehaviour
                 map3.SetActive(true);
                 pic3.sprite = buttonSouth;
                 txt3.text = "Decrease field of vision & increase speed";
+                break;
+            case "Pinpoint The Endpoint" : 
+                desc.text = "Follow the ball. The ball will turn invisble after a while.\n";
+                desc.text += "Predict where the ball will end up.\n";
+                desc.text += "The closest player to the ball wins!\n";
+                // desc.text += "Stay stationary to eventually and slowly restore mana.\n";
+                map1.SetActive(true);
+                pic1.sprite = stickEverything;
+                txt1.text = "Move";
                 break;
             default : Debug.LogError("MINIGAME NAME INCORRECT IN PrviewManager  (" + SceneMiniName + ")"); break;
         }

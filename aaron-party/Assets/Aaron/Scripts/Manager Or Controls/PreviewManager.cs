@@ -36,6 +36,7 @@ public class PreviewManager : MonoBehaviour
     // *** UNIQUE *** //
     public float timeToStop;
     [SerializeField] private MultipleTargetCamera mtCam;
+    [SerializeField] private GameObject whereTheBall;
 
 
     // ** EVERY NEW MINIGAME ADJUST TIMER
@@ -144,7 +145,11 @@ public class PreviewManager : MonoBehaviour
             SpawnPlayers_CIRCLE(1, 7.5f);
             SetupMultiTargetCam();
         }
-
+        else if (sceneName == "Pinpoint The Endpoint") 
+        {
+            timer = 11;
+            SpawnPlayers(1);
+        }
 
         // timerText.text = timer.ToString();
         blackScreen.gameObject.SetActive(true);
@@ -336,6 +341,10 @@ public class PreviewManager : MonoBehaviour
         //// Debug.Log("-- timer = " + timer);
 
         if (timer > 0) { StartCoroutine( StartMinigame() ); }
+        else if (sceneName == "Pinpoint The Endpoint")
+        {
+            StartCoroutine( EventGameOver() );
+        }
         // TIMES UP
         else           { StartCoroutine( RELOAD() ); }
     }
@@ -352,14 +361,33 @@ public class PreviewManager : MonoBehaviour
 
     private IEnumerator EventGameOver()
     {
-        for (int i=0 ;i<players.Length ; i++)
+        if (sceneName == "Stop Watchers")
         {
-            players[i].ShowTime();
-        }
-        CLOSEST_TIME();
+            for (int i=0 ;i<players.Length ; i++)
+            {
+                players[i].ShowTime();
+            }
+            CLOSEST_TIME();
 
-        yield return new WaitForSeconds(1);
-        StartCoroutine( RELOAD() );
+            yield return new WaitForSeconds(1);
+            StartCoroutine( RELOAD() );
+        }
+        else if (sceneName == "Pinpoint The Endpoint")
+        {
+            if (whereTheBall != null) whereTheBall.SetActive(true);
+
+            yield return new WaitForSeconds(2);
+            // if (whereTheBall != null) whereTheBall.SetActive(false);
+
+            yield return new WaitForSeconds(5);
+            canPlay = false;
+            MagicBall mb = GameObject.Find("BALL").GetComponent<MagicBall>();
+            mb.CHECK_DISTANCE();
+
+            yield return new WaitForSeconds(3);
+            StartCoroutine( RELOAD() );
+        }
+
     }
 
     private void CLOSEST_TIME()

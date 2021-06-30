@@ -59,6 +59,8 @@ public class LevelManager : MonoBehaviour
     public float timeToStop;
     public bool bossBattle; // ** INSPECTOR
 
+    [SerializeField] private GameObject whereTheBall;
+
 
 
     // ----------------------------------------------------------------------------------------------------------------------------
@@ -171,6 +173,12 @@ public class LevelManager : MonoBehaviour
             timer = 30;
             SpawnPlayers_CIRCLE(1, 7.5f);
             SetupMultiTargetCam();
+        }
+        else if (sceneName == "Pinpoint-The-Endpoint") 
+        {
+            timer = 17;
+            timeUI.SetActive(false);
+            SpawnPlayers(1);
         }
         
         
@@ -396,9 +404,18 @@ public class LevelManager : MonoBehaviour
         timer--;
         timerText.text = timer.ToString();
         if (timerText.text == "5" && sceneName == "Stop_Watchers") { timeUI.SetActive(true); }
+        // PINPOINT THE ENDPOINT
+        if (timerText.text == "7" && sceneName == "Pinpoint-The-Endpoint") { whereTheBall.SetActive(true); }
+        if (timerText.text == "5" && sceneName == "Pinpoint-The-Endpoint") { timeUI.SetActive(true); }
+        if (timerText.text == "Finished!" && sceneName == "Pinpoint-The-Endpoint") { bgMusic.Stop(); }
 
         // TIMES UP (STOP WATCHERS)
         if (sceneName == "Stop_Watchers")
+        {
+            if (timer > 0) { StartCoroutine( TIMER_DECREMENT() ); }
+            else           { StartCoroutine( EventGameOver() ); }
+        }
+        else if (sceneName == "Pinpoint-The-Endpoint")
         {
             if (timer > 0) { StartCoroutine( TIMER_DECREMENT() ); }
             else           { StartCoroutine( EventGameOver() ); }
@@ -461,7 +478,7 @@ public class LevelManager : MonoBehaviour
             {
                 players[i].COIN_MINIGAME();
             }
-            // CALCULATE_MOST_GOLD();
+            CALCULATE_MOST_GOLD();
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);     // COINS WON IN MINIGAME (QUEST)
             winMusic.Play();
         }
@@ -520,6 +537,27 @@ public class LevelManager : MonoBehaviour
         else {
             for ( int i=0 ; i<controller.nPlayers ; i++)    { controller.RICH_ORB_UPDATE(i); }
             SceneManager.LoadScene("0Prize_Money");
+        }
+    }
+
+    private IEnumerator EventGameOver()
+    {
+        if (sceneName == "Stop_Watchers")
+        {
+            for (int i=0 ; i<players.Length ; i++)
+            {
+                players[i].ShowTime();
+            }
+            yield return new WaitForSeconds(1);
+            StartCoroutine( GameOver() );
+        }
+        else if (sceneName == "Pinpoint-The-Endpoint")
+        {
+            canPlay = false;
+            countdown.text = "Finished!";
+            bgMusic.Stop();
+            MagicBall mb = GameObject.Find("BALL").GetComponent<MagicBall>();
+            mb.CHECK_DISTANCE();
         }
     }
 
@@ -620,20 +658,6 @@ public class LevelManager : MonoBehaviour
         if (!controller.isSetOrder) {
             controller.playerOrder = pid;
         }
-    }
-
-    private IEnumerator EventGameOver()
-    {
-        if (sceneName == "Stop_Watchers")
-        {
-            for (int i=0 ; i<players.Length ; i++)
-            {
-                players[i].ShowTime();
-            }
-        }
-
-        yield return new WaitForSeconds(1);
-        StartCoroutine( GameOver() );
     }
 
 
