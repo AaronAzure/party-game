@@ -28,7 +28,6 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI  timerText;
     [SerializeField] private TextMeshProUGUI  winnerText;
     [SerializeField] private MinigameControls spawnPlayers;
-    [SerializeField] private MinigameControls spawnCursors;
 
     // SPAWN BETWEEN POINT "_A" TO "_B"
     [SerializeField] private Transform _A;  
@@ -92,7 +91,7 @@ public class LevelManager : MonoBehaviour
         else if (sceneName == "Card_Collectors") 
         {
             timer = 30;
-            SpawnCursors(1);
+            SpawnPlayers(1);
         }
         else if (sceneName == "Leaf_Leap") 
         {
@@ -307,72 +306,6 @@ public class LevelManager : MonoBehaviour
             player.playerID = i; 
             player.name = "Player_" + (i+1); 
             player.manager = this.gameObject.GetComponent<LevelManager>();;
-            player.sceneName = this.sceneName;
-
-            players[i] = player;
-        }
-    }
-
-    private void SpawnCursors(float ratio)
-    {
-        if (controller.nPlayers < 5) {
-            for ( int i=0 ; i<controller.nPlayers ; i++ )
-            {
-                var player = Instantiate(spawnPlayers, 
-                        Vector3.Lerp(_A.position, _B.position, (float) (i+1)/(controller.nPlayers+1) ), Quaternion.identity);
-                player.transform.parent = instances.transform;
-                player.transform.localScale *= ratio;
-                player.playerID = i; 
-                player.name = "Player_" + (i+1); 
-                player.manager = this.gameObject.GetComponent<LevelManager>();
-                player.cursorMode = true;
-                player.sceneName = this.sceneName;
-
-                players[i] = player;
-            }
-        }
-        else {
-            for ( int i=0 ; i<controller.nPlayers ; i++ )
-            {
-                var player = Instantiate(spawnCursors, 
-                        Vector3.Lerp(_A.position, _B.position, (float) (i)/(controller.nPlayers-1) ), Quaternion.identity);
-                player.transform.parent = instances.transform;
-                player.transform.localScale *= ratio;
-                player.playerID = i; 
-                player.name = "Player_" + (i+1); 
-                player.manager = this.gameObject.GetComponent<LevelManager>();
-                player.cursorMode = true;
-                player.sceneName = this.sceneName;
-
-                players[i] = player;
-            }
-        }
-    }
-
-    private void SpawnCursors_CIRCLE(float ratio, float radius)
-    {
-        for ( int i=0 ; i<controller.nPlayers ; i++ )
-        {
-            /* Distance around the circle */  
-            var radians = 2 * Mathf.PI / controller.nPlayers * i;
-            
-            /* Get the vector direction */ 
-            var vertical = Mathf.Sin(radians);
-            var horizontal = Mathf.Cos(radians); 
-            
-            var spawnDir = new Vector3 (-horizontal, vertical);
-            
-            /* Get the spawn position */ 
-            Vector3 spawnPos = _A.transform.position + (spawnDir * radius); // Radius is just the distance away from the point
-            
-            /* Now spawn */
-            var player = Instantiate(spawnCursors, spawnPos , Quaternion.identity);
-            player.transform.parent = instances.transform;
-            player.transform.localScale *= ratio;
-            player.playerID = i; 
-            player.name = "Player_" + (i+1); 
-            player.manager = this.gameObject.GetComponent<LevelManager>();;
-            player.cursorMode = true;
             player.sceneName = this.sceneName;
 
             players[i] = player;

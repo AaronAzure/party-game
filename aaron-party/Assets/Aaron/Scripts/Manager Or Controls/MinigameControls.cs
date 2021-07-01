@@ -324,6 +324,10 @@ public class MinigameControls : MonoBehaviour
             _collider.enabled = false;
             cursorCollider.enabled = false;
             RESET_PLAYER_UI();
+            if (pw != null) 
+            {
+                scoreHead.gameObject.GetComponent<RectTransform>().transform.position -= new Vector3(0,3*transform.localScale.x);
+            }
         }
         else if (sceneName == "Leaf_Leap" || sceneName == "Leaf Leap")
         {
@@ -580,8 +584,8 @@ public class MinigameControls : MonoBehaviour
         {
             for (int i=0 ; i<cursors.Length ; i++) {
                 if (cursors[i].name.Contains(characterName)) {
-                    var obj = Instantiate(cursors[i], transform.position + new Vector3(0.75f, -0.75f), Quaternion.identity, this.transform); 
-                    character = obj.gameObject; obj.transform.parent = instances.transform;
+                    var obj = Instantiate(cursors[i], transform.position , Quaternion.identity, instances.transform); 
+                    // character = obj.gameObject; obj.transform.parent = instances.transform;
                     cursorSprite = obj.GetComponent<SpriteRenderer>();
                     break;
                 }

@@ -65,7 +65,7 @@ public class PreviewManager : MonoBehaviour
         else if (sceneName == "Card Collectors") 
         {
             timer = 30;
-            SpawnCursors(1);
+            SpawnPlayers(1);
         }
         else if (sceneName == "Leaf Leap") 
         {
