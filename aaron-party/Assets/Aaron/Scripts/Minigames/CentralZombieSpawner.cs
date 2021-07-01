@@ -6,13 +6,13 @@ public class CentralZombieSpawner : MonoBehaviour
 {
     private ZombieSpawner[] spawners;
     private GameController ctr;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
     public List<GameObject> targets;
     private int nSpawn;
 
     private void Start() {
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         ctr = GameObject.Find("Game_Controller").GetComponent<GameController>();
         if (ctr.hard) nSpawn = 5;
         

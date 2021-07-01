@@ -8,7 +8,7 @@ public class GoldSpawner : MonoBehaviour
     private List<int> spawnIndex;
     private int nSpawn;
     private int maxSpawn;
-    private LevelManager manager;
+    private MinigameManager manager;
     private GameController controller;
     [SerializeField] private GameObject goldPrefab;
     [SerializeField] private GameObject effPrefab;
@@ -18,7 +18,7 @@ public class GoldSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         if (GameObject.Find("Game_Controller") != null) 
         {
             controller = GameObject.Find("Game_Controller").GetComponent<GameController>();

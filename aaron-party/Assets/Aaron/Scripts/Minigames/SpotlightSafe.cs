@@ -9,7 +9,7 @@ public class SpotlightSafe : MonoBehaviour
     public bool doneMoving;
     private bool shrinker;
     public int nLight;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
     public int currentPos;
     private int index;

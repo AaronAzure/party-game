@@ -7,7 +7,7 @@ public class FlowerSpawner : MonoBehaviour
     private List<Transform> spawnPos;
     private List<int> spawnIndex;
     private int nSpawn;
-    private LevelManager manager;
+    private MinigameManager manager;
     private GameController controller;
     [SerializeField] private GameObject flowerPrefab;
     [SerializeField] private GameObject goldPrefab;
@@ -17,7 +17,7 @@ public class FlowerSpawner : MonoBehaviour
 
     void Start()
     {
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         if (GameObject.Find("Game_Controller") != null) 
         {
             controller = GameObject.Find("Game_Controller").GetComponent<GameController>();

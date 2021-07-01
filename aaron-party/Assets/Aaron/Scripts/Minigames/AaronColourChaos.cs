@@ -11,7 +11,7 @@ public class AaronColourChaos : MonoBehaviour
     [SerializeField] private SpriteRenderer[] blanks;
     [SerializeField] private Sprite[] spacesWarningSprites;
     [SerializeField] private GameObject teleportSpellPrefab;
-    private LevelManager manager;
+    private MinigameManager manager;
     private GameController ctr;
     private int nTimesCast;
     private int nCircles = 1;
@@ -28,7 +28,7 @@ public class AaronColourChaos : MonoBehaviour
         // StartCoroutine(TeleportElimination());
         if (SceneManager.GetActiveScene().name == "Colour_Chaos") {
             if (GameObject.Find("Level_Manager") != null) {
-                manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+                manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
             }
             StartCoroutine(StartDelay());
         }

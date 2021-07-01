@@ -14,7 +14,7 @@ public class AaronBoss : MonoBehaviour
     [SerializeField] private Animator anim;
 
     GameController ctr;
-    LevelManager manager;
+    MinigameManager manager;
     PreviewManager pw;
     GameObject instances;
     private GameObject character;
@@ -46,7 +46,7 @@ public class AaronBoss : MonoBehaviour
         for (int i=0 ; i<smlAngles.Length ; i++) { smlAngles[i] = (i*11.25f); }
 
         if (GameObject.Find("Level_Manager") != null) {
-            manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+            manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
             instances = manager.gameObject;
         }
         if (GameObject.Find("Preview_Manager") != null)

@@ -11,7 +11,7 @@ public class Spawner : MonoBehaviour
     private float spawnRate     = 1.1f;
     private int nSpawned        = 0;
     private bool newWave      = true;
-    private LevelManager manager;
+    private MinigameManager manager;
     private GameController ctr;
     // private GameObject instances;
 
@@ -22,7 +22,7 @@ public class Spawner : MonoBehaviour
         }
 
         if (GameObject.Find("Level_Manager") != null) {
-            manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+            manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
             StartCoroutine( START_CO(4) );
         }
         else    { StartCoroutine( START_CO(0.5f) ); }

@@ -10,7 +10,7 @@ public class RandomPatrol : MonoBehaviour
 
 
     private GameController ctr;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
 
     [SerializeField] private Animator anim;
@@ -20,7 +20,7 @@ public class RandomPatrol : MonoBehaviour
     {
         if (anim == null) anim = GetComponent<Animator>();
         if (GameObject.Find("Preview_Manager") != null) pw = GameObject.Find("Preview_Manager").GetComponent<PreviewManager>();
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         if (GameObject.Find("Game_Controller") != null) ctr = GameObject.Find("Game_Controller").GetComponent<GameController>();
 
         LEVEL_DIFFICULTY();

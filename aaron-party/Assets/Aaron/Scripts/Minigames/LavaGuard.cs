@@ -8,7 +8,7 @@ public class LavaGuard : MonoBehaviour
     [SerializeField] private float startIn = 0;
     [SerializeField] private GameObject lavaTrail;
     private GameController ctr;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
     private int index;
     private float moveSpeed = 5;
@@ -19,7 +19,7 @@ public class LavaGuard : MonoBehaviour
     void Start()
     {
         if (GameObject.Find("Preview_Manager") != null) pw = GameObject.Find("Preview_Manager").GetComponent<PreviewManager>();
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         index  = Random.Range(0, target.Length);
         lScale = transform.localScale.x;
 

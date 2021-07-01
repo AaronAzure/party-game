@@ -10,7 +10,7 @@ public class CrystalBeast : MonoBehaviour
     [SerializeField] private GameObject _hurtBox;
     [SerializeField] private GameObject _zzz;
 
-    private LevelManager manager;   // GET COMPONENT
+    private MinigameManager manager;   // GET COMPONENT
     private PreviewManager pw;   // GET COMPONENT
     private AudioSource bgMusic;    // get
     private bool started;
@@ -24,7 +24,7 @@ public class CrystalBeast : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == "Sneak_And_Snore") 
         {
-            manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+            manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
             bgMusic = GameObject.Find("BG_MUSIC").GetComponent<AudioSource>();
         }
 

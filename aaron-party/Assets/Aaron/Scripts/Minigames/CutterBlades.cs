@@ -12,7 +12,7 @@ public class CutterBlades : MonoBehaviour
 
 
     private GameController ctr;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
 
 
@@ -22,7 +22,7 @@ public class CutterBlades : MonoBehaviour
         waitTime = new float[]{0, 0, 0, 0.1f, 0.25f, 0.25f, 0.5f, 0.5f, 0.75f, 1f, 2.5f};
 
         if (GameObject.Find("Preview_Manager") != null) pw = GameObject.Find("Preview_Manager").GetComponent<PreviewManager>();
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
 
         LEVEL_DIFFICULTY();
 

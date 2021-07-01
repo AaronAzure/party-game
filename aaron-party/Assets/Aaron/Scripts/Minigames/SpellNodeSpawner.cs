@@ -7,7 +7,7 @@ public class SpellNodeSpawner : MonoBehaviour
     private List<Transform> spawnPos;
     private List<int> spawnIndex;
     private int nSpawn;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
     private GameController controller;
     [SerializeField] private GameObject nodePrefab;
@@ -19,7 +19,7 @@ public class SpellNodeSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         if (GameObject.Find("Preview_Manager") != null) pw    = GameObject.Find("Preview_Manager").GetComponent<PreviewManager>();
         if (GameObject.Find("Game_Controller") != null) controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
         

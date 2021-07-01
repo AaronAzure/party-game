@@ -9,7 +9,7 @@ public class BoxSpawner : MonoBehaviour
     private int      nBox = 0;
     private int      maxBox = 16;
     private List<string> boxContents;   // 15 BOXES CONTAINING ONE OF THE FOUR   
-    private LevelManager manager;   
+    private MinigameManager manager;   
     private GameController ctr;
     [SerializeField] private GameObject boxPrefab;
     private float spawnRate = 1.125f;    // Box.moveFor + Box.stopFor
@@ -45,7 +45,7 @@ public class BoxSpawner : MonoBehaviour
         if (transform.position.x < 0) { onLeftSide = true; }
 
         if (GameObject.Find("Level_Manager") != null) {
-            manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+            manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
             StartCoroutine( START_CO(4) );
         }
         else    { StartCoroutine( START_CO(0.5f) ); }

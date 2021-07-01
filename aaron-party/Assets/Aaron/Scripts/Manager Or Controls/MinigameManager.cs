@@ -7,7 +7,7 @@ using TMPro;
 using Rewired;
 
 
-public class LevelManager : MonoBehaviour
+public class MinigameManager : MonoBehaviour
 {
     private string sceneName;
     public bool canPlay;
@@ -227,7 +227,7 @@ public class LevelManager : MonoBehaviour
                 player.transform.localScale *= ratio;
                 player.playerID = i; 
                 player.name = "Player_" + (i+1); 
-                player.manager = this.gameObject.GetComponent<LevelManager>();;
+                player.manager = this.gameObject.GetComponent<MinigameManager>();;
                 player.sceneName = this.sceneName;
 
                 players[i] = player;
@@ -250,7 +250,7 @@ public class LevelManager : MonoBehaviour
                 player.transform.localScale *= ratio;
                 player.playerID = i; 
                 player.name = "Player_" + (i+1); 
-                player.manager = this.gameObject.GetComponent<LevelManager>();;
+                player.manager = this.gameObject.GetComponent<MinigameManager>();;
                 player.sceneName = this.sceneName;
 
                 players[i] = player;
@@ -276,7 +276,7 @@ public class LevelManager : MonoBehaviour
             player.transform.localScale *= ratio;
             player.playerID = i; 
             player.name = "Player_" + (i+1); 
-            player.manager = this.gameObject.GetComponent<LevelManager>();;
+            player.manager = this.gameObject.GetComponent<MinigameManager>();;
             player.sceneName = this.sceneName;
 
             players[i] = player;
@@ -305,7 +305,7 @@ public class LevelManager : MonoBehaviour
             player.transform.localScale *= ratio;
             player.playerID = i; 
             player.name = "Player_" + (i+1); 
-            player.manager = this.gameObject.GetComponent<LevelManager>();;
+            player.manager = this.gameObject.GetComponent<MinigameManager>();;
             player.sceneName = this.sceneName;
 
             players[i] = player;

@@ -7,7 +7,7 @@ public class ZombieSpawner : MonoBehaviour
 
     [SerializeField] private Zombie zombiePrefab;
     [SerializeField] private Animator anim;
-    private LevelManager manager;
+    private MinigameManager manager;
     public CentralZombieSpawner hub;
 
 

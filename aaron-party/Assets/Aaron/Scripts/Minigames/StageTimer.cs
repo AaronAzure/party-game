@@ -9,7 +9,7 @@ public class StageTimer : MonoBehaviour
     private bool gameStart;
     public float timer;
     // private MinigameControls player;
-    private LevelManager manager;
+    private MinigameManager manager;
     [SerializeField] private TextMeshPro timeText;
     // private float nextActionTime = 0;
     // private float period = 0.01f;

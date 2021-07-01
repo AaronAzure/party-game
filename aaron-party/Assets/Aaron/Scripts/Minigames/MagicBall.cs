@@ -6,7 +6,7 @@ public class MagicBall : MonoBehaviour
 {
 
     private GameController ctr;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
 
     private Rigidbody2D rb;
@@ -38,7 +38,7 @@ public class MagicBall : MonoBehaviour
         if (ctr.hard)   speed = Random.Range(5f, 7f);
         
         if (GameObject.Find("Preview_Manager") != null) pw = GameObject.Find("Preview_Manager").GetComponent<PreviewManager>();
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
 
         if (manager == null)    StartCoroutine( StartMovingIn(1) );
         else                    StartCoroutine( StartMovingIn(4) );

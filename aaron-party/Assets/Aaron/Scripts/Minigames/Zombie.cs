@@ -10,7 +10,7 @@ public class Zombie : MonoBehaviour
     [SerializeField] private AIPath aIPath;
     [SerializeField] private GameObject character;
     public CentralZombieSpawner spawner;
-    private LevelManager manager;
+    private MinigameManager manager;
     private float scaleX;
     // public GameObject targets;
     private float minDistance;
@@ -20,7 +20,7 @@ public class Zombie : MonoBehaviour
         scaleX = character.transform.localScale.x;
         Debug.Log(dest.name + " moving towards " + spawner.targets[0].name);
         if (GameObject.Find("Level_Manager") != null) {
-            manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+            manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         }
     }
 

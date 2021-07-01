@@ -6,13 +6,13 @@ using TMPro;
 public class StopWatch : MonoBehaviour
 {
     private float timeToStop;
-    private LevelManager manager;
+    private MinigameManager manager;
     private PreviewManager pw;
     [SerializeField] private TextMeshProUGUI giantTime;
 
     void Start()
     {
-        if (GameObject.Find("Level_Manager") != null)   manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null)   manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         if (GameObject.Find("Preview_Manager") != null) pw = GameObject.Find("Preview_Manager").GetComponent<PreviewManager>();
 
         timeToStop = Random.Range(10f,20f);

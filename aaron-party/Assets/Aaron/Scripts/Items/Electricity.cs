@@ -9,7 +9,7 @@ public class Electricity : MonoBehaviour
     private bool newDir;
     private Vector3[] movePos;
     private bool readyToMove;
-    private LevelManager manager;
+    private MinigameManager manager;
     [SerializeField] private GameObject electricity;
     [SerializeField] private GameObject prefabHolder;
     [SerializeField] private bool tooMany;  // ** INSPECTOR
@@ -34,7 +34,7 @@ public class Electricity : MonoBehaviour
         }
         if (!controller.hard && hardMode) { Destroy(this.gameObject); }
 
-        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<LevelManager>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
         int rng = Random.Range(0, movePos.Length);
         posToMove = transform.position + movePos[rng];
 

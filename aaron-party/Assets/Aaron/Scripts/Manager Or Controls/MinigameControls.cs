@@ -66,7 +66,7 @@ public class MinigameControls : MonoBehaviour
     [SerializeField] private GameObject charlotteH;
 
 
-    [SerializeField] public LevelManager manager;
+    [SerializeField] public MinigameManager manager;
     [SerializeField] public PreviewManager pw;
     public string sceneName;    // SET BY PreviewManager 
     private GameController controller;
