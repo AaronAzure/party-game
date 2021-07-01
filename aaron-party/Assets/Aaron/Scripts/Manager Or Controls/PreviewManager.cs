@@ -150,6 +150,11 @@ public class PreviewManager : MonoBehaviour
             timer = 11;
             SpawnPlayers(1);
         }
+        else if (sceneName == "Camo Cutters") 
+        {
+            timer = 45;
+            SpawnPlayers_CIRCLE(1, 2);
+        }
 
         // timerText.text = timer.ToString();
         blackScreen.gameObject.SetActive(true);

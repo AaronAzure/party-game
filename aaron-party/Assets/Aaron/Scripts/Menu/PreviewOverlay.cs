@@ -281,6 +281,14 @@ public class PreviewOverlay : MonoBehaviour
                 pic1.sprite = stickEverything;
                 txt1.text = "Move";
                 break;
+            case "Camo Cutters" : 
+                desc.text = "Last man standing rules.\n";
+                desc.text += "Avoid the magical saw blades,\n";
+                desc.text += "which can camoflage in its own colour.\n";
+                map1.SetActive(true);
+                pic1.sprite = stickEverything;
+                txt1.text = "Move";
+                break;
             default : Debug.LogError("MINIGAME NAME INCORRECT IN PrviewManager  (" + SceneMiniName + ")"); break;
         }
     }

@@ -273,6 +273,7 @@ public class GameController : MonoBehaviour
         quests.Add( new Quest("Barrier Bearers", "Barrier_Bearers") );
         quests.Add( new Quest("Plunder Ground", "Plunder-Ground") );
         quests.Add( new Quest("Pinpoint The Endpoint", "Pinpoint-The-Endpoint") );
+        quests.Add( new Quest("Camo Cutters", "Camo-Cutters") );
         // CATCHY TUNES
         // TIDAL FOOLS
         // SPEEDY SERVERS
@@ -314,6 +315,7 @@ public class GameController : MonoBehaviour
     // QUEST(S) NOT TO PLAY/SELECTED
     public bool ADD_TO_NO_LIST(string questName)
     {
+        // PLAYABLE
         foreach (string alreadyIn in noList)
         {
             if (alreadyIn == questName)
@@ -322,6 +324,7 @@ public class GameController : MonoBehaviour
                 return true;
             }
         }
+        // NON-PLAYABLE
         noList.Add(questName);
         return false;
     }
@@ -860,7 +863,7 @@ public class GameController : MonoBehaviour
         // SceneManager.LoadScene("Darkness"); 
         // SceneManager.LoadScene("Colour_Chaos"); 
     }
-    
+
     public void QUICK_PLAY()
     {
         SceneManager.LoadScene( quests[quests.Count - 1].questReal ); 

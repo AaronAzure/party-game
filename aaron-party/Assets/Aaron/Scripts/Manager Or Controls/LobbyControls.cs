@@ -305,6 +305,7 @@ public class LobbyControls : MonoBehaviour
         if (controller.noList.Count < controller.quests.Count)
         {
             _settings.gameObject.SetActive(false);
+            touchingBoard = false;
             if(SceneUtility.GetBuildIndexByScenePath(boardToPlay) >= 0)
             {
                 boardSelected = false;
@@ -449,16 +450,16 @@ public class LobbyControls : MonoBehaviour
             _quests.gameObject.SetActive(false);
         }
         // ADJUST SETTING
-        // else if (player.GetButtonDown("R")) {
-        //     CHANGE_MINIGAME_DIFFICULTY(true);
-        // }
-        // else if (player.GetButtonDown("L")) {
-        //     CHANGE_MINIGAME_DIFFICULTY(false);
-        // }
-        // // CHOOSE CHARACTERS AGAIN
-        // else if (player.GetButtonDown("A")) { 
-        //     CHANGE_MINIGAME_DIFFICULTY(true); 
-        // }
+        else if (player.GetButtonDown("R")) {
+            CHANGE_MINIGAME_DIFFICULTY(true);
+        }
+        else if (player.GetButtonDown("L")) {
+            CHANGE_MINIGAME_DIFFICULTY(false);
+        }
+        // CHOOSE CHARACTERS AGAIN
+        else if (player.GetButtonDown("A")) { 
+            CHANGE_MINIGAME_DIFFICULTY(true); 
+        }
 
         DISPLAY_DIFFICULTY();
     }

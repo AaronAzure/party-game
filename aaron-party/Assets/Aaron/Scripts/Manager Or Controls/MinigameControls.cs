@@ -218,6 +218,7 @@ public class MinigameControls : MonoBehaviour
     [SerializeField] private GameObject teleBlueEffect;
     [SerializeField] private GameObject barrierEffect;
     [SerializeField] private GameObject deathEffect;
+    [SerializeField] private GameObject genericDeathEffect;
     [SerializeField] private GameObject deathElectricEffect;
 
 
@@ -511,6 +512,12 @@ public class MinigameControls : MonoBehaviour
             shooterCollider.enabled = true;
             moveSpeed = 7;
             points = 0;
+        }
+        else if (sceneName == "Camo-Cutters" || sceneName == "Camo Cutters")
+        {
+            moveSpeed = 5;
+            rb = GetComponent<Rigidbody2D>();
+            bouncePhysics = true;
         }
        
        
@@ -1183,6 +1190,15 @@ public class MinigameControls : MonoBehaviour
             BOUNDARIES();
         }
 
+        else if (sceneName == "Camo-Cutters" && manager.canPlay && !manager.timeUp && !isOut) 
+        {
+            MOVEMENT();
+        }
+        else if (sceneName == "Camo Cutters" && pw.canPlay && !isOut) 
+        {
+            MOVEMENT();
+        }
+
 
 
         // BOSS BATTLE
@@ -1312,7 +1328,7 @@ public class MinigameControls : MonoBehaviour
             MOVE();
         }
         
-        if (sceneName == "Barrier_Bearers" && manager.canPlay && !manager.timeUp && !isOut )
+        else if (sceneName == "Barrier_Bearers" && manager.canPlay && !manager.timeUp && !isOut )
         {
             MOVE();
             if (barrierOn) BARRIER();
@@ -1334,6 +1350,15 @@ public class MinigameControls : MonoBehaviour
             mask.transform.position = maskPos.position;
         }
         
+        else if (sceneName == "Camo-Cutters" && manager.canPlay && !manager.timeUp && !isOut) 
+        {
+            MOVE();
+        }
+        else if (sceneName == "Camo Cutters" && pw.canPlay && !isOut) 
+        {
+            MOVE();
+        }
+
         // BOSS BATTLE
         else if (manager != null)
         {
@@ -2687,6 +2712,30 @@ public class MinigameControls : MonoBehaviour
                 else if (pw != null)
                 {
                     points = controller.nPlayers - pw.nPlayersOut;
+                    pw.nPlayersOut++;
+                    pw.CheckIfEveyoneIsOut(1);
+                }
+            }
+        }
+
+        else if (sceneName == "Camo-Cutters" || sceneName == "Camo Cutters")
+        {
+            if (other.tag == "Hurtbox") {
+                isOut = true;
+                var dead = Instantiate(genericDeathEffect, transform.position, Quaternion.identity);
+                Destroy(dead, 2);
+                transform.position = new Vector3(transform.position.x, 50);
+                if (manager != null) 
+                {
+                    StartCoroutine( DelayElimCo() );
+                    dead.transform.parent = manager.transform;
+                    points = manager.nPlayersOut - controller.nPlayers;
+                    score.text = points.ToString();
+                }
+                else if (pw != null) 
+                {
+                    dead.GetComponent<AudioSource>().volume = 0;
+                    dead.transform.parent = pw.transform;
                     pw.nPlayersOut++;
                     pw.CheckIfEveyoneIsOut(1);
                 }

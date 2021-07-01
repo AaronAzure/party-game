@@ -16127,6 +16127,7 @@ MonoBehaviour:
   barrierEffect: {fileID: 7785269661457258712}
   deathEffect: {fileID: 1408916167051838, guid: db8e5e1cf4c43a4479b6a7ed83ced530,
     type: 3}
+  genericDeathEffect: {fileID: 119968, guid: e73000b12fb76244cbffd6abbf8bb6e4, type: 3}
   deathElectricEffect: {fileID: 1763152032527406, guid: 0e37cdfe4a79e73478288f3c171e917b,
     type: 3}
   restorePrefab: {fileID: 334230341785300966}

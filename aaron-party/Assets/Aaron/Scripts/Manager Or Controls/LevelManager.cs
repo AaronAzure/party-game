@@ -180,7 +180,12 @@ public class LevelManager : MonoBehaviour
             timeUI.SetActive(false);
             SpawnPlayers(1);
         }
-        
+        else if (sceneName == "Camo-Cutters") 
+        {
+            timer = 45;
+            SpawnPlayers_CIRCLE(1, 2);
+        }
+
         
         else if (sceneName == "Aaron-Boss-Battle") 
         {
