@@ -6,6 +6,10 @@ public class RandomPatrol : MonoBehaviour
 {
     [SerializeField] private Vector3 posToMove;
     [SerializeField] private float moveSpeed = 6f;
+    public float lowerBound;
+    public float upperBound;
+    public float leftBound;
+    public float rightBound;
     private float[] waitTime;
 
 
@@ -25,15 +29,15 @@ public class RandomPatrol : MonoBehaviour
 
         LEVEL_DIFFICULTY();
 
-        if (manager == null)    StartCoroutine( GET_NEW_DESTINATION(1 + Random.Range(1, 7)) );
-        else                    StartCoroutine( GET_NEW_DESTINATION(4 + Random.Range(1, 7)) );
+        if (manager == null)    StartCoroutine( GET_NEW_DESTINATION(Random.Range(0.5f, 7f)) );
+        else                    StartCoroutine( GET_NEW_DESTINATION(Random.Range(0.5f, 7f)) );
     }
 
     void LEVEL_DIFFICULTY()
     {
         if (ctr != null && ctr.easy) { moveSpeed = 3f; waitTime = new float[]{5, 6, 7, 8}; }
         if (ctr != null && ctr.norm) { moveSpeed = 4f; waitTime = new float[]{5, 5.5f, 6, 6.5f, 4, 4.5f}; }
-        if (ctr != null && ctr.hard) { moveSpeed = 5f; waitTime = new float[]{3, 3, 3.5f, 4, 4.5f, 4.25f, 3.25f, 3.75f}; }
+        if (ctr != null && ctr.hard) { moveSpeed = 5f; waitTime = new float[]{3.5f, 4, 4.5f, 4.25f, 3.25f, 3.75f}; }
         if (waitTime == null) waitTime = new float[]{5,5,6,6,4};
     }
 
@@ -46,14 +50,39 @@ public class RandomPatrol : MonoBehaviour
         }
         else {
             anim.SetTrigger("idle");
+            anim.speed = 1;
         }
     }
 
 
-    IEnumerator GET_NEW_DESTINATION(float delay=2)
+    IEnumerator GET_NEW_DESTINATION(float delay=2, bool starting=true)
     {
-        float x = Random.Range(-8f, 8f);
-        float y = Random.Range(-8f, 8f);
+        if (starting) yield return new WaitForSeconds( delay );
+
+        if (manager != null && manager.timeUp) yield break;
+        if (pw != null && pw.timeUp) yield break;
+
+        float x = 0;
+        float y = 0;
+        if (transform.position.x < leftBound) {
+            x = Random.Range(4f, 8f);
+        }
+        else if (transform.position.x > rightBound) {
+            x = Random.Range(-8f, -4f);
+        }
+        else {
+            x = Random.Range(-8f, 8f);
+        }
+        if (transform.position.y < lowerBound) {
+            x = Random.Range(4f, 8f);
+        }
+        else if (transform.position.y > upperBound) {
+            x = Random.Range(-8f, -4f);
+        }
+        else {
+            y = Random.Range(-8f, 8f);
+        }
+
         posToMove = new Vector3(x, y);
         if (x > 0 && transform.localScale.x > 0) {
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
@@ -62,8 +91,9 @@ public class RandomPatrol : MonoBehaviour
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         }
         anim.SetTrigger("walk");
+        anim.speed = moveSpeed;
         
         yield return new WaitForSeconds( delay );
-        StartCoroutine( GET_NEW_DESTINATION( waitTime[ Random.Range(0, waitTime.Length)] ) );
+        StartCoroutine( GET_NEW_DESTINATION( waitTime[ Random.Range(0, waitTime.Length)], false ) );
     }
 }

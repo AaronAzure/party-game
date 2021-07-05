@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour
     [Header("Debugging")]
     public bool skipSideQuest;  //* DEBUGGING ONLY, INSPECTOR
     public bool slowerDice;  //* DEBUGGING ONLY, INSPECTOR
+    public bool infiniteMovement;  //* DEBUGGING ONLY, INSPECTOR
     public bool playLatestQuest;  //* DEBUGGING ONLY, INSPECTOR
 
 
@@ -66,6 +67,7 @@ public class GameController : MonoBehaviour
 
     public List<SpellType> randomSpells;
     public List<SpellType> randomGoodSpells;
+    public List<SpellType> spellBook;
 
 
     public int[] playerOrder;
@@ -157,6 +159,7 @@ public class GameController : MonoBehaviour
 
         randomSpells   = new List<SpellType>();
         randomGoodSpells   = new List<SpellType>();
+        spellBook   = new List<SpellType>();
         FILL_RANDOM_SPELLS();
     }
 
@@ -185,12 +188,36 @@ public class GameController : MonoBehaviour
         // randomGoodSpells.Add( new SpellType("Spell_Move_Slowgo", 2, "Move") );
         // randomGoodSpells.Add( new SpellType("Spell_Move_Dash_5", 2, "Move") );
 
-
         randomGoodSpells.Add( new SpellType("Spell_Move_Barrier", 2, "Move") );
         randomGoodSpells.Add( new SpellType("Spell_Move_Dash_8", 3, "Move") );
         randomGoodSpells.Add( new SpellType("Spell_Move_Slow", 3, "Move") );
         randomGoodSpells.Add( new SpellType("Spell_Move_Steal", 3, "Move") );
         randomGoodSpells.Add( new SpellType("Spell_Move_Orb", 3, "Move") );
+
+
+        spellBook.Add( new SpellType("Spell_Trap_10", 1, "Trap") );
+        spellBook.Add( new SpellType("Spell_Trap_10", 1, "Trap") );
+        spellBook.Add( new SpellType("Spell_Trap_10", 1, "Trap") );
+
+        spellBook.Add( new SpellType("Spell_Trap_20", 2, "Trap") );
+        spellBook.Add( new SpellType("Spell_Trap_20", 2, "Trap") );
+
+        spellBook.Add( new SpellType("Spell_Trap_Orb", 3, "Trap") );
+
+        spellBook.Add( new SpellType("Spell_Effect_10", 2, "Effect") );
+        spellBook.Add( new SpellType("Spell_Effect_10", 2, "Effect") );
+        spellBook.Add( new SpellType("Spell_Effect_Spell_1", 2, "Effect") );
+        spellBook.Add( new SpellType("Spell_Effect_Spell_1", 2, "Effect") );
+        spellBook.Add( new SpellType("Spell_Effect_Slow_1", 2, "Effect") );
+        spellBook.Add( new SpellType("Spell_Effect_Slow_1", 2, "Effect") );
+        spellBook.Add( new SpellType("Spell_Move_Barrier", 2, "Move") );
+        spellBook.Add( new SpellType("Spell_Move_Barrier", 2, "Move") );
+
+        spellBook.Add( new SpellType("Spell_Move_Dash_5", 2, "Move") );
+        spellBook.Add( new SpellType("Spell_Move_Dash_8", 3, "Move") );
+        spellBook.Add( new SpellType("Spell_Move_Slowgo", 2, "Move") );
+        spellBook.Add( new SpellType("Spell_Move_Slow", 3, "Move") );
+        spellBook.Add( new SpellType("Spell_Move_Orb", 3, "Move") );
     }
 
     public void SET_PLAYER_CHARACTER(int playerNumber, string newCharacterName)
@@ -274,6 +301,8 @@ public class GameController : MonoBehaviour
         quests.Add( new Quest("Plunder Ground", "Plunder-Ground") );
         quests.Add( new Quest("Pinpoint The Endpoint", "Pinpoint-The-Endpoint") );
         quests.Add( new Quest("Camo Cutters", "Camo-Cutters") );
+        quests.Add( new Quest("County Bounty", "County-Bounty") );
+        quests.Add( new Quest("Slay The Shades", "Slay-The-Shades") );
         // CATCHY TUNES
         // TIDAL FOOLS
         // SPEEDY SERVERS

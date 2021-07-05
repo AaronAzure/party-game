@@ -12,7 +12,7 @@ public class MinigameControls : MonoBehaviour
 {
     // public static MinigameControls itself;
 
-    [SerializeField] public  int playerID;  // ASSIGN FROM LevelManager
+    [SerializeField] public  int playerID;  // ASSIGN FROM MingameManager
     [SerializeField] private Player player;
     [SerializeField] private GameObject  placeBubble;
     [SerializeField] private TextMeshPro placetext;
@@ -48,6 +48,7 @@ public class MinigameControls : MonoBehaviour
     public string characterName;
     private Animator _anim;
     private SpriteRenderer cursorSprite;
+    private bool characterCreated;
     [SerializeField] private GameObject character;   // UNIVERSAL REFERENCE TO CHARACTER GAMEOBJECT (ANY)
     [SerializeField] private GameObject[] characters;   // ** INSPECTOR (ALL CHARACTER PREFABS)
     [SerializeField] private GameObject[] shooters;   // ** INSPECTOR (ALL CHARACTER PREFABS)
@@ -204,6 +205,12 @@ public class MinigameControls : MonoBehaviour
     private float nMask = 3;    // { 1, 2, 3, 4, 5}
 
 
+    [Header("County Bounty")]
+    public GameObject thoughtBubble;
+    [SerializeField] private TextMeshPro thoughtNumber;
+    public int count;
+
+
     [Header("Sound Effects")]
     [SerializeField] private AudioSource coinPickup;
     [SerializeField] private AudioSource electrocuted;
@@ -220,6 +227,12 @@ public class MinigameControls : MonoBehaviour
     [SerializeField] private GameObject deathEffect;
     [SerializeField] private GameObject genericDeathEffect;
     [SerializeField] private GameObject deathElectricEffect;
+
+
+    [Header("Target Shooting")]
+    [SerializeField] private GameObject[] targetBlastPrefabs;
+    [SerializeField] private GameObject targetBlast;
+    [SerializeField] private GameObject characterShooter;
 
 
     [Header("Boss Battles")]
@@ -261,19 +274,6 @@ public class MinigameControls : MonoBehaviour
             case "Player_6" : characterName = controller.characterName6;    playerID = 5; break;
             case "Player_7" : characterName = controller.characterName7;    playerID = 6; break;
             case "Player_8" : characterName = controller.characterName8;    playerID = 7; break;
-        }
-        if (sceneName == "Card_Collectors" || sceneName == "Card Collectors") 
-        {
-            cursorMode = true;
-            CREATE_CHARACTER("Cursor");
-        }
-        else if (sceneName == "Pinpoint The Endpoint" || sceneName == "Pinpoint-The-Endpoint") 
-        {
-            CREATE_CHARACTER("Shooter");
-        }
-        else 
-        {
-            CREATE_CHARACTER("");
         }
         // UI SCORE CHARACTER FACE
         switch (characterName)
@@ -328,6 +328,9 @@ public class MinigameControls : MonoBehaviour
             {
                 scoreHead.gameObject.GetComponent<RectTransform>().transform.position -= new Vector3(0,3*transform.localScale.x);
             }
+
+            cursorMode = true;
+            CREATE_CHARACTER("Cursor");
         }
         else if (sceneName == "Leaf_Leap" || sceneName == "Leaf Leap")
         {
@@ -427,8 +430,10 @@ public class MinigameControls : MonoBehaviour
             else if (characterName == "Pinkins")        { _anim.Play("Pink_Pumpkin_Invisible", -1, 0); }
             else if (characterName == "Sweeterella")    { _anim.Play("Sweeterella_Invisible", -1, 0); }
             else if (characterName == "Thanatos")       { _anim.Play("Thanatos_Invisible", -1, 0); }
+            else if (characterName == "Charlotte")      { _anim.Play("Charlotte_Invisible", -1, 0); }
             character.transform.position -= new Vector3(-2,3);
             character.transform.localScale *= 4;
+
             if (manager != null) splitCam.gameObject.transform.parent = manager.instances.transform;
             if (pw != null)      splitCam.gameObject.transform.parent = pw.transform;
 
@@ -512,10 +517,12 @@ public class MinigameControls : MonoBehaviour
         }
         else if (sceneName == "Pinpoint-The-Endpoint" || sceneName == "Pinpoint The Endpoint")
         {
+            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
             _collider.enabled = false;
             shooterCollider.enabled = true;
             moveSpeed = 7;
             points = 0;
+            CREATE_CHARACTER("Shooter");
         }
         else if (sceneName == "Camo-Cutters" || sceneName == "Camo Cutters")
         {
@@ -523,7 +530,22 @@ public class MinigameControls : MonoBehaviour
             rb = GetComponent<Rigidbody2D>();
             bouncePhysics = true;
         }
-       
+        else if (sceneName == "County-Bounty" || sceneName == "County Bounty")
+        {
+            thoughtBubble.SetActive(true);
+        }
+        else if (sceneName == "Slay-The-Shades" || sceneName == "Slay The Shades")
+        {
+            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
+            _collider.enabled = false;
+            shooterCollider.enabled = true;
+            moveSpeed = 5;
+            points = 0;
+            CREATE_CHARACTER("Shooter");
+            CREATE_CHARACTER("Fake");
+            GET_CHARACTER_TARGET_BLAST();
+        }
+
        
        else if (sceneName == "Aaron Boss Battle" || sceneName == "Aaron-Boss-Battle" || sceneName == "Dojo")
         {
@@ -550,6 +572,10 @@ public class MinigameControls : MonoBehaviour
         }
 
 
+        // IF CHARACTER IS NOT A CURSOR, THEN CREATE ACTUAL PERSON CHARACTER
+        if (!characterCreated)  { CREATE_CHARACTER(""); }
+
+
         if (whoPaused != null) whoPaused.text = characterName + " Paused";
         rInput.RewiredInputManager = GameObject.Find("Rewired_Input_Manager").GetComponent<InputManager>();
         if (rInput.RewiredPlayerIds != null) rInput.RewiredPlayerIds[0] = playerID;
@@ -563,6 +589,7 @@ public class MinigameControls : MonoBehaviour
 
     public void CREATE_CHARACTER(string characterStyle)
     {
+        characterCreated = true;    // DO NOT CREATE ACTUAL PERSON CHARACTER
         // SHOOTER
         if (characterStyle == "Shooter")
         {
@@ -602,6 +629,10 @@ public class MinigameControls : MonoBehaviour
                 if (characterName == characters[i].name) {
                     var obj = Instantiate(characters[i], transform.position, Quaternion.identity, this.transform); 
                     character = obj.gameObject; obj.transform.parent = instances.transform;  _anim = obj.GetComponent<Animator>();
+                    if (characterStyle == "Fake") {
+                        obj.transform.parent = null;
+                        characterShooter = obj.gameObject;
+                    }
                     break;
                 }
                 if (i == characters.Length - 1) {
@@ -612,7 +643,14 @@ public class MinigameControls : MonoBehaviour
         }
     }
 
-
+    private void GET_CHARACTER_TARGET_BLAST()
+    {
+        for (int i=0 ; i<targetBlastPrefabs.Length ; i++)
+        {
+            Debug.Log(targetBlastPrefabs[i].name);
+            if (targetBlastPrefabs[i].name.Contains(characterName)) {targetBlast = targetBlastPrefabs[i].gameObject; break;}
+        }
+    }
 
     // SPAWN OBJECTS (based on map)
     private void GAME_SETUP()
@@ -958,7 +996,7 @@ public class MinigameControls : MonoBehaviour
     }
 
 
-    // ******************************************************************************************************************** //
+    // todo ******************************************************************************************************************** //
     void Update()
     {
         if (manager != null)
@@ -1203,7 +1241,27 @@ public class MinigameControls : MonoBehaviour
             MOVEMENT();
         }
 
+        else if (sceneName == "County-Bounty" && manager.canPlay && !manager.timeUp && !isOut) 
+        {
+            COUNT();
+        }
+        else if (sceneName == "County Bounty" && pw.canPlay && !isOut) 
+        {
+            COUNT();
+        }
 
+        else if (sceneName == "Slay-The-Shades" && manager.canPlay && !manager.timeUp && !isOut ) 
+        {
+            TRANSLATION();
+            TARGET_BLAST();
+            BOUNDARIES();
+        }
+        else if (sceneName == "Slay The Shades" && pw.canPlay && !pw.timeUp && !isOut ) 
+        {
+            TRANSLATION();
+            TARGET_BLAST();
+            BOUNDARIES();
+        }
 
         // BOSS BATTLE
         else if (manager != null && manager.bossBattle && manager.canPlay && !manager.timeUp && !isOut )
@@ -1247,6 +1305,8 @@ public class MinigameControls : MonoBehaviour
         Reload();   // DELETE
     }
     
+
+    // FOR MOVEMENT RELATED
     private void FixedUpdate() 
     {
         if (sceneName == "Colour_Chaos" && manager.canPlay && !manager.timeUp) 
@@ -1363,6 +1423,8 @@ public class MinigameControls : MonoBehaviour
             MOVE();
         }
 
+
+
         // BOSS BATTLE
         else if (manager != null)
         {
@@ -1375,7 +1437,9 @@ public class MinigameControls : MonoBehaviour
         }
     }
 
-    // ******************************************************************************************************************** //
+    // todo ******************************************************************************************************************** //
+
+
     // ************* PAUSED *************
     void Reload()
     {
@@ -1514,7 +1578,6 @@ public class MinigameControls : MonoBehaviour
         }
         Vector3 direction = new Vector3(moveHorizontal, moveVertical);
         //// rb.MovePosition(transform.position + direction * moveSpeed * Time.fixedDeltaTime);
-        Debug.Log(direction.ToString());
         transform.Translate(direction * moveSpeed * Time.deltaTime);
 
         // ANIMATION
@@ -2408,6 +2471,49 @@ public class MinigameControls : MonoBehaviour
             }
         }
     }
+
+
+    // ------------------------------------------------------------------ //
+    // ------------------------- COUNTY BOUNTY -------------------------- //
+
+    void COUNT()
+    {
+        // HIDE / DISPLAY ANSWER
+        if (player.GetButtonDown("X")) thoughtBubble.SetActive(!thoughtBubble.activeSelf);
+
+        if      (player.GetButtonDown("A") && count < 100)  {count++; thoughtNumber.text = count.ToString();}
+        else if (player.GetButtonDown("B") && count > 0)    {count--; thoughtNumber.text = count.ToString();}
+    }
+
+    public void SHOW_ANSWER()
+    {
+        // DISPLAY ANSWER
+        thoughtBubble.SetActive(true);
+        RESET_PLAYER_UI();
+
+        if (manager != null) points = Mathf.Abs( count - manager.correctAns );
+        if (pw != null) {
+            points = Mathf.Abs( count - pw.timeToStop );
+            scoreHead.text = points.ToString();
+        }
+        score.text = points.ToString();
+    }
+
+
+    // -------------------------------------------------------------------- //
+    // ------------------------- SLAY THE SHADES -------------------------- //
+
+
+    void TARGET_BLAST()
+    {
+        if (player.GetButtonDown("A"))
+        {
+            Debug.Log("  BLAST");
+            var blast = Instantiate(targetBlast, characterShooter.transform.position, Quaternion.identity);
+            blast.GetComponent<TargetBlast>().MOVE_TO_POSITION(this.transform.position, 3f);
+        }
+    }
+
 
     // ***************************************************************************** //
     // ***************************************************************************** //

@@ -44,6 +44,10 @@ public class MinigameManager : MonoBehaviour
     private GameController controller;
     private int timer;
 
+
+    [Header("County Bounty")]
+    public int correctAns = 15;
+
     [SerializeField] public GameObject instances;
     public MinigameControls[] players;             // PLAYERS GAMEOBJECT
     [SerializeField] private AudioSource winMusic;
@@ -71,6 +75,9 @@ public class MinigameManager : MonoBehaviour
         controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
         players = new MinigameControls[controller.nPlayers];
         sceneName = SceneManager.GetActiveScene().name;
+
+        if (_A == null && GameObject.Find("SPAWN_A") != null)   _A = GameObject.Find("SPAWN_A").transform;
+        if (_B == null && GameObject.Find("SPAWN_B") != null)   _B = GameObject.Find("SPAWN_B").transform;
 
         // TIMER MAP-SPECIFIC
         if (sceneName == "Sneak_And_Snore") 
@@ -184,6 +191,16 @@ public class MinigameManager : MonoBehaviour
             timer = 45;
             SpawnPlayers_CIRCLE(1, 2);
         }
+        else if (sceneName == "County-Bounty") 
+        {
+            timer = 30;
+            SpawnPlayers();
+        }
+        else if (sceneName == "Slay-The-Shades") 
+        {
+            timer = 30;
+            SpawnPlayers();
+        }
 
         
         else if (sceneName == "Aaron-Boss-Battle") 
@@ -191,7 +208,10 @@ public class MinigameManager : MonoBehaviour
             timer = 300;
             SpawnPlayers_CIRCLE(0.75f, 2);
         }
+        else Debug.LogError("  ERROR : Have not added (spawning players) to PreviewManager");
         
+
+
         // PLAY WITHOUT COUNTDOWN
         if (sceneName == "Dojo") 
         {
@@ -216,7 +236,7 @@ public class MinigameManager : MonoBehaviour
         }
     }
 
-    private void SpawnPlayers(float ratio)
+    private void SpawnPlayers(float ratio=1)
     {
         if (controller.nPlayers < 5) {
             for ( int i=0 ; i<controller.nPlayers ; i++ )
@@ -267,7 +287,7 @@ public class MinigameManager : MonoBehaviour
     }
 
     // EACH INDIVIDUAL SPAWN POINT
-    private void SpawnPlayers_POINTS(float ratio)
+    private void SpawnPlayers_POINTS(float ratio=1)
     {
         for ( int i=0 ; i<controller.nPlayers ; i++ )
         {
@@ -349,6 +369,11 @@ public class MinigameManager : MonoBehaviour
 
         // TIMES UP (STOP WATCHERS)
         if (sceneName == "Stop_Watchers")
+        {
+            if (timer > 0) { StartCoroutine( TIMER_DECREMENT() ); }
+            else           { StartCoroutine( EventGameOver() ); }
+        }
+        else if (sceneName == "County-Bounty")
         {
             if (timer > 0) { StartCoroutine( TIMER_DECREMENT() ); }
             else           { StartCoroutine( EventGameOver() ); }
@@ -447,8 +472,9 @@ public class MinigameManager : MonoBehaviour
         // RANK-BASED MINIGAME (SCORE-BASED)
         else 
         {
-            if (sceneName != "Stop_Watchers") CALCULATE_MOST_POINTS();
-            else CALCULATE_LEAST_POINTS();
+            if (sceneName == "Stop_Watchers") CALCULATE_LEAST_POINTS();
+            if (sceneName == "County-Bounty") CALCULATE_LEAST_POINTS();
+            else CALCULATE_MOST_POINTS();
 
             controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);     // COINS WON IN MINIGAME (QUEST)
             yield return new WaitForSeconds(1);
@@ -489,6 +515,22 @@ public class MinigameManager : MonoBehaviour
             yield return new WaitForSeconds(1);
             StartCoroutine( GameOver() );
         }
+        else if (sceneName == "County-Bounty")
+        {
+            if (GameObject.Find("TO_BE_COUNTED") != null) {
+                correctAns = GameObject.Find("TO_BE_COUNTED").transform.childCount;
+            }
+            for (int i=0 ; i<players.Length ; i++)
+            {
+                players[i].SHOW_ANSWER();
+            }
+
+            GameObject.Find("Correct_Speech").GetComponent<SpriteRenderer>().color = new Color(1,1,1,1);
+            GameObject.Find("Correct_Answer").GetComponent<TextMeshPro>().text = correctAns.ToString();
+
+            yield return new WaitForSeconds(1);
+            StartCoroutine( GameOver() );
+        }
         else if (sceneName == "Pinpoint-The-Endpoint")
         {
             canPlay = false;
@@ -526,7 +568,7 @@ public class MinigameManager : MonoBehaviour
         for (int i=0 ; i<controller.nPlayers ; i++) { arr[i] = players[i].points; pid[i] = i; }
 
         // SORT EVERYONE'S SCORES
-        if (sceneName != "Stop_Watchers") 
+        if (sceneName != "Stop_Watchers" && sceneName != "County-Bounty") 
         {
             // ASCENDING ORDER
             for ( int i=0 ; i<arr.Length ; i++ )

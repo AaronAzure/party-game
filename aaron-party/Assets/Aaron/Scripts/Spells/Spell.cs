@@ -58,6 +58,10 @@ public class Spell : MonoBehaviour
                 if (SceneManager.GetActiveScene().name == "Shogun_Seaport") { _desc = "Change the current boat"; }    break;
 
 
+            case "SpellBook":     _price = 30;    _mpCost = 0;    _spellKind = "Item";
+                _desc = "Contains three random spells";  break;
+
+
             case "move-potion":   _price = 40;    _mpCost = 0;    _spellKind = "Item";
                 _desc = "Permanently increases max movement by 5.";    break;
             case "range-potion":   _price = 40;    _mpCost = 0;    _spellKind = "Item";

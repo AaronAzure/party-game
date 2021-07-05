@@ -170,6 +170,7 @@ public class PathFollower : MonoBehaviour
     public bool playerMove15    = false;
     public bool playerRange2    = false;
     public bool playerExtraBuy  = false;
+    public int  spellsLeftToGain = 0;
     [SerializeField] private GameObject powerup;  //   RAINBOW SPARKLE EFFECT
     [SerializeField] private AudioSource powerupSound;  
 
@@ -266,8 +267,8 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private TextMeshProUGUI spellDesc;
     [SerializeField] private GameObject spellDescUI;
     private Sprite fourthSpell;  // HOLDER
-    private GameObject highlightedSpell;
-    private GameObject currentSelected;
+    [SerializeField] private GameObject highlightedSpell;
+    [SerializeField] private GameObject currentSelected;
     private int spellToGain;        // RANDOM SPELL FROM CONTROLLER
     private bool fromGoodSpell;
     private int shopSeller;
@@ -574,7 +575,7 @@ public class PathFollower : MonoBehaviour
             }
 
             mpBar.value = mpBar.maxValue;
-            coins = 10; // TO BE CHANGED // DELETE
+            coins = 100; // TO BE CHANGED // DELETE
             orbs = 0;
             _collider.enabled = true;
             maxNPurchases = 1;
@@ -640,6 +641,8 @@ public class PathFollower : MonoBehaviour
             {
                 READY_TO_START();
             }
+
+            // else if (spellsLeftToGain > 0) {}
 
             // DISCARDING SPELL(S)
             else if (discardSpellUI.activeSelf)
@@ -1103,8 +1106,9 @@ public class PathFollower : MonoBehaviour
         //* AT SHOP SPACE
         else if (isAtShop) 
         {
+            if (spellsLeftToGain > 0) {}
             // GET SHOP KEEPER
-            if (shopUI.activeSelf == false && !isViewingMap) { 
+            else if (!shopUI.activeSelf && !isViewingMap) { 
                 nMovesLeft.gameObject.SetActive(false); 
                 _mapMoves.text = _movesRemaining + " Moves Left";
                 _animator.speed = 1;
@@ -1188,7 +1192,7 @@ public class PathFollower : MonoBehaviour
                 if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && !noMovementLoss && !moveDecremented &&
                     Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
                         moveDecremented = true;
-                        _movesRemaining--;
+                        if (!controller.infiniteMovement) _movesRemaining--;
                 }
             }
             // MOVING TO NEXT NODE
@@ -1238,7 +1242,7 @@ public class PathFollower : MonoBehaviour
                 if (_movesRemaining == 1 && !moveDecremented) {
                     if (currentNode.DOES_SPACE_DECREASE_MOVEMENT() && !noMovementLoss) {
                         moveDecremented = true;
-                        _movesRemaining--;  
+                        if (!controller.infiniteMovement) _movesRemaining--;  
                     }
                 }
                 // HAVE NOT FINISHED MOVING
@@ -1852,7 +1856,6 @@ public class PathFollower : MonoBehaviour
 
     // todo -------------------------------------------------------- *//
 
-
     private void UserPathForkMenu()
     {
         if (isAtFork && !isViewingMap) mapViewmap.gameObject.SetActive(true);
@@ -2004,6 +2007,8 @@ public class PathFollower : MonoBehaviour
             magicOrbUI.SetActive(false);
         }
     }
+
+    // todo -------------------------------------------------------- *//
 
 
     // TEXT SHOWING MOVES REMAINING
@@ -2872,6 +2877,56 @@ public class PathFollower : MonoBehaviour
     /* ---------------------------------------------------------------- */
     /* ------------------------ SPELLS RELATED ------------------------ */
 
+    public void BOUGHT_A_SPELLBOOK()     { StartCoroutine( GAIN_MULTIPLE_SPELLS() ); }
+
+    public IEnumerator GAIN_MULTIPLE_SPELLS()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        if (!shop4) { shopSpellUI.SetActive(false); }
+        else        { shopItemUI.SetActive(false);  }
+
+        // GAIN SPELL 
+        if (spells.Count < 3)
+        {
+            spellPickup.Play();
+            yield return new WaitForSeconds(0.1f);
+            if (spells == null) { spells = new List<SpellType>(); }
+
+            int rng = Random.Range(0,controller.spellBook.Count);
+            spells.Add( controller.spellBook[rng] );
+            SPELL_IMG_INSTANTIATE(controller.spellBook[rng].spellName, true);
+
+            UPDATE_SPELLS_UI();
+
+            yield return new WaitForSeconds(0.5f);
+            // isAtFree = false;
+            UPDATE_INFORMATION(true);
+            
+            yield return new WaitForSeconds(0.5f);
+            if (spellsLeftToGain > 0) STILL_RECEIVING_SPELLS();
+        }
+    // **************************************************************************************************
+        // GAIN SPELL, FULL INVENTORY MUST DISCARD A SPELL
+        else 
+        {
+            spellPickup.Play();
+            yield return new WaitForSeconds(0.1f);
+
+            discardSpellUI.SetActive(true);
+            spellDescUI.SetActive(true);
+            manager.HIDE_UI();
+            for (int i=0 ; i<spells.Count ; i++) { 
+                discardSpellImg[i].sprite = spellSlots[i].sprite; 
+                discardSpellImg[i].name = spellSlots[i].name;
+            }
+
+            int rng = Random.Range(0,controller.spellBook.Count);
+            SPELL_IMG_INSTANTIATE(controller.spellBook[rng].spellName, true);
+            spellToGain = rng; fromGoodSpell = true;
+        }
+    }
+
     private IEnumerator GAIN_RANDOM_SPELL()
     {
         // GAIN SPELL 
@@ -3177,7 +3232,22 @@ public class PathFollower : MonoBehaviour
         Color bot = new Color(0.8f, 0, 0.05f);
         go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
         UPDATE_SPELLS_UI();
+
+        if (spellsLeftToGain > 0) STILL_RECEIVING_SPELLS();
     }
+
+    void STILL_RECEIVING_SPELLS()
+    {
+        if (spellsLeftToGain > 0) {
+            spellsLeftToGain--;
+            StartCoroutine( GAIN_MULTIPLE_SPELLS() );
+        }
+        else {
+            if (!shop4) { shopSpellUI.SetActive(true); }
+            else        { shopItemUI.SetActive(true);  }
+        }
+    }
+
     void REFRESH_SPELLS()
     {
         for (int i=0 ; i<spellSlots.Length ; i++)

@@ -32,6 +32,7 @@ public class PreviewManager : MonoBehaviour
 
     private GameController controller;
     private int timer;
+    public int correctAns = 15;
 
     // *** UNIQUE *** //
     public float timeToStop;
@@ -45,6 +46,11 @@ public class PreviewManager : MonoBehaviour
         controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
         sceneName = gameObject.scene.name;
         players = new MinigameControls[controller.nPlayers];
+
+
+        if (_A == null && GameObject.Find("SPAWN_A") != null)   _A = GameObject.Find("SPAWN_A").transform;
+        if (_B == null && GameObject.Find("SPAWN_B") != null)   _B = GameObject.Find("SPAWN_B").transform;
+
 
         // TIMER MAP-SPECIFIC
         if (sceneName == "Sneak And Snore") 
@@ -155,16 +161,23 @@ public class PreviewManager : MonoBehaviour
             timer = 45;
             SpawnPlayers_CIRCLE(1, 2);
         }
+        else if (sceneName == "County Bounty") 
+        {
+            timer = 20;
+            SpawnPlayers();
+        }
+
+        else Debug.LogError("  ERROR : Have not added (spawning players) to PreviewManager");
 
         // timerText.text = timer.ToString();
         blackScreen.gameObject.SetActive(true);
         blackScreen.CrossFadeAlpha(0f, transitionTime, false);  // FADE OUT
 
         canPlay = true;
-        StartCoroutine( StartMinigame() );
+        StartCoroutine( TIMER_DECREMENT() );
     }
 
-    private void SpawnPlayers(float ratio)
+    private void SpawnPlayers(float ratio=1)
     {
         if (controller.nPlayers < 5)
         {
@@ -217,7 +230,7 @@ public class PreviewManager : MonoBehaviour
     }
 
     // EACH INDIVIDUAL SPAWN POINT
-    private void SpawnPlayers_POINTS(float ratio)
+    private void SpawnPlayers_POINTS(float ratio=1)
     {
         for ( int i=0 ; i<controller.nPlayers ; i++ )
         {
@@ -339,13 +352,17 @@ public class PreviewManager : MonoBehaviour
     }
 
     // TIMER DECREMENTS
-    private IEnumerator StartMinigame()
+    private IEnumerator TIMER_DECREMENT()
     {
         yield return new WaitForSeconds(1);
         timer--;
         //// Debug.Log("-- timer = " + timer);
 
-        if (timer > 0) { StartCoroutine( StartMinigame() ); }
+        if (timer > 0) { StartCoroutine( TIMER_DECREMENT() ); }
+        else if (sceneName == "County Bounty")
+        {
+            StartCoroutine( EventGameOver() );
+        }
         else if (sceneName == "Pinpoint The Endpoint")
         {
             StartCoroutine( EventGameOver() );
@@ -353,17 +370,7 @@ public class PreviewManager : MonoBehaviour
         // TIMES UP
         else           { StartCoroutine( RELOAD() ); }
     }
-
-
-    public void CheckIfEveyoneIsOut(int x)
-    {
-        if (nPlayersOut >= controller.nPlayers - x)     
-        { 
-            if (sceneName == "Stop Watchers") { StartCoroutine( EventGameOver() ); }
-            else    { StartCoroutine( RELOAD() ); }
-        }
-    }
-
+    
     private IEnumerator EventGameOver()
     {
         if (sceneName == "Stop Watchers")
@@ -374,6 +381,21 @@ public class PreviewManager : MonoBehaviour
             }
             CLOSEST_TIME();
 
+            yield return new WaitForSeconds(1);
+            StartCoroutine( RELOAD() );
+        }
+        else if (sceneName == "County Bounty")
+        {
+            if (GameObject.Find("TO_BE_COUNTED") != null) {
+                correctAns = GameObject.Find("TO_BE_COUNTED").transform.childCount;
+            }
+            for (int i=0 ; i<players.Length ; i++)
+            {
+                players[i].SHOW_ANSWER();
+            }
+            GameObject.Find("Correct_Speech").GetComponent<SpriteRenderer>().color = new Color(1,1,1,1);
+            GameObject.Find("Correct_Answer").GetComponent<TextMeshPro>().text = correctAns.ToString();
+            
             yield return new WaitForSeconds(1);
             StartCoroutine( RELOAD() );
         }
@@ -394,6 +416,17 @@ public class PreviewManager : MonoBehaviour
         }
 
     }
+
+
+    public void CheckIfEveyoneIsOut(int x)
+    {
+        if (nPlayersOut >= controller.nPlayers - x)     
+        { 
+            if (sceneName == "Stop Watchers") { StartCoroutine( EventGameOver() ); }
+            else    { StartCoroutine( RELOAD() ); }
+        }
+    }
+
 
     private void CLOSEST_TIME()
     {
