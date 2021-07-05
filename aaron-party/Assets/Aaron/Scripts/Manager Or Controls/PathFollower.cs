@@ -170,7 +170,9 @@ public class PathFollower : MonoBehaviour
     public bool playerMove15    = false;
     public bool playerRange2    = false;
     public bool playerExtraBuy  = false;
+    public bool boughtASpellBook;
     public int  spellsLeftToGain = 0;
+    private SpellType newSpellToGain;
     [SerializeField] private GameObject powerup;  //   RAINBOW SPARKLE EFFECT
     [SerializeField] private AudioSource powerupSound;  
 
@@ -642,8 +644,6 @@ public class PathFollower : MonoBehaviour
                 READY_TO_START();
             }
 
-            // else if (spellsLeftToGain > 0) {}
-
             // DISCARDING SPELL(S)
             else if (discardSpellUI.activeSelf)
             {
@@ -1106,7 +1106,7 @@ public class PathFollower : MonoBehaviour
         //* AT SHOP SPACE
         else if (isAtShop) 
         {
-            if (spellsLeftToGain > 0) {}
+            if (boughtASpellBook) {}
             // GET SHOP KEEPER
             else if (!shopUI.activeSelf && !isViewingMap) { 
                 nMovesLeft.gameObject.SetActive(false); 
@@ -2877,12 +2877,28 @@ public class PathFollower : MonoBehaviour
     /* ---------------------------------------------------------------- */
     /* ------------------------ SPELLS RELATED ------------------------ */
 
-    public void BOUGHT_A_SPELLBOOK()     { StartCoroutine( GAIN_MULTIPLE_SPELLS() ); }
+    public IEnumerator BOUGHT_A_SPELLBOOK()     
+    { 
+        int cost = 30;
+        coins -= cost;
+        nPurchaseLeft--;
+        purchaseLeftText.text = "Purchase Left: " + nPurchaseLeft;
+        // UPDATE_SPELLS_UI();
+
+        // LOSE COINS
+        for (int i = 0; i < cost; i++)
+        {
+            if (cost<11) { yield return new WaitForSeconds(0.1f); }
+            else { yield return new WaitForSeconds(0.02f); }
+            coinLoss.Play();
+        }
+        manager.CHECK_RANKINGS();
+
+        StartCoroutine( GAIN_MULTIPLE_SPELLS() ); 
+    }
 
     public IEnumerator GAIN_MULTIPLE_SPELLS()
     {
-        yield return new WaitForSeconds(0.5f);
-
         if (!shop4) { shopSpellUI.SetActive(false); }
         else        { shopItemUI.SetActive(false);  }
 
@@ -2904,7 +2920,7 @@ public class PathFollower : MonoBehaviour
             UPDATE_INFORMATION(true);
             
             yield return new WaitForSeconds(0.5f);
-            if (spellsLeftToGain > 0) STILL_RECEIVING_SPELLS();
+            if (boughtASpellBook) STILL_RECEIVING_SPELLS();
         }
     // **************************************************************************************************
         // GAIN SPELL, FULL INVENTORY MUST DISCARD A SPELL
@@ -2923,7 +2939,8 @@ public class PathFollower : MonoBehaviour
 
             int rng = Random.Range(0,controller.spellBook.Count);
             SPELL_IMG_INSTANTIATE(controller.spellBook[rng].spellName, true);
-            spellToGain = rng; fromGoodSpell = true;
+            newSpellToGain = controller.spellBook[rng];
+            spellToGain = rng; 
         }
     }
 
@@ -3232,19 +3249,19 @@ public class PathFollower : MonoBehaviour
         Color bot = new Color(0.8f, 0, 0.05f);
         go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
         UPDATE_SPELLS_UI();
-
-        if (spellsLeftToGain > 0) STILL_RECEIVING_SPELLS();
     }
 
     void STILL_RECEIVING_SPELLS()
     {
+        spellsLeftToGain--;
         if (spellsLeftToGain > 0) {
-            spellsLeftToGain--;
             StartCoroutine( GAIN_MULTIPLE_SPELLS() );
         }
         else {
+            Debug.Log("  DONE RECEIVING SPELLS");
             if (!shop4) { shopSpellUI.SetActive(true); }
             else        { shopItemUI.SetActive(true);  }
+            boughtASpellBook = false;
         }
     }
 
@@ -3270,8 +3287,27 @@ public class PathFollower : MonoBehaviour
     // ** CALLED BY BUTTON
     public void DISCARD_THIS(int index)
     {
+        if (boughtASpellBook) {
+            // DISCARD OLD SPELL
+            if (index < 3) {
+                SPELL_IMG_INSTANTIATE(spells[index].spellName, false);
+                spells.RemoveAt(index);
+                spells.Add( newSpellToGain );
+                UPDATE_SPELLS_UI();
+                discardSpellUI.SetActive(false);
+                spellDescUI.SetActive(false);
+                highlightedSpell = null;
+            }
+            // DISCARD NEW SPELL
+            else {
+                DISCARD_NEW_SPELL();
+            }
+
+            STILL_RECEIVING_SPELLS();
+            return;  //* STOP
+        }
         // GOOD SPELL
-        if (fromGoodSpell)
+        else if (fromGoodSpell)
         {
             // DISCARD OLD SPELL
             if (index < 3)
@@ -3287,6 +3323,7 @@ public class PathFollower : MonoBehaviour
                 DISCARD_NEW_SPELL();
             }
         }
+        // AVG SPELL
         else 
         {
             // DISCARD OLD SPELL

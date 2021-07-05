@@ -193,9 +193,11 @@ public class ShopMenu : MonoBehaviour
                 // BUYING SPELLBOOK
                 else if (currentSelected.name == "SpellBook")
                 {
+                    player.boughtASpellBook = true;  
                     player.spellsLeftToGain = 3;  
                     confirmObj.SetActive(false);
-                    player.BOUGHT_A_SPELLBOOK();
+                    StartCoroutine( player.BOUGHT_A_SPELLBOOK() );
+                    StartCoroutine( BuyMore() );
                     return;
                 }
                 // BUYING UPGRADE
