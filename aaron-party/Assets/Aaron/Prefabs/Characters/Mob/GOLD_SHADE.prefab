@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 6855607066205749495}
   - component: {fileID: -4891485249080059429}
   - component: {fileID: 4666663186880561208}
+  - component: {fileID: -4003515238411463037}
   m_Layer: 0
   m_Name: GOLD_SHADE
-  m_TagString: Untagged
+  m_TagString: Gold
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 740808024532467877}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 6906511368473130443}
   - {fileID: 2322187077526530398}
@@ -97,8 +98,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 3
   _collider: {fileID: 0}
+  anim: {fileID: 0}
   deathEffect: {fileID: 1889919486439536, guid: fe56b8a950c38491c834ca7261f65228,
     type: 3}
+  renders:
+  - {fileID: 5242611841106362032}
+  - {fileID: 7534041222482567796}
+  - {fileID: 7739806400909270505}
+  isRed: 0
+  isGold: 1
+  fleeTime: 7.5
+--- !u!50 &-4003515238411463037
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740808024532467877}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &4704945532228965210
 GameObject:
   m_ObjectHideFlags: 0

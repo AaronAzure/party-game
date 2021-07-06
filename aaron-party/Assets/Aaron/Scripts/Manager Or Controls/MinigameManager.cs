@@ -198,7 +198,7 @@ public class MinigameManager : MonoBehaviour
         }
         else if (sceneName == "Slay-The-Shades") 
         {
-            timer = 30;
+            timer = 45;
             SpawnPlayers();
         }
 

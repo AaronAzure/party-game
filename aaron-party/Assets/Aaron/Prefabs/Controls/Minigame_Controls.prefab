@@ -16217,14 +16217,16 @@ MonoBehaviour:
     type: 3}
   targetBlastPrefabs:
   - {fileID: 151808, guid: 295802d0c2a8848628ac1e7dc13edc6f, type: 3}
-  - {fileID: 151808, guid: 8b283528bc5884e8db0f42342086dd1f, type: 3}
-  - {fileID: 151808, guid: 87d042304c6564421b4eab9326a060ad, type: 3}
-  - {fileID: 151808, guid: 62a6461b712254ec7a1c8d200eedda22, type: 3}
-  - {fileID: 151808, guid: e3467f38b08864eb687e7e2203120308, type: 3}
-  - {fileID: 151808, guid: 1a5fe97416b50485fb0444c99ef3a1ba, type: 3}
-  - {fileID: 151808, guid: 921b8066f6ae64ae2b4d9a46b5b758e2, type: 3}
-  - {fileID: 151808, guid: 6d69a5c90ddfb41a79b69e12a844b925, type: 3}
-  - {fileID: 151808, guid: 3840bb0d026f749abb9f6afe93a82241, type: 3}
+  - {fileID: 151808, guid: b1c146fcf2a414b7083de5ac7de48173, type: 3}
+  - {fileID: 151808, guid: ab08ec596be094ff4ad4a34d46bc1a40, type: 3}
+  - {fileID: 151808, guid: 7336703ab38e5483d89ceba8c7d64ef3, type: 3}
+  - {fileID: 151808, guid: e57e0a12ea1994a28beac1946181774b, type: 3}
+  - {fileID: 151808, guid: a40016b887a24481db7e12a4adf2dc06, type: 3}
+  - {fileID: 151808, guid: d37d7f1e301024b1dba55d37e69e2c43, type: 3}
+  - {fileID: 151808, guid: 36eba9fc33d8f478182e47dea8349dcc, type: 3}
+  - {fileID: 151808, guid: a08804f39c25e49b6b7774d89f808184, type: 3}
+  targetBlast: {fileID: 0}
+  characterShooter: {fileID: 0}
   restorePrefab: {fileID: 334230341785300966}
   hurtPrefab: {fileID: 121052, guid: 45b74d42e5559bf49a14a707b4842b51, type: 3}
   projectileEffect:

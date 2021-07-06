@@ -166,6 +166,11 @@ public class PreviewManager : MonoBehaviour
             timer = 20;
             SpawnPlayers();
         }
+        else if (sceneName == "Slay The Shades") 
+        {
+            timer = 45;
+            SpawnPlayers();
+        }
 
         else Debug.LogError("  ERROR : Have not added (spawning players) to PreviewManager");
 

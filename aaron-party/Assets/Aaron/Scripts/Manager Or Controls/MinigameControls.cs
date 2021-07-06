@@ -231,8 +231,8 @@ public class MinigameControls : MonoBehaviour
 
     [Header("Target Shooting")]
     [SerializeField] private GameObject[] targetBlastPrefabs;
-    [SerializeField] private GameObject targetBlast;
-    [SerializeField] private GameObject characterShooter;
+    private GameObject targetBlast;
+    private GameObject characterShooter;
 
 
     [Header("Boss Battles")]
@@ -324,10 +324,6 @@ public class MinigameControls : MonoBehaviour
             _collider.enabled = false;
             cursorCollider.enabled = false;
             RESET_PLAYER_UI();
-            if (pw != null) 
-            {
-                scoreHead.gameObject.GetComponent<RectTransform>().transform.position -= new Vector3(0,3*transform.localScale.x);
-            }
 
             cursorMode = true;
             CREATE_CHARACTER("Cursor");
@@ -517,7 +513,6 @@ public class MinigameControls : MonoBehaviour
         }
         else if (sceneName == "Pinpoint-The-Endpoint" || sceneName == "Pinpoint The Endpoint")
         {
-            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
             _collider.enabled = false;
             shooterCollider.enabled = true;
             moveSpeed = 7;
@@ -536,14 +531,14 @@ public class MinigameControls : MonoBehaviour
         }
         else if (sceneName == "Slay-The-Shades" || sceneName == "Slay The Shades")
         {
-            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
             _collider.enabled = false;
             shooterCollider.enabled = true;
-            moveSpeed = 5;
+            moveSpeed = 10;
             points = 0;
             CREATE_CHARACTER("Shooter");
             CREATE_CHARACTER("Fake");
             GET_CHARACTER_TARGET_BLAST();
+            RESET_PLAYER_UI();
         }
 
        
@@ -605,6 +600,8 @@ public class MinigameControls : MonoBehaviour
                 }
             }
             scaleX = character.transform.localScale.x;
+            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
+            scoreHead.transform.position -= new Vector3(0, 3*transform.localScale.x);
         }
         // CHANGE CURSOR
         else if (cursorMode && characterStyle == "Cursor")
@@ -620,6 +617,8 @@ public class MinigameControls : MonoBehaviour
                     Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
                 }
             }
+            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
+            scoreHead.transform.position -= new Vector3(0, 3*transform.localScale.x);
         }
         // Gameobject character
         else
@@ -628,10 +627,14 @@ public class MinigameControls : MonoBehaviour
             for (int i=0 ; i<characters.Length ; i++) {
                 if (characterName == characters[i].name) {
                     var obj = Instantiate(characters[i], transform.position, Quaternion.identity, this.transform); 
-                    character = obj.gameObject; obj.transform.parent = instances.transform;  _anim = obj.GetComponent<Animator>();
                     if (characterStyle == "Fake") {
                         obj.transform.parent = null;
                         characterShooter = obj.gameObject;
+                        characterShooter.transform.position -= new Vector3(0,5);
+                    }
+                    else {
+                        character = obj.gameObject; obj.transform.parent = instances.transform;  
+                        _anim = obj.GetComponent<Animator>();
                     }
                     break;
                 }
@@ -2506,12 +2509,35 @@ public class MinigameControls : MonoBehaviour
 
     void TARGET_BLAST()
     {
-        if (player.GetButtonDown("A"))
+        if (canShootAgain && player.GetButtonDown("A"))
         {
-            Debug.Log("  BLAST");
             var blast = Instantiate(targetBlast, characterShooter.transform.position, Quaternion.identity);
-            blast.GetComponent<TargetBlast>().MOVE_TO_POSITION(this.transform.position, 3f);
+            blast.GetComponent<TargetBlast>().player = this;
+            StartCoroutine( blast.GetComponent<TargetBlast>().MOVE_TO_POSITION(this.transform.position, 0.25f) );
+            StartCoroutine( RELOAD() );
         }
+    }
+
+
+    public void POINT(int n)
+    {
+        if      (n <= 1) {
+            points += n;
+            if (pw == null) onePointSound.Play();
+        }
+        else if (n <= 2) {
+            points += n;
+            if (pw == null) twpPointSound.Play();
+        }
+        else if (n <= 3) {
+            points += n;
+            if (pw == null) threePointSound.Play();
+        }
+        else  {
+            points += n;
+            if (pw == null) fivePointSound.Play();
+        }
+        UPDATE_POINTS();
     }
 
 
@@ -3376,7 +3402,8 @@ public class MinigameControls : MonoBehaviour
         // scoreHead.text = coins.ToString();
         // scoreHead.color = new Color (0,1,0);
         points = coins;
-        manager.PLAYER_WON_N_COINS(coins, name);
+        if (crystalised.activeSelf) manager.PLAYER_WON_N_COINS(0, name);
+        else manager.PLAYER_WON_N_COINS(coins, name);
     }
 
 }

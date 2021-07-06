@@ -302,6 +302,18 @@ public class PreviewOverlay : MonoBehaviour
                 pic3.sprite = buttonNorth;
                 txt3.text = "Hide/Display your answer";
                 break;
+            case "Slay The Shades" : 
+                desc.text = "Shoot down the malicious shades.\n";
+                desc.text += "Blue shades = 1 point each hit.\n";
+                desc.text += "Red shades = 2 point each hit.\n";
+                desc.text += "Gold shades = 5 point each hit.\n";
+                map1.SetActive(true);
+                pic1.sprite = stickEverything;
+                txt1.text = "Move";
+                map2.SetActive(true);
+                pic2.sprite = buttonEast;
+                txt2.text = "Fire";
+                break;
             default : Debug.LogError("MINIGAME NAME INCORRECT IN PrviewManager  (" + SceneMiniName + ")"); break;
         }
     }
