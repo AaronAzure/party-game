@@ -582,6 +582,7 @@ public class MinigameControls : MonoBehaviour
         }
     }
 
+    // * SHOOTER, CURSOR, CHARACTER
     public void CREATE_CHARACTER(string characterStyle)
     {
         characterCreated = true;    // DO NOT CREATE ACTUAL PERSON CHARACTER
@@ -600,8 +601,8 @@ public class MinigameControls : MonoBehaviour
                 }
             }
             scaleX = character.transform.localScale.x;
-            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
-            scoreHead.transform.position -= new Vector3(0, 3*transform.localScale.x);
+            placeBubble.transform.position -= new Vector3(0, 2*transform.localScale.x);
+            scoreHead.transform.position -= new Vector3(0, 2*transform.localScale.x);
         }
         // CHANGE CURSOR
         else if (cursorMode && characterStyle == "Cursor")
@@ -617,7 +618,7 @@ public class MinigameControls : MonoBehaviour
                     Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
                 }
             }
-            if (pw != null) placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
+            placeBubble.transform.position -= new Vector3(0, 3*transform.localScale.x);
             scoreHead.transform.position -= new Vector3(0, 3*transform.localScale.x);
         }
         // Gameobject character
@@ -2415,10 +2416,10 @@ public class MinigameControls : MonoBehaviour
         }
     }
 
-    IEnumerator RELOAD()
+    IEnumerator RELOAD(float wait=0.1f)
     {
         canShootAgain = false;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(wait);
         canShootAgain = true;
     }
 
@@ -2509,12 +2510,12 @@ public class MinigameControls : MonoBehaviour
 
     void TARGET_BLAST()
     {
-        if (canShootAgain && player.GetButtonDown("A"))
+        if (canShootAgain && player.GetButton("A"))
         {
             var blast = Instantiate(targetBlast, characterShooter.transform.position, Quaternion.identity);
             blast.GetComponent<TargetBlast>().player = this;
             StartCoroutine( blast.GetComponent<TargetBlast>().MOVE_TO_POSITION(this.transform.position, 0.25f) );
-            StartCoroutine( RELOAD() );
+            StartCoroutine( RELOAD(0.2f) );
         }
     }
 

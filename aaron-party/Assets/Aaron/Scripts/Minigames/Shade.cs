@@ -27,11 +27,17 @@ public class Shade : MonoBehaviour
     private float _angle;
 
 
+    private MinigameManager manager;
+    [SerializeField] private AudioSource deathSoundEffect;
+
+
     // Start is called before the first frame update
     void Start()
     {
         if (_collider == null) _collider = GetComponent<CircleCollider2D>();
         if (anim == null)    anim = GetComponent<Animator>();
+        if (GameObject.Find("Level_Manager") != null) manager = GameObject.Find("Level_Manager").GetComponent<MinigameManager>();
+
 
         _centre = transform.position;        
         _collider.enabled = false;
@@ -74,6 +80,7 @@ public class Shade : MonoBehaviour
                 {
                     Instantiate(deathEffect, this.transform.position + new Vector3(0,1*transform.localScale.x), 
                         Quaternion.identity, this.transform);
+                    if (manager != null && deathSoundEffect != null) deathSoundEffect.Play();
                 }
                 Destroy(gameObject, 2f);
             }
