@@ -18,7 +18,6 @@ public class EffectSpell : MonoBehaviour
 
     private void Start() {
         itself = gameObject.GetComponent<SpriteRenderer>();
-        // mpCost.text = "-" + spellCasterPlayer.spellMpCost.ToString();
     }
 
     private void OnEnable() {
@@ -31,7 +30,6 @@ public class EffectSpell : MonoBehaviour
         {
             if (other.tag == "Node" && inRange)
             {
-                //// Node space = other.GetComponent<Node>();
                 Node space = other.transform.parent.GetComponent<Node>();
                 if (space.VALID_NODE_TO_CAST_EFFECT())
                 {
@@ -103,7 +101,6 @@ public class EffectSpell : MonoBehaviour
         {
             Vector3 tempPos     = spellCasterPlayer.transform.position;
             string  tempPath    = spellCasterPlayer.data[0].path;
-            // int     tempNode    = spellCasterPlayer.currentNode;
             
             // SET CASTER'S NEW LOCATION
             string newPath                          = targetedPlayer.data[0].path;
@@ -119,13 +116,11 @@ public class EffectSpell : MonoBehaviour
             // SET TARGET'S NEW LOCATION
             string oldPath                      = tempPath; 
             targetedPlayer.SET_NEW_PATH(oldPath);
-            // targetedPlayer.currentNode          = tempNode;
             targetedPlayer.data[0].pos          = tempPos;
             targetedPlayer.transform.position   = tempPos + asideDif;
             targetedPlayer.currentNode.transform.position = targetedPlayer.data[0].pos;
 
 
-            // spaceToCastEffect.EFFECT_SPELL(spellName);
             spellCasterPlayer.USE_MP(spellCasterPlayer.spellMpCost);
         }
     }

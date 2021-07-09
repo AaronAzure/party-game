@@ -608,10 +608,9 @@ public class MinigameManager : MonoBehaviour
             }
         }
 
-        // int same = 0;
-        string results = "";
-        foreach (float score in arr) { results += score.ToString() + ", "; }
-        // Debug.Log(results);
+        //// string results = "";
+        //// foreach (float score in arr) { results += score.ToString() + ", "; }
+        //// Debug.Log(results);
 
         // FIRST -> LAST
         for ( int i=0 ; i<arr.Length ; i++ )
@@ -629,21 +628,23 @@ public class MinigameManager : MonoBehaviour
             }
         }
 
+
         // IF THE PLAYER ORDER IS NOT SET, THEN SET NEW PLAYER ORDER BASED ON RANKINGS
         if (!controller.isSetOrder) {
             List<int> tied = new List<int>();
+            List<int> origTied = new List<int>();
             for (int i=0 ; i<pid.Length - 1 ; i++) {
                 if (players[ pid[i] ].points == players[ pid[i+1] ].points) {
-                    if (tied.Count == 0 || !tied.Contains(pid[i]))   { tied.Add( pid[i] ); Debug.LogError("Added " + pid[i]);}
-                    if (tied.Count == 0 || !tied.Contains(pid[i+1])) { tied.Add( pid[i+1] ); Debug.LogError("Added " + pid[i+1]);}
-
+                    if (tied.Count == 0 || !tied.Contains(pid[i]))   { tied.Add( pid[i] );  origTied.Add( pid[i] ); }
+                    if (tied.Count == 0 || !tied.Contains(pid[i+1])) { tied.Add( pid[i+1] );  origTied.Add( pid[i+1] ); }
+                    string ties = "";
+                    foreach (int pId in tied) ties += pId.ToString();
+                    Debug.LogError(ties);
                 }
             }
             // DETERMINE ORDER OF PLAYERS WHO TIED, BASED ON PREVIOUS PLAYER ORDER
             if (tied.Count > 0) {
-                // int[] tiedArr = tied.ToArray();
                 List<int> newOrder = sortAccording(tied, controller.playerOrder, tied.Count, controller.playerOrder.Length);
-                // int[] newOrder = sortAccording(tiedArr, controller.playerOrder, tiedArr.Length, controller.playerOrder.Length);
 
                 //! DEBUG
                 string rank = "";
@@ -651,14 +652,15 @@ public class MinigameManager : MonoBehaviour
                 string orig = "";
                 foreach (int pId in controller.playerOrder) orig += pId.ToString() + ", ";
                 string ties = "";
-                foreach (int pId in tied)                ties += pId.ToString() + ", ";
+                foreach (int pId in origTied)               ties += pId.ToString() + ", ";
                 string debug = "";
                 foreach (int pId in newOrder)               debug += pId.ToString() + ", ";
-                Debug.LogError("-- SOME PLAYER DREW : placement=" + rank + " : prevOrder=" + orig + " : idOfTied=" + ties + " : result=" +  debug);
+                Debug.LogError("-- SOME PLAYER DREW : placement=" + rank + " : prevOrder=" + 
+                    orig + " : idOfTied=" + ties + " : result=" +  debug);
 
-                for (int i=0; i<tied.Count ; i++)
+                for (int i=0; i<origTied.Count ; i++)
                 {
-                    int ind = System.Array.IndexOf(pid, tied[i]);
+                    int ind = System.Array.LastIndexOf(pid, origTied[i]);
                     Debug.LogError(ind + " : " + pid[ind] + " -> " + newOrder[i]);
                     if (ind != -1 && pid.Length > ind && newOrder.Count > i) { pid[ind] = newOrder[i]; }
                 }
@@ -1058,7 +1060,7 @@ public class MinigameManager : MonoBehaviour
             }
         }
 
-
+        //! DELETE
         // string debug = "";
         // foreach (int elem in A1) debug += elem.ToString() + ", ";
         // Debug.LogError("-- A1 : " + debug);

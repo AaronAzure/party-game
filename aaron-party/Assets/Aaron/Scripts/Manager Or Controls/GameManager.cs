@@ -54,6 +54,9 @@ public class GameManager : MonoBehaviour
     public int startingCharge = 5;
     private bool turretOnCoolDown;
 
+    private float mainCamOrigSize;
+
+
     // -------------------------------------------------------------------------------
     // RECEIVE INFO/DATA FROM GAME CONTROLLER
 
@@ -581,7 +584,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator CAMERA_ZOOM() 
     {
-        while (mainCam.orthographicSize > 3) {
+        while (mainCam.orthographicSize > 2.5f) {
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             mainCam.orthographicSize -= 0.05f;
@@ -732,6 +735,7 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine( turret.ROTATE_TURRET() );
         mainCam.gameObject.SetActive(true);
+        mainCamOrigSize = mainCam.orthographicSize;
         mainCam.orthographicSize *= 2;
         mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
     }
@@ -750,6 +754,7 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("TurretCount", startingCharge);
             AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
             bgMusic.volume /= 6;
+            mainCamOrigSize = mainCam.orthographicSize;
             mainCam.orthographicSize *= 1.5f;
             mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
         }
@@ -766,6 +771,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1);
         if (eventName == "Laser Countdown") mainCam.gameObject.SetActive(false);
         playerThatTriggeredEvent.PLAYER_CAM_ON();
+        if (mainCamOrigSize != 0) mainCam.orthographicSize = mainCamOrigSize;
 
         yield return new WaitForSeconds(1);
         if (playerThatTriggeredEvent == null) Debug.LogError("  ERROR: Did not register any PathFollower");

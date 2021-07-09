@@ -31,7 +31,10 @@ public class Spell : MonoBehaviour
                 _desc = "Create a trap, steal an orb from any opponent that lands on the trap.";    break;
 
             case "Spell_Effect_10" :    _price = 8;    _mpCost = 2;    _spellKind = "Effect";
-                _desc = "Destroy 15 gold to all opponents on a targeted space (within range).";  break;
+                _desc = "Destroy 15 gold to all opponents on a targeted space (within range).";  
+                if (SceneManager.GetActiveScene().name == "Crystal_Caverns") { 
+                    _desc = "Destroy 15 gold to all opponents on a targeted space (within range). Also destroy boulders."; 
+                } break;
             case "Spell_Effect_Mana_3": _price = 12;    _mpCost = 2;    _spellKind = "Effect";
                 _desc = "Destroy 3 mana to all opponents on a targeted space (within range).";    break;
             case "Spell_Effect_Spell_1": _price = 8;    _mpCost = 2;    _spellKind = "Effect";

@@ -189,13 +189,6 @@ public class Node : MonoBehaviour
 
 
         _soundNode = this.GetComponentInChildren<AudioSource>();
-        // if (aaronPrefab != null && _spaceType.sprite == orbSpace) { 
-        //     var orbHandler = Instantiate(aaronPrefab, aaronPrefab.transform.position, Quaternion.identity);
-        //     var aaron = orbHandler;
-        //     aaronAnim = aaron.GetComponent<Animator>();
-        //     aaron.SetActive(false); 
-        //     aaron.transform.parent = this.transform; 
-        // }
 
         // ONLY ORB SPACES SHOULD HAVE AN AARON GAMEOBJ
         if (_spaceType.sprite != orbSpace) { Destroy(aaron); }
@@ -711,7 +704,11 @@ public class Node : MonoBehaviour
     {
         switch (spellName)
         {
-            case "Spell_Effect_10" : Instantiate(effect10Prefab, transform.position, Quaternion.identity); break;
+            case "Spell_Effect_10" : 
+                Instantiate(effect10Prefab, transform.position, Quaternion.identity); 
+                if (_spaceType.sprite == boulders) UNBLOCK();
+                break;
+                
             case "Spell_Effect_Mana_3" : Instantiate(effectMp3Prefab, transform.position, Quaternion.identity); break;
             case "Spell_Effect_Spell_1" : Instantiate(effectSpell1Prefab, transform.position, Quaternion.identity); break;
             case "Spell_Effect_Slow_1" : Instantiate(effectSlow1Prefab, transform.position, Quaternion.identity); break;
@@ -767,18 +764,6 @@ public class Node : MonoBehaviour
                 }
             }
         }
-        // else if (_spaceType.sprite == orbSpace && magicOrb.activeSelf) {
-        //     if (nSpace.text == "x") {
-        //         nSpace.gameObject.SetActive(true);
-        //         nSpace.text = n.ToString();
-        //         foreach (Nexts next in nexts) {
-        //             if (next.node != null) {
-        //                 Node checkNode = next.node.GetComponent<Node>();
-        //                 if (checkNode._spaceType.sprite != boulders) checkNode.DISPLAY_MOVEMENT(n, moveLeft);
-        //             }
-        //         }
-        //     }
-        // }
         // SPACE DOES NOT DECREMENT MOVEMENT //? DON'T DISPLAY
         else {
             foreach (Nexts next in nexts) {
