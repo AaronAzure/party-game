@@ -89,6 +89,7 @@ public class LobbyControls : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        controller  = GameObject.Find("Game_Controller").GetComponent<GameController>();
         if (playerID == 0) {
             manager     = GameObject.Find("Lobby_Manager").GetComponent<LobbyManager>();
             cam         = GameObject.Find("Main Camera").GetComponent<Camera>();
@@ -107,10 +108,10 @@ public class LobbyControls : MonoBehaviour
             else if (sceneName == "2Lobby")
             {
                 questList = questListPrefab.GetComponentsInChildren<Button>();
+                WHAT_MINIGAMES_ARE_AVAILABLE();
             }
         }
         
-        controller  = GameObject.Find("Game_Controller").GetComponent<GameController>();
         rb = this.GetComponent<Rigidbody2D>();
         if (_settings != null)  _settings.SetActive(false);
         if (_quests != null)    _quests.SetActive(false);
@@ -580,6 +581,15 @@ public class LobbyControls : MonoBehaviour
     }
 
     // **************** BUTTONS **************** //
+    private void WHAT_MINIGAMES_ARE_AVAILABLE()
+    {
+        foreach (Button quest in questList) {
+            if (controller.noList.Contains(quest.name)) {
+                quest.gameObject.GetComponent<Image>().color = new Color(1, 0.1f, 0.1f, 1);
+            }
+        }
+    }
+
     public void TOGGLE_MINIGAME()
     {
         string minigameName = EventSystem.current.currentSelectedGameObject.name;
@@ -638,6 +648,7 @@ public class LobbyControls : MonoBehaviour
         NO_SIDE_QUEST();
     }
 
+    // CHECK IF THERE IS AT LEAST ONE MINIGAME AVAILABLE
     private void NO_SIDE_QUEST()
     {
         if (controller.noList.Count >= controller.quests.Count) { notEnough.SetActive(true); }

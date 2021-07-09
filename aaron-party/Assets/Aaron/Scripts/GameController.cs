@@ -126,7 +126,7 @@ public class GameController : MonoBehaviour
 
         turnNumber = 1;
         DontDestroyOnLoad(this);
-        Screen.SetResolution(1980,1090,Screen.fullScreen);
+        Screen.SetResolution(1980, 1090, Screen.fullScreen);
 
         // SPACES THAT HAVE BEEN TRANSFORMED INTO TRAPS
         changedSpaces = new List<NodeSpace>();
@@ -138,6 +138,13 @@ public class GameController : MonoBehaviour
         quests = new List<Quest>();
         noList = new List<string>();
         RESET_QUESTS();
+
+        // PREVIOUS GAME SETTINGS (MINIGAME NOT TO INCLUDE)
+        for (int i=0 ; i<quests.Count ; i++) {
+            if (PlayerPrefs.HasKey( quests[i].questMini )) {
+                ADD_TO_NO_LIST(quests[i].questMini);
+            }
+        }
 
         spells1 = new List<SpellType>();
         spells2 = new List<SpellType>();
@@ -350,11 +357,14 @@ public class GameController : MonoBehaviour
             if (alreadyIn == questName)
             {
                 noList.Remove(questName);
+                if (PlayerPrefs.HasKey(questName)) PlayerPrefs.DeleteKey(questName);
                 return true;
             }
         }
         // NON-PLAYABLE
         noList.Add(questName);
+        if (!PlayerPrefs.HasKey(questName)) PlayerPrefs.SetString(questName, questName);
+
         return false;
     }
 
@@ -1187,7 +1197,7 @@ public class GameController : MonoBehaviour
             if (i==7)   rich += p8[0].coins.ToString() + ", ";   
         }
 
-        Debug.Log(rich);
+        // Debug.Log(rich); //! DELETE
     }
 
     public void EVENT_ORB_UPDATE(int playerIndex)

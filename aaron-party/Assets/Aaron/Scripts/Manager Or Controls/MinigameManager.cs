@@ -565,12 +565,14 @@ public class MinigameManager : MonoBehaviour
         int[] pid = new int[controller.nPlayers];
 
         // RANGE OF SCORES/POINTS
-        for (int i=0 ; i<controller.nPlayers ; i++) { arr[i] = players[i].points; pid[i] = i; }
+        for (int i=0 ; i<controller.nPlayers ; i++) { 
+            arr[i] = players[i].points; 
+            pid[i] = i; 
+        }
 
-        // SORT EVERYONE'S SCORES
-        if (sceneName != "Stop_Watchers" && sceneName != "County-Bounty") 
-        {
+        //* SORT EVERYONE'S SCORES
             // ASCENDING ORDER
+        if (sceneName != "Stop_Watchers" && sceneName != "County-Bounty") {
             for ( int i=0 ; i<arr.Length ; i++ )
             {
                 for ( int j=0 ; j<arr.Length ; j++ )
@@ -580,9 +582,6 @@ public class MinigameManager : MonoBehaviour
                         float temp = arr[i];
                         arr[i] = arr[j];
                         arr[j] = temp;
-                    }
-                    if (pid[i] > pid[j])
-                    {
                         int tempId = pid[i];
                         pid[i] = pid[j];
                         pid[j] = tempId;
@@ -590,9 +589,8 @@ public class MinigameManager : MonoBehaviour
                 }
             }
         }
-        else
-        {
             // DESCENDING ORDER
+        else {
             for ( int i=0 ; i<arr.Length ; i++ )
             {
                 for ( int j=0 ; j<arr.Length ; j++ )
@@ -602,9 +600,6 @@ public class MinigameManager : MonoBehaviour
                         float temp = arr[i];
                         arr[i] = arr[j];
                         arr[j] = temp;
-                    }
-                    if (pid[i] < pid[j])
-                    {
                         int tempId = pid[i];
                         pid[i] = pid[j];
                         pid[j] = tempId;
@@ -636,7 +631,48 @@ public class MinigameManager : MonoBehaviour
 
         // IF THE PLAYER ORDER IS NOT SET, THEN SET NEW PLAYER ORDER BASED ON RANKINGS
         if (!controller.isSetOrder) {
-            controller.playerOrder = pid;
+            List<int> tied = new List<int>();
+            for (int i=0 ; i<pid.Length - 1 ; i++) {
+                if (players[ pid[i] ].points == players[ pid[i+1] ].points) {
+                    if (tied.Count == 0 || !tied.Contains(pid[i]))   { tied.Add( pid[i] ); Debug.LogError("Added " + pid[i]);}
+                    if (tied.Count == 0 || !tied.Contains(pid[i+1])) { tied.Add( pid[i+1] ); Debug.LogError("Added " + pid[i+1]);}
+
+                }
+            }
+            // DETERMINE ORDER OF PLAYERS WHO TIED, BASED ON PREVIOUS PLAYER ORDER
+            if (tied.Count > 0) {
+                // int[] tiedArr = tied.ToArray();
+                List<int> newOrder = sortAccording(tied, controller.playerOrder, tied.Count, controller.playerOrder.Length);
+                // int[] newOrder = sortAccording(tiedArr, controller.playerOrder, tiedArr.Length, controller.playerOrder.Length);
+
+                //! DEBUG
+                string rank = "";
+                foreach (int pId in pid)                    rank += pId.ToString() + ", ";
+                string orig = "";
+                foreach (int pId in controller.playerOrder) orig += pId.ToString() + ", ";
+                string ties = "";
+                foreach (int pId in tied)                ties += pId.ToString() + ", ";
+                string debug = "";
+                foreach (int pId in newOrder)               debug += pId.ToString() + ", ";
+                Debug.LogError("-- SOME PLAYER DREW : placement=" + rank + " : prevOrder=" + orig + " : idOfTied=" + ties + " : result=" +  debug);
+
+                for (int i=0; i<tied.Count ; i++)
+                {
+                    int ind = System.Array.IndexOf(pid, tied[i]);
+                    Debug.LogError(ind + " : " + pid[ind] + " -> " + newOrder[i]);
+                    if (ind != -1 && pid.Length > ind && newOrder.Count > i) { pid[ind] = newOrder[i]; }
+                }
+
+                rank = "";
+                foreach (int pId in pid)                    rank += pId.ToString() + ", ";
+                Debug.LogError("-- NewOrder = " + rank);
+
+                controller.playerOrder = pid;
+            }
+            // NO TIES
+            else {
+                controller.playerOrder = pid;
+            }
         }
     }
 
@@ -960,5 +996,80 @@ public class MinigameManager : MonoBehaviour
         }
 
         return 0;
+    }
+
+
+
+
+    private int first(int[] arr, int low, int high, int x, int n)
+    {
+        if (high >= low) {
+            int mid = low + (high - low) / 2;
+ 
+            if ((mid == 0 || x > arr[mid - 1]) && arr[mid] == x)
+                return mid;
+            if (x > arr[mid])
+                return first(arr, (mid + 1), high,
+                             x, n);
+            return first(arr, low, (mid - 1), x, n);
+        }
+        return -1;
+    }
+ 
+    // Sort A1[0..m-1] according to the order defined by A2[0..n-1].
+    // private int[] sortAccording(int[] A1, int[] A2, int m, int n)
+    private List<int> sortAccording(List<int> A1, int[] A2, int m, int n)
+    {
+        int[] temp = new int[m];
+        int[] visited = new int[m];
+ 
+        for (int i = 0; i < m; i++) {
+            temp[i] = A1[i];
+            visited[i] = 0;
+        }
+ 
+        // Sort elements in temp
+        // System.Array.Sort(temp);
+ 
+        // for index of output which is sorted A1[]
+        int ind = 0;
+ 
+        // Consider all elements of A2[], find them in temp[] and copy to A1[] in order.
+        for (int i = 0; i < n; i++) {
+ 
+            // Find index of the first occurrence of A2[i] in temp
+            int f = first(temp, 0, m - 1, A2[i], m);
+ 
+            // If not present, no need to proceed
+            if (f == -1)
+                continue;
+ 
+            // Copy all occurrences of A2[i] to A1[]
+            for (int j = f; (j < m && temp[j] == A2[i]); j++) {
+                A1[ind++] = temp[j];
+                visited[j] = 1;
+            }
+        }
+ 
+        // Now copy all items of temp[] which are not present in A2[]
+        for (int i = 0; i < m; i++) {
+            if (visited[i] == 0) {
+                A1[ind++] = temp[i];
+            }
+        }
+
+
+        // string debug = "";
+        // foreach (int elem in A1) debug += elem.ToString() + ", ";
+        // Debug.LogError("-- A1 : " + debug);
+        // debug = "";
+        // foreach (int elem in A2) debug += elem.ToString() + ", ";
+        // Debug.LogError("-- A2 : " + debug);
+        // debug = "";
+        // foreach (int elem in temp) debug += elem.ToString() + ", ";
+        // Debug.LogError("-- temp : " + debug);
+
+
+        return A1;
     }
 }

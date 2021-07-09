@@ -96,30 +96,8 @@ public class PlayerSetupMenu : MonoBehaviour
 
     private void CANCEL()
     {
-        // if (finishedSetup)
-        // {
-        //     readyFirstButton.gameObject.SetActive(true);
-        //     controller.nReady--;
-        //     finishedSetup = false;
-        // }
-        // else if (isReady) 
-        // {
-        //     isReady = false;
-        //     menuPanel.gameObject.SetActive(true);
-        //     bottomText.gameObject.SetActive(true);
-        //     readyPanel.SetActive(false);
-        //     for (int i=0 ; i<controller.charactersChosen.Count ; i++) 
-        //     {
-        //         if (controller.charactersChosen[i] == this.characterIndex)
-        //         {
-        //             controller.charactersChosen.Remove(controller.charactersChosen[i]);
-        //             break;
-        //         }
-        //     }
-        // }
         if (finishedSetup)
         {
-            // readyFirstButton.gameObject.SetActive(true);
             _ready.SetActive(false);
             controller.nReady--;
             finishedSetup = false;
@@ -134,6 +112,12 @@ public class PlayerSetupMenu : MonoBehaviour
                     controller.charactersChosen.Remove(controller.charactersChosen[i]);
                     break;
                 }
+            }
+            if (controller.ALL_PLAYERS_READY()) {
+                PRESS_START_TO_PLAY();
+            }
+            else {
+                PLEASE_SELECT_YOUR_CHARACTER();
             }
         }
         else if (joinedGame)
@@ -193,7 +177,6 @@ public class PlayerSetupMenu : MonoBehaviour
         // CHANGE BACKGROUND COLOR BASED ON CHARACTER
         switch (selectedCharacter.sprite.name)  
         {
-            // case "Winged" :       background.color = new Color(0, 0.7f, 1, 1); break;
             case "Sweeterella" :    background.color = new Color(1, 0.7f, 0, 1); break;
             case "Laurel" :         background.color = new Color(0.9716981f, 0.8611333f, 0.7104397f, 1); break;
             case "Mimi" :           background.color = new Color(0.75f, 0.9f, 0.4f, 1); break;
@@ -263,7 +246,7 @@ public class PlayerSetupMenu : MonoBehaviour
     }
 
     private void PRESS_START_TO_PLAY() {
-        if (instruction != null) instruction.text = "Press +";
+        if (instruction != null) instruction.text = "Press Start!";
     }
     
     private void PLEASE_SELECT_YOUR_CHARACTER() {
