@@ -645,30 +645,13 @@ public class MinigameManager : MonoBehaviour
             // DETERMINE ORDER OF PLAYERS WHO TIED, BASED ON PREVIOUS PLAYER ORDER
             if (tied.Count > 0) {
                 List<int> newOrder = sortAccording(tied, controller.playerOrder, tied.Count, controller.playerOrder.Length);
-
-                //! DEBUG
-                string rank = "";
-                foreach (int pId in pid)                    rank += pId.ToString() + ", ";
-                string orig = "";
-                foreach (int pId in controller.playerOrder) orig += pId.ToString() + ", ";
-                string ties = "";
-                foreach (int pId in origTied)               ties += pId.ToString() + ", ";
-                string debug = "";
-                foreach (int pId in newOrder)               debug += pId.ToString() + ", ";
-                Debug.LogError("-- SOME PLAYER DREW : placement=" + rank + " : prevOrder=" + 
-                    orig + " : idOfTied=" + ties + " : result=" +  debug);
-
+                
                 for (int i=0; i<origTied.Count ; i++)
                 {
                     int ind = System.Array.LastIndexOf(pid, origTied[i]);
-                    Debug.LogError(ind + " : " + pid[ind] + " -> " + newOrder[i]);
+                    Debug.LogError("index " + ind + " : " + pid[ind] + " -> " + newOrder[i]);
                     if (ind != -1 && pid.Length > ind && newOrder.Count > i) { pid[ind] = newOrder[i]; }
                 }
-
-                rank = "";
-                foreach (int pId in pid)                    rank += pId.ToString() + ", ";
-                Debug.LogError("-- NewOrder = " + rank);
-
                 controller.playerOrder = pid;
             }
             // NO TIES

@@ -25,14 +25,7 @@ public class PathFollower : MonoBehaviour
     //// public Node[] _currentPath;                    // CURRENT NODE(PATH)    
     //// public int _currentNode;                       // INDEX OF THE CURRENT SPACE ON NODE(PATH)  
     //// public Vector3 _currentPositionHolder;         // POSITION OF THE CURRENT SPACE 
-    private Vector3 asidePos1;
-    private Vector3 asidePos2;
-    private Vector3 asidePos3;
-    private Vector3 asidePos4;
-    private Vector3 asidePos5;
-    private Vector3 asidePos6;
-    private Vector3 asidePos7;
-    private Vector3 asidePos8;
+    private Vector3 asidePos;
 
 
     [Header("Player Character")]
@@ -1139,7 +1132,7 @@ public class PathFollower : MonoBehaviour
     private void AT_FORK()
     {
         isAtFork = true;
-        // if (_movesRemaining > 0) { SHOW_ARROWS(); }
+        _animator.SetBool("IsWalking", false);
         SHOW_ARROWS();
     }
 
@@ -1231,7 +1224,7 @@ public class PathFollower : MonoBehaviour
         }
     }
     
-    // SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
+    //* SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
     private void SPACE_END()
     {
         isLanded = true;
@@ -1487,85 +1480,30 @@ public class PathFollower : MonoBehaviour
         if (!gotAsidePos)   // CALL ONCE
         {
             _timer = 0;
-            // // float scaleFactor = 1.3f;
-            // // float trig1 = 0.5f * scaleFactor;
-            // // float trig2 = 0.866f * scaleFactor;
             float playerX = transform.position.x;
             float playerY = transform.position.y;
-            float sin45 = 0.707f * 1.5f;
-            asidePos1 = new Vector3(playerX - 1.5f,     playerY + 0);
-            asidePos2 = new Vector3(playerX - sin45,    playerY + sin45);
-            asidePos3 = new Vector3(playerX + 0,        playerY + 1.5f);
-            asidePos4 = new Vector3(playerX + sin45,    playerY + sin45);
-            asidePos5 = new Vector3(playerX + 1.5f,     playerY - 0);
-            asidePos6 = new Vector3(playerX + sin45,    playerY - sin45 - 0.75f);
-            asidePos7 = new Vector3(playerX - 0,        playerY - 1.5f - 0.75f);
-            asidePos8 = new Vector3(playerX - sin45,    playerY - sin45 - 0.75f);
+            float scale   = 1.5f;
+
+            float radians = 2 * Mathf.PI / controller.nPlayers * playerID;
+            
+            float vertical   = Mathf.Sin(radians) * scale;
+            float horizontal = Mathf.Cos(radians) * scale; 
+            
+            asidePos = new Vector3 (playerX - horizontal, playerY + vertical);
+            
             gotAsidePos = true;
         }
 
         _moveSpeed = 7.5f;
         _timer += _moveSpeed * Time.deltaTime;
-        // if (transform.localScale.x > 0.25f) {
-        //     this.transform.localScale -= new Vector3(0.025f, 0.025f, 0.025f);    // STRINK
-        // }
 
-        // MOVE TO ASIDE POSITION
-        switch (name)
-        {
-            case "Player_1":
-                if (this.transform.position != asidePos1) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos1, _timer); }
-                break;
-            case "Player_2":
-                if (this.transform.position != asidePos2) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos2, _timer); }
-                break;
-            case "Player_3":
-                if (this.transform.position != asidePos3) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos3, _timer); }
-                break;
-            case "Player_4":
-                if (this.transform.position != asidePos4) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos4, _timer); }
-                break;
-            case "Player_5":
-                if (this.transform.position != asidePos5) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos5, _timer); }
-                break;
-            case "Player_6":
-                if (this.transform.position != asidePos6) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos6, _timer); }
-                break;
-            case "Player_7":
-                if (this.transform.position != asidePos7) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos7, _timer); }
-                break;
-            case "Player_8":
-                if (this.transform.position != asidePos8) {
-                    this.transform.position = Vector3.Lerp(this.transform.position, asidePos8, _timer); }
-                break;
+        // MOVE TO ASIDE POSITION 
+        if (this.transform.position != asidePos) {
+            this.transform.position = Vector3.Lerp(this.transform.position, asidePos, _timer);
         }
-
         // END TURN
-        switch (name)
-        {
-            case "Player_1":
-                if (this.transform.position == asidePos1) { TURN_FINISHED(); }     break;
-            case "Player_2":
-                if (this.transform.position == asidePos2) { TURN_FINISHED(); }     break;
-            case "Player_3":
-                if (this.transform.position == asidePos3) { TURN_FINISHED(); }     break;
-            case "Player_4":
-                if (this.transform.position == asidePos4) { TURN_FINISHED(); }     break;
-            case "Player_5":
-                if (this.transform.position == asidePos5) { TURN_FINISHED(); }     break;
-            case "Player_6":
-                if (this.transform.position == asidePos6) { TURN_FINISHED(); }     break;
-            case "Player_7":
-                if (this.transform.position == asidePos7) { TURN_FINISHED(); }     break;
-            case "Player_8":
-                if (this.transform.position == asidePos8) { TURN_FINISHED(); }     break;
+        else {
+            TURN_FINISHED();
         }
     }
 

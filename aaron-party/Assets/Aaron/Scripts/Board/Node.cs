@@ -334,13 +334,15 @@ public class Node : MonoBehaviour
         if (_spaceType.sprite == blueSpace)
         {
             Debug.Log("  Landed on BLUE");
-            Instantiate(instanBlueEffect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanBlueEffect, transform.position, instanBlueEffect.transform.rotation, this.transform);
+            Destroy(eff, 4);
             return 3;
         }
         else if (_spaceType.sprite == redSpace)
         {
             Debug.Log("  Landed on RED");
-            Instantiate(instanRedEffect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanRedEffect, transform.position, instanRedEffect.transform.rotation, this.transform);
+            Destroy(eff, 4);
             return -3;
         }
         else if (_spaceType.sprite == goldSpace)
