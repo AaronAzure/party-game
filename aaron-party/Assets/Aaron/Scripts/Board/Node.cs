@@ -291,7 +291,13 @@ public class Node : MonoBehaviour
             _spaceType.sprite == goldSpace || _spaceType.sprite == eventSpace);
     }
 
-    public bool IS_GREEN() { return (greenSpaces.Contains(_spaceType.sprite)); }    // BONUS
+    public bool IS_GREEN() { 
+        if (greenSpaces.Contains(_spaceType.sprite)) {
+            var eff = Instantiate(instanGreenEffect, transform.position, instanGreenEffect.transform.rotation);
+            Destroy(eff, 4);
+        }
+        return (greenSpaces.Contains(_spaceType.sprite)); 
+    }    // BONUS
     public bool IS_SPELL() { return (_spaceType.sprite == spellSpace); }
     // public bool IS_EVENT() { return (_spaceType.sprite == eventSpace || _spaceType.sprite == happenSpace); }
     public bool IS_BLUE() { return (_spaceType.sprite == blueSpace); }
@@ -334,30 +340,31 @@ public class Node : MonoBehaviour
         if (_spaceType.sprite == blueSpace)
         {
             Debug.Log("  Landed on BLUE");
-            var eff = Instantiate(instanBlueEffect, transform.position, instanBlueEffect.transform.rotation, this.transform);
+            var eff = Instantiate(instanBlueEffect, transform.position, instanBlueEffect.transform.rotation);
             Destroy(eff, 4);
             return 3;
         }
         else if (_spaceType.sprite == redSpace)
         {
             Debug.Log("  Landed on RED");
-            var eff = Instantiate(instanRedEffect, transform.position, instanRedEffect.transform.rotation, this.transform);
+            var eff = Instantiate(instanRedEffect, transform.position, instanRedEffect.transform.rotation);
             Destroy(eff, 4);
             return -3;
         }
         else if (_spaceType.sprite == goldSpace)
         {
             Debug.Log("  Landed on FORTUNE");
-            Instantiate(instanGoldEffect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanGoldEffect, transform.position, instanGoldEffect.transform.rotation);
+            Destroy(eff, 4);
             int[] fortune = new int[]{10,10,10,10,10,15,15,15,20,30};
             return fortune[ Random.Range(0, fortune.Length) ];
         }
-        else if (_spaceType.sprite == eventSpace)
-        {
-            Debug.Log("  Landed on EVENT");
-            Instantiate(instanGreenEffect, transform.position, Quaternion.identity);
-            return Random.Range(1,11);
-        }
+        // else if (_spaceType.sprite == eventSpace)
+        // {
+        //     Debug.Log("  Landed on EVENT");
+        //     Instantiate(instanGreenEffect, transform.position, instanGreenEffect.transform.rotation);
+        //     return Random.Range(1,11);
+        // }
         return 0;
     }
 
@@ -482,55 +489,12 @@ public class Node : MonoBehaviour
     {
         if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
         _spaceType.sprite = spaceType;
-        // Debug.Log(spaceType);
-
-        //! DELETE
-        // switch (spaceType)
-        // {
-        //     // SPELL NAMES FROM .png FILES (UNDER Player Spaces in INSPECTOR Node prefab)
-        //     case "Felix_10 (UnityEngine.Sprite)" :          _spaceType.sprite = felixCoin10; break;
-        //     case "Felix_20 (UnityEngine.Sprite)" :          _spaceType.sprite = felixCoin20; break;
-        //     case "Felix_Orb (UnityEngine.Sprite)" :         _spaceType.sprite = felixOrb; break;
-
-        //     case "Jacob_10 (UnityEngine.Sprite)" :          _spaceType.sprite = jacobCoin10; break;
-        //     case "Jacob_20 (UnityEngine.Sprite)" :          _spaceType.sprite = jacobCoin20; break;
-        //     case "Jacob_Orb (UnityEngine.Sprite)" :         _spaceType.sprite = jacobOrb; break;
-
-        //     case "Laurel_10 (UnityEngine.Sprite)" :         _spaceType.sprite = laurelCoin10; break;
-        //     case "Laurel_20 (UnityEngine.Sprite)" :         _spaceType.sprite = laurelCoin20; break;
-        //     case "Laurel_Orb (UnityEngine.Sprite)" :        _spaceType.sprite = laurelOrb; break;
-
-        //     case "Maurice_10 (UnityEngine.Sprite)" :        _spaceType.sprite = mauriceCoin10; break;
-        //     case "Maurice_20 (UnityEngine.Sprite)" :        _spaceType.sprite = mauriceCoin20; break;
-        //     case "Maurice_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = mauriceOrb; break;
-
-        //     case "Mimi_10 (UnityEngine.Sprite)" :           _spaceType.sprite = mimiCoin10; break;
-        //     case "Mimi_20 (UnityEngine.Sprite)" :           _spaceType.sprite = mimiCoin20; break;
-        //     case "Mimi_Orb (UnityEngine.Sprite)" :          _spaceType.sprite = mimiOrb; break;
-
-        //     case "Pinkins_10 (UnityEngine.Sprite)" :        _spaceType.sprite = pinkinsCoin10; break;
-        //     case "Pinkins_20 (UnityEngine.Sprite)" :        _spaceType.sprite = pinkinsCoin20; break;
-        //     case "Pinkins_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = pinkinsOrb; break;
-
-        //     case "Sweeterella_10 (UnityEngine.Sprite)" :    _spaceType.sprite = sweeterellaCoin10; break;
-        //     case "Sweeterella_20 (UnityEngine.Sprite)" :    _spaceType.sprite = sweeterellaCoin20; break;
-        //     case "Sweeterella_Orb (UnityEngine.Sprite)" :   _spaceType.sprite = sweeterellaOrb; break;
-
-        //     case "Thanatos_10 (UnityEngine.Sprite)" :        _spaceType.sprite = thanatosCoin10; break;
-        //     case "Thanatos_20 (UnityEngine.Sprite)" :        _spaceType.sprite = thanatosCoin20; break;
-        //     case "Thanatos_Orb (UnityEngine.Sprite)" :       _spaceType.sprite = thanatosOrb; break;
-            
-        //     case "Charlotte_10 (UnityEngine.Sprite)" :       _spaceType.sprite = charlotteCoin10; break;
-        //     case "Charlotte_20 (UnityEngine.Sprite)" :       _spaceType.sprite = charlotteCoin20; break;
-        //     case "Charlotte_Orb (UnityEngine.Sprite)" :      _spaceType.sprite = charlotteOrb; break;
-
-        //     default : break;
-        // }
 
         if (_anim == null) { _anim = this.GetComponentInChildren<Animator>(); }
         _anim.SetTrigger("isTrap");
     }
 
+    // ORB TRAP
     public int ORB_TRAP_SPACE_COST(string characterName)
     {
         if (_spaceType.sprite == felixOrb && characterName == "Felix") { return 5; }
@@ -542,7 +506,9 @@ public class Node : MonoBehaviour
         if (_spaceType.sprite == sweeterellaOrb && characterName == "Sweeterella") { return 5; }
         if (_spaceType.sprite == thanatosOrb && characterName == "Thanatos") { return 5; }
         if (_spaceType.sprite == charlotteOrb && characterName == "Charlotte") { return 5; }
-        // Debug.LogError("NOT A VALID ORB TRAP SPACE || CHARACTER NAME NOT ADDED");
+        
+        var eff = Instantiate(instanTrapOrbEffect, transform.position, instanTrapOrbEffect.transform.rotation);
+        Destroy(eff, 4);
         return 0;
     }
 
@@ -550,97 +516,119 @@ public class Node : MonoBehaviour
     {
         if      (_spaceType.sprite == felixCoin10) {
             if (characterName == "Felix") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == felixCoin20) {
             if (characterName == "Felix") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
-            Instantiate(instanTrap20Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
+
         else if (_spaceType.sprite == jacobCoin10) {
             if (characterName == "Jacob") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == jacobCoin20) {
             if (characterName == "Jacob") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
-            Instantiate(instanTrap20Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
         else if (_spaceType.sprite == laurelCoin10) {
             if (characterName == "Laurel") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == laurelCoin20) {
             if (characterName == "Laurel") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
-            Instantiate(instanTrap20Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
         else if (_spaceType.sprite == mauriceCoin10) {
             if (characterName == "Maurice") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == mauriceCoin20) {
             if (characterName == "Maurice") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
-            Instantiate(instanTrap20Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
         else if (_spaceType.sprite == mimiCoin10) {
             if (characterName == "Mimi") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == mimiCoin20) {
             if (characterName == "Mimi") { return 5; }
-            Instantiate(instanTrap10Effect, transform.position, Quaternion.identity);
-            Instantiate(instanTrap20Effect, transform.position, Quaternion.identity);
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
         else if (_spaceType.sprite == pinkinsCoin10) {
             if (characterName == "Pinkins") { return 5; }
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == pinkinsCoin20) {
             if (characterName == "Pinkins") { return 5; }
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
         else if (_spaceType.sprite == sweeterellaCoin10) {
             if (characterName == "Sweeterella") { return 5; }
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == sweeterellaCoin20) {
             if (characterName == "Sweeterella") { return 5; }
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
         else if (_spaceType.sprite == thanatosCoin10) {
             if (characterName == "Thanatos") { return 5; }
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == thanatosCoin20) {
             if (characterName == "Thanatos") { return 5; }
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 
         else if (_spaceType.sprite == charlotteCoin10) {
             if (characterName == "Charlotte") { return 5; }
+            var eff = Instantiate(instanTrap10Effect, transform.position, instanTrap10Effect.transform.rotation);
+            Destroy(eff, 4);
             return -10;
         }
         else if (_spaceType.sprite == charlotteCoin20) {
             if (characterName == "Charlotte") { return 5; }
+            var eff = Instantiate(instanTrap20Effect, transform.position, instanTrap20Effect.transform.rotation);
+            Destroy(eff, 4);
             return -20;
         }
 

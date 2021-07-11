@@ -21,6 +21,7 @@ public class MinigameControls : MonoBehaviour
     [SerializeField] private GameObject crystalised;
     [SerializeField] private Rigidbody2D rb;
 
+
     [Header("Colliders")]
     [SerializeField] private Collider2D _collider;              // CHARACTER COLLIDERS
     [SerializeField] private Collider2D cursorCollider;         // CURSOR COLLIDER
@@ -34,10 +35,12 @@ public class MinigameControls : MonoBehaviour
     private float knockbackPower = 0.25f;
     private float knockbackDuration = 0.11f;
 
+
     [Header("Pause")]
     [SerializeField] private GameObject pauseUi;
     [SerializeField] private GameObject[] freePlayButtons;
     [SerializeField] private TextMeshProUGUI whoPaused;
+
 
     [Header("Rewired")]
     [SerializeField] private RewiredStandaloneInputModule rInput;
@@ -498,7 +501,8 @@ public class MinigameControls : MonoBehaviour
         }
         else if (sceneName == "Plunder-Ground" || sceneName == "Plunder Ground")
         {
-            character.SetActive(false);
+            if (character != null) character.SetActive(false);
+            characterCreated = true; // DON'T CREATE THE PLAYER
             mask.SetActive(true);
             moveSpeed = 7;
             knockbackPower = 0;
@@ -575,10 +579,10 @@ public class MinigameControls : MonoBehaviour
         rInput.RewiredInputManager = GameObject.Find("Rewired_Input_Manager").GetComponent<InputManager>();
         if (rInput.RewiredPlayerIds != null) rInput.RewiredPlayerIds[0] = playerID;
         if (!controller.minigameMode) { 
-            foreach (GameObject button in freePlayButtons)
-            {
-                button.SetActive(false);
-            }
+            foreach (GameObject button in freePlayButtons) { button.SetActive(false); }
+        }
+        else {
+            foreach (GameObject button in freePlayButtons) { button.SetActive(true); }
         }
     }
 
@@ -1009,6 +1013,11 @@ public class MinigameControls : MonoBehaviour
             {
                 Time.timeScale = 0;
                 pauseUi.SetActive(true);
+            }
+            else if (player.GetButtonDown("Start") && Time.timeScale == 0 && manager.canPlay)
+            {
+                Time.timeScale = 1;
+                pauseUi.SetActive(false);
             }
         }
 
@@ -1490,12 +1499,12 @@ public class MinigameControls : MonoBehaviour
         // FLIP CHARACTER WHEN MOVING RIGHT
         if (moveHorizontal > 0 && !cursorMode && !shooting)
         {
-            character.transform.localScale = new Vector3(-scaleX, scaleX, scaleX);
+            if (character != null) character.transform.localScale = new Vector3(-scaleX, scaleX, scaleX);
             if (mask != null) { mask.transform.rotation = Quaternion.Euler(0,180,0); }
         }
         else if (moveHorizontal < 0 && !cursorMode && !shooting)
         {
-            character.transform.localScale = new Vector3(scaleX, scaleX, scaleX);
+            if (character != null) character.transform.localScale = new Vector3(scaleX, scaleX, scaleX);
             if (mask != null) { mask.transform.rotation = Quaternion.Euler(0,0,0);}
         }
         // Vector3 direction = new Vector3(moveHorizontal, moveVertical, 0);
@@ -1503,7 +1512,7 @@ public class MinigameControls : MonoBehaviour
         // rb.velocity = direction * moveSpeed;
 
         // ANIMATION
-        if (!cursorMode)
+        if (!cursorMode && character != null)
         {
             if (moveHorizontal != 0 || moveVertical != 0)
             {
@@ -1521,7 +1530,7 @@ public class MinigameControls : MonoBehaviour
                     movePower = moveSpeed * Mathf.Abs(moveVertical);
                 }
             }
-            else { 
+            else if (_anim != null) { 
                 _anim.SetBool("IsWalking", false); 
                 _anim.speed = 1;
                 movePower = 0;
@@ -1537,32 +1546,15 @@ public class MinigameControls : MonoBehaviour
         // FLIP CHARACTER WHEN MOVING RIGHT
         if (moveHorizontal > 0 && !cursorMode && !shooting)
         {
-            character.transform.localScale = new Vector3(-scaleX, scaleX, scaleX);
+            if (character != null) character.transform.localScale = new Vector3(-scaleX, scaleX, scaleX);
         }
         else if (moveHorizontal < 0 && !cursorMode && !shooting)
         {
-            character.transform.localScale = new Vector3(scaleX, scaleX, scaleX);
+            if (character != null) character.transform.localScale = new Vector3(scaleX, scaleX, scaleX);
         }
         moveDir = new Vector3(moveHorizontal, moveVertical, 0);
         // rb.MovePosition(transform.position + direction * moveSpeed * Time.fixedDeltaTime);
         // rb.velocity = direction * moveSpeed;
-
-        // // ANIMATION
-        // if (!cursorMode)
-        // {
-        //     if (moveHorizontal != 0 || moveVertical != 0)
-        //     {
-        //         if (!hasMoved) hasMoved = true;
-        //         _anim.SetBool("IsWalking", true);
-        //         _anim.speed =  moveSpeed * (Mathf.Abs(moveHorizontal) + Mathf.Abs(moveVertical)) ;
-        //         movePower = moveSpeed * (Mathf.Abs(moveHorizontal) + Mathf.Abs(moveVertical));
-        //     }
-        //     else { 
-        //         _anim.SetBool("IsWalking", false); 
-        //         _anim.speed = 1;
-        //         movePower = 0;
-        //     }
-        // }
     }
     
     void TRANSLATION()

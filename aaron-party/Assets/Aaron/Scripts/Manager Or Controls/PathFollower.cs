@@ -517,9 +517,10 @@ public class PathFollower : MonoBehaviour
                 MOVE_PLAYER();
                 UPDATE_MOVEMENT(_movesRemaining);
             }
-            else if (pseudoMove && _movesRemaining == 0 && isReadyToMove) { 
+            else if (pseudoMove && _movesRemaining <= 0 && isReadyToMove) { 
                 pseudoMove = false; 
                 isReadyToMove = false; 
+                nextNode = null;
                 _animator.SetBool("IsWalking", false);
                 _animator.speed = 1;
 
@@ -924,6 +925,7 @@ public class PathFollower : MonoBehaviour
         }
     }
 
+    // PRESS ANY BUTTON TO START PLAYER'S TURN
     void READY_TO_START()
     {
         if ((player.GetButtonDown("A") || player.GetButtonDown("B") || player.GetButtonDown("X") || player.GetButtonDown("Y"))
@@ -1133,6 +1135,7 @@ public class PathFollower : MonoBehaviour
     {
         isAtFork = true;
         _animator.SetBool("IsWalking", false);
+        _animator.speed = 1;
         SHOW_ARROWS();
     }
 

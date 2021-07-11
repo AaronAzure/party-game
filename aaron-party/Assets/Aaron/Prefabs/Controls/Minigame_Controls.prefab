@@ -16225,8 +16225,6 @@ MonoBehaviour:
   - {fileID: 151808, guid: d37d7f1e301024b1dba55d37e69e2c43, type: 3}
   - {fileID: 151808, guid: 36eba9fc33d8f478182e47dea8349dcc, type: 3}
   - {fileID: 151808, guid: a08804f39c25e49b6b7774d89f808184, type: 3}
-  targetBlast: {fileID: 0}
-  characterShooter: {fileID: 0}
   restorePrefab: {fileID: 334230341785300966}
   hurtPrefab: {fileID: 121052, guid: 45b74d42e5559bf49a14a707b4842b51, type: 3}
   projectileEffect:
@@ -20159,7 +20157,7 @@ PrefabInstance:
     - target: {fileID: 1530046031762338655, guid: a281930c7178c46e89de4b1890cb08ad,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1530046031762338655, guid: a281930c7178c46e89de4b1890cb08ad,
         type: 3}
@@ -20194,7 +20192,7 @@ PrefabInstance:
     - target: {fileID: 2191018121956554259, guid: a281930c7178c46e89de4b1890cb08ad,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2191018121956554259, guid: a281930c7178c46e89de4b1890cb08ad,
         type: 3}
@@ -20234,7 +20232,7 @@ PrefabInstance:
     - target: {fileID: 5563383076204318629, guid: a281930c7178c46e89de4b1890cb08ad,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5563383076204318629, guid: a281930c7178c46e89de4b1890cb08ad,
         type: 3}

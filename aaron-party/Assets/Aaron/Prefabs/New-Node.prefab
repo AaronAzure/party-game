@@ -24204,12 +24204,11 @@ MonoBehaviour:
   trapCreateEffect: {fileID: 188698, guid: d59453060233d2f49884f7de0b768335, type: 3}
   instanBlueEffect: {fileID: 100006, guid: 4ac279154e61c4c8286ca1061947cfdc, type: 3}
   instanRedEffect: {fileID: 100008, guid: b9442091b362b48a5958941e423cd707, type: 3}
-  instanGoldEffect: {fileID: 187180, guid: e70e1592d7f154edb9ad9557898c34b1, type: 3}
-  instanGreenEffect: {fileID: 152882, guid: ee817f2a6f2d36f489f03cdf54902f0b, type: 3}
-  instanTrap10Effect: {fileID: 1372241149341006, guid: 73dd52c851c98bc469685251a9046eb5,
-    type: 3}
-  instanTrap20Effect: {fileID: 173314, guid: 4d3473d4bd4973043a81c15073823353, type: 3}
-  instanTrapOrbEffect: {fileID: 0}
+  instanGoldEffect: {fileID: 100000, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
+  instanGreenEffect: {fileID: 100006, guid: 64c24c055ff034b84845c1e5695181cf, type: 3}
+  instanTrap10Effect: {fileID: 161470, guid: ef2fdb9a8a7d35c448dae6d056e9b1e7, type: 3}
+  instanTrap20Effect: {fileID: 136800, guid: 50c0d8c73dfeed248826c384c274984d, type: 3}
+  instanTrapOrbEffect: {fileID: 100000, guid: 352304b7fbe11f445970df6ae36e6227, type: 3}
   effect10Prefab: {fileID: 1077009852118748725, guid: 571c43aa2304840cf9a06b02c1e9f367,
     type: 3}
   effectMp3Prefab: {fileID: 1077009852118748725, guid: de15427272aa0436d9cdc1a6e8f5597c,

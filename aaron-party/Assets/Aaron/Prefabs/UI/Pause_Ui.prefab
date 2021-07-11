@@ -221,7 +221,7 @@ GameObject:
   - component: {fileID: 3906871571737345313}
   - component: {fileID: 4170472195501367353}
   m_Layer: 0
-  m_Name: RewiredEventSystem
+  m_Name: PauseRewiredEventSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

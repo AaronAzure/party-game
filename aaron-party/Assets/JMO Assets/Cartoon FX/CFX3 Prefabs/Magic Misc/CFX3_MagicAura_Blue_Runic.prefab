@@ -14085,6 +14085,7 @@ GameObject:
   - component: {fileID: 19800006}
   - component: {fileID: 19900006}
   - component: {fileID: 11400002}
+  - component: {fileID: 199160702813023900}
   m_Layer: 0
   m_Name: CFX3_MagicAura_Blue_Runic
   m_TagString: Untagged
@@ -18794,6 +18795,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   OnlyDeactivate: 0
+--- !u!210 &199160702813023900
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100006}
+  m_Enabled: 1
+  m_SortingLayerID: 1798455321
+  m_SortingLayer: 2
+  m_SortingOrder: 0
 --- !u!1 &8964774853704140555
 GameObject:
   m_ObjectHideFlags: 0
