@@ -710,7 +710,7 @@ PrefabInstance:
     - target: {fileID: 5651451908290183956, guid: ca14df406f85744dc9a310f0239c681d,
         type: 3}
       propertyPath: minigameName
-      value: Don't Be A Zombie
+      value: Undead Dread
       objectReference: {fileID: 0}
     - target: {fileID: 5651451908290183958, guid: ca14df406f85744dc9a310f0239c681d,
         type: 3}

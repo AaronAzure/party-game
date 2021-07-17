@@ -485,7 +485,7 @@ public class MinigameControls : MonoBehaviour
             bouncePhysics = true;
             RESET_PLAYER_UI();
         }
-        else if (sceneName == "Don't Be A Zombie" || sceneName == "Don't-Be-A-Zombie")
+        else if (sceneName == "Undead Dread" || sceneName == "Don't-Be-A-Zombie")
         {
             moveSpeed = 5;
             knockbackPower = 0.25f;
@@ -1208,7 +1208,7 @@ public class MinigameControls : MonoBehaviour
         {
             MOVEMENT();
         }
-        else if (sceneName == "Don't Be A Zombie" && pw.canPlay && !isOut) 
+        else if (sceneName == "Undead Dread" && pw.canPlay && !isOut) 
         {
             MOVEMENT();
         }
@@ -1403,7 +1403,7 @@ public class MinigameControls : MonoBehaviour
         {
             MOVE();
         }
-        else if (sceneName == "Don't Be A Zombie" && pw.canPlay && !isOut) 
+        else if (sceneName == "Undead Dread" && pw.canPlay && !isOut) 
         {
             MOVE();
         }
@@ -2902,7 +2902,7 @@ public class MinigameControls : MonoBehaviour
     {
         if (bouncePhysics && !isTitan)
         {
-            if (sceneName == "Don't-Be-A-Zombie" || sceneName == "Don't Be A Zombie")
+            if (sceneName == "Don't-Be-A-Zombie" || sceneName == "Undead Dread")
             {
                 if (other.gameObject.tag == "Enemy" && !isZombie)
                 {

@@ -304,7 +304,7 @@ public class GameController : MonoBehaviour
         quests.Add( new Quest("Shocking Situation", "Shocking-Situation") );
         quests.Add( new Quest("Attack Of Titan", "Attack-On-Titan") );
         quests.Add( new Quest("Flower Shower", "Flower-Shower") );          // 15
-        quests.Add( new Quest("Don't Be A Zombie", "Don't-Be-A-Zombie") );
+        quests.Add( new Quest("Undead Dread", "Don't-Be-A-Zombie") );
         quests.Add( new Quest("Barrier Bearers", "Barrier_Bearers") );
         quests.Add( new Quest("Plunder Ground", "Plunder-Ground") );
         quests.Add( new Quest("Pinpoint The Endpoint", "Pinpoint-The-Endpoint") );

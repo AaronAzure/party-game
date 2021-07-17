@@ -141,7 +141,7 @@ EditorBuildSettings:
     path: Assets/Aaron/Scenes/Minigames/Don't-Be-A-Zombie.unity
     guid: 83e4f8c800111411bb0b7859b6144120
   - enabled: 1
-    path: Assets/Aaron/Scenes/Minigames_Mini/Don't Be A Zombie.unity
+    path: Assets/Aaron/Scenes/Minigames_Mini/Undead Dread.unity
     guid: 48b9a36bbef5b41cd9ec47bd29e0ab19
   - enabled: 1
     path: Assets/Aaron/Scenes/Minigames/Barrier_Bearers.unity

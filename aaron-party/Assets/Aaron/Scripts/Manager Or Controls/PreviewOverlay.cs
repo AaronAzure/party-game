@@ -238,7 +238,7 @@ public class PreviewOverlay : MonoBehaviour
                 pic1.sprite = stickEverything;
                 txt1.text = "Move";
                 break;
-            case "Don't Be A Zombie" : 
+            case "Undead Dread" : 
                 desc.text = "Run away from the zombies. Last man standing wins!\n";
                 desc.text += "If you turn into a zombie, you can infect other humans.\n";
                 map1.SetActive(true);

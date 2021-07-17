@@ -134,7 +134,7 @@ public class PreviewManager : MonoBehaviour
             timer = 30;
             SpawnPlayers_CIRCLE(0.75f, 2);
         }
-        else if (sceneName == "Don't Be A Zombie") 
+        else if (sceneName == "Undead Dread") 
         {
             SpawnPlayers_CIRCLE(1.25f, 3);
             timer = 60;
