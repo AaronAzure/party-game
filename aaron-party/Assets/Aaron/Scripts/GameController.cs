@@ -410,9 +410,61 @@ public class GameController : MonoBehaviour
     public void NEXT_TURN() { turnNumber++; }
 
 
+    // todo -----------------------------------------------------------------------------------
     public void SAVE_GAME()
     {
-        // playerpre
+        int[] boardSettings = new int[]{turnNumber, maxTurns, restoreMpTurn, nPlayers};
+        PlayerPrefsElite.SetIntArray("board-settings", boardSettings);
+
+        List<PlayerPrevData> p = new List<PlayerPrevData>();
+        if (p1 != null && p1.Count >= 1 && p1[0] != null) p.Add(p1[0]);
+        if (p2 != null && p2.Count >= 1 && p2[0] != null) p.Add(p2[0]);
+        if (p3 != null && p3.Count >= 1 && p3[0] != null) p.Add(p3[0]);
+        if (p4 != null && p4.Count >= 1 && p4[0] != null) p.Add(p4[0]);
+        if (p5 != null && p5.Count >= 1 && p5[0] != null) p.Add(p5[0]);
+        if (p6 != null && p6.Count >= 1 && p6[0] != null) p.Add(p6[0]);
+        if (p7 != null && p7.Count >= 1 && p7[0] != null) p.Add(p7[0]);
+        if (p8 != null && p8.Count >= 1 && p8[0] != null) p.Add(p8[0]);
+
+        for (int i=0 ; i<nPlayers ; i++)
+        {
+            int[] playerStats = new int[]{p[i].coins, p[i].orbs, p[i].mp};
+
+            //* GOLDS, ORBS, MP
+            PlayerPrefsElite.SetIntArray("pathfollower-stats-" + (i+1), playerStats);
+            //* STRING PATH ( TO GameObject.Find() )
+            PlayerPrefsElite.SetString("pathfollower-path-" + (i+1), p[i].path);
+            //* Vector3 position
+            PlayerPrefsElite.SetVector3("pathfollower-pos-" + (i+1), p[i].pos);
+            //* SPELLS
+            // PlayerPrefsElite.setB
+            //* BUFFD
+            // PlayerPrefsX.SetBoolArray("pathfollower-buff-" + (i+1), buffDatas[i].);
+        }
+    }
+
+    public void RESUME_LAST_GAME()
+    {
+        // GET PREVIOUS BOARD SETTINGS
+        if (PlayerPrefsElite.VerifyArray("board-settings")) {
+            int[] lastBoardSettings = PlayerPrefsElite.GetIntArray("board-settings");
+            turnNumber = lastBoardSettings[0]; maxTurns = lastBoardSettings[1]; restoreMpTurn = lastBoardSettings[2];
+            int prevNPlayers = lastBoardSettings[3];
+            if (turnNumber != 1) hasStarted = true;
+            for (int i=0 ; i<nPlayers ; i++) {
+                if (i >= prevNPlayers) {
+
+                }
+                else {
+                    
+                }
+            }
+
+        }
+
+        // LOAD PREVIOUS BOARD (MAP)
+        string lastBoardName = PlayerPrefs.GetString("sceneName");
+        SceneManager.LoadScene(lastBoardName);
     }
 
 

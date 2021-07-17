@@ -393,17 +393,31 @@ public class PathFollower : MonoBehaviour
         // TURN 2+
         if (controller.hasStarted)
         {
+
             // GET PREVIOUS VALUES (LAST SCENE) FROM GAME_CONTROLLER
             data = controller.GET_PLAYER_DATA(playerID);
 
             string newPath  = data[0].path;
             currentNode = GameObject.Find(newPath).GetComponent<Node>();
-            transform.position  = data[0].posAside;
+            transform.position  = data[0].pos;
             mpBar.value         = data[0].mp;
             coins               = data[0].coins;
             orbs                = data[0].orbs;
 
-            if (controller.playerOrder[0] == playerID) { transform.position = data[0].pos; }
+            // IF PLAYER IS NOT FIRST, STAND ASIDE
+            if (controller.playerOrder[0] != playerID) { 
+                float playerX = transform.position.x;
+                float playerY = transform.position.y;
+                float scale   = 1.5f;
+
+                float radians = 2 * Mathf.PI / controller.nPlayers * playerID;
+                
+                float vertical   = Mathf.Sin(radians) * scale;
+                float horizontal = Mathf.Cos(radians) * scale; 
+                
+                Vector3 aside = new Vector3 (playerX - horizontal, playerY + vertical);
+                transform.position += aside; 
+            }
 
             // STATUS EFFECTS / ITEMS FROM LAST TURN
             playerSlowed    = controller.buffDatas[playerID][0].slowed;
@@ -1879,13 +1893,15 @@ public class PathFollower : MonoBehaviour
                 manager.PAYING_SOMEONE(toWhom, tempGold);
             }
         }
+        // CANNOT PAY ANYTHING
         else if (isPayingSomeone && tempGold == 0) {
             yield return new WaitForSeconds(1);
             StartCoroutine( PLAYER_CAM_OFF(0) );
             string toWhom = currentNode.WHOS_TRAP();
-            // CANNOT PAY ANYTHING
             manager.PAYING_SOMEONE(toWhom, tempGold);
         }
+        
+        
         // MOVE PLAYER TO THE SIDE
         if (_movesRemaining == 0 && isPlayerTurn) {
             yield return new WaitForSeconds(0.5f);
@@ -2200,6 +2216,8 @@ public class PathFollower : MonoBehaviour
     { 
         if (shop4)  { nPurchaseLeft = controller.turnMultiplier; }
         else        { nPurchaseLeft = maxNPurchases * controller.turnMultiplier;  }
+        purchaseLeftText.color = new Color(1,1,1);
+        purchaseLeftText2.color = new Color(1,1,1);
     }
 
     public void SHOP_ORB_UPDATE(int amount)
@@ -2211,7 +2229,7 @@ public class PathFollower : MonoBehaviour
     {
         coins -= cost;
         nPurchaseLeft--;
-        purchaseLeftText.text = "Purchase Left: " + nPurchaseLeft;
+        PURCHASES_LEFT();
         if (spells == null) { spells = new List<SpellType>(); }
         spells.Add( new SpellType(newSpellName, newSpellCost, newSpellKind) );
         UPDATE_SPELLS_UI();
@@ -2232,7 +2250,7 @@ public class PathFollower : MonoBehaviour
         shopItemUIcontent.SetActive(false);
         shopItemUIdesc.SetActive(false);
         nPurchaseLeft--;
-        purchaseLeftText2.text = "Purchase Left: " + nPurchaseLeft;
+        PURCHASES_LEFT();
 
 
         // LOSE COINS
@@ -2268,6 +2286,10 @@ public class PathFollower : MonoBehaviour
     {
         purchaseLeftText.text = "Purchase Left: " + nPurchaseLeft;
         purchaseLeftText2.text = "Purchase Left: " + nPurchaseLeft;
+        if (nPurchaseLeft <= 0) {
+            purchaseLeftText.color = new Color(1,0,0);
+            purchaseLeftText2.color = new Color(1,0,0);
+        }
     }
 
     public void FINISHED_SHOPPING()
@@ -2368,7 +2390,7 @@ public class PathFollower : MonoBehaviour
         int cost = 30;
         coins -= cost;
         nPurchaseLeft--;
-        purchaseLeftText.text = "Purchase Left: " + nPurchaseLeft;
+        PURCHASES_LEFT();
         // UPDATE_SPELLS_UI();
 
         // LOSE COINS
