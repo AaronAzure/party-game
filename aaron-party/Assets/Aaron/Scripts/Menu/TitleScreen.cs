@@ -19,24 +19,6 @@ public class TitleScreen : MonoBehaviour
         List<int> ints = new List<int>();
         ints.Add(0);
 
-        //! DELTETE
-        // List<Pid> pid = new List<Pid>();
-        // List<int> tied = new List<int>();
-        // pid.Add( new Pid(0, 100) );
-        // pid.Add( new Pid(1, 100) );
-        // pid.Add( new Pid(2, 150) );
-        // pid.Add( new Pid(3, 100) );
-
-        // for (int i=0 ; i<pid.Count - 1 ; i++) {
-        //     if (pid[i].score == pid[i+1].score) {
-        //         if (!tied.Contains(pid[i].id))      tied.Add( pid[i].id );
-        //         if (!tied.Contains(pid[i+1].id))    tied.Add( pid[i+1].id );
-        //         string debug = "";
-        //         foreach (int num in tied)   debug += num.ToString();
-        //         Debug.LogError(debug);
-        //     }
-        // }
-
     }
 
     void Update() {

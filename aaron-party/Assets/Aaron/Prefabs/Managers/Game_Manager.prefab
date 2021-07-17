@@ -789,8 +789,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fed68d22f8f844d89de3cb1fba57df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6025906858046013595}
+        m_MethodName: FORCED_START_SIDE_QUEST
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   nPlayers: 0
+  playerSpawn: {fileID: 0}
   UIcanvas: {fileID: 6170847150891012806}
+  mainCam: {fileID: 0}
   sideQuest: {fileID: 3596924100820749660}
   transitionCam: {fileID: 4368663882201902594}
   blackScreen: {fileID: 1935028515165559488}
@@ -798,6 +814,10 @@ MonoBehaviour:
   turnNumber: {fileID: 2114914233316589670}
   boats: {fileID: 0}
   currentBoat: 
+  turret: {fileID: 0}
+  turretShot: {fileID: 0}
+  turretCount: 0
+  startingCharge: 5
 --- !u!1 &8148548349955173607
 GameObject:
   m_ObjectHideFlags: 0

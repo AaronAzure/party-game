@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,6 +8,10 @@ using BeautifulTransitions.Scripts.Transitions.Components.Camera;
 public class GameManager : MonoBehaviour
 {
     // GLOBAL VARIABLES
+    [System.Serializable]
+    public class MyEventType : UnityEvent { }
+ 
+    public MyEventType OnEvent;
 
     [SerializeField] private int nPlayers;
     private string sceneName;
@@ -490,7 +494,14 @@ public class GameManager : MonoBehaviour
         blackScreen.CrossFadeAlpha(0f, transitionTime, false);
     }
 
-    private IEnumerator SIDE_QUEST_TIME() 
+
+    public void FORCED_START_SIDE_QUEST()
+    {
+        if (!mainCam.gameObject.activeSelf) mainCam.gameObject.SetActive(true);
+        StartCoroutine( SIDE_QUEST_TIME() );
+    }
+
+    public IEnumerator SIDE_QUEST_TIME() 
     {
         // HIDE UI STUFF
         UPDATE_ALL_INFO();

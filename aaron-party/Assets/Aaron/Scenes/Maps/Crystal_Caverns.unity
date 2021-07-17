@@ -27538,6 +27538,11 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 599349874741930314, guid: fcbdd23428d03554fb38025033ca8723,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1975556106607290106, guid: fcbdd23428d03554fb38025033ca8723,
         type: 3}
       propertyPath: useAllRewiredGamePlayers

@@ -37,7 +37,13 @@ public class Node : MonoBehaviour
     [Header("Paths - next node(s)")]
     public Nexts[] nexts;
 
+
+    // MAGIC GATE = PATH IS LOCKED, UNLOCKED WITH 4 MANA CONSUMPTION
+    [Header("Magic Gate")]
+    public GameObject magicGate;
+    private Animator gateAnim;
     
+
 
     [Header("Type of Space")]
     [SerializeField] private Sprite emptySpace;     //
@@ -135,6 +141,11 @@ public class Node : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // * IF MAGIC GATE
+        if (magicGate != null) {
+            gateAnim = magicGate.GetComponent<Animator>();
+        }
+
         if (_anim == null)      { _anim = this.GetComponentInChildren<Animator>(); }
         if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
         originalNode = _spaceType.sprite;
@@ -186,14 +197,13 @@ public class Node : MonoBehaviour
             trapSpaces.Add(charlotteCoin20);
             trapSpaces.Add(charlotteOrb);
         }
-
-
+        
         _soundNode = this.GetComponentInChildren<AudioSource>();
 
         // ONLY ORB SPACES SHOULD HAVE AN AARON GAMEOBJ
         if (_spaceType.sprite != orbSpace) { Destroy(aaron); }
         if (_spaceType.sprite == freeSpace) { FREE_SPELL_SPACE_SETUP(); }
-        
+    
         // SET ANIMATIONS
         CHANGE_ANIMATION();
     }
@@ -204,94 +214,53 @@ public class Node : MonoBehaviour
     }
 
 
-    //! DELETE
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        // if (other.tag == "hello")
-        // {
-        //     // SPACES THAT DO DECREASE MOVEMENT
-        //     if (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace &&  _spaceType.sprite != freeSpace &&
-        //         _spaceType.sprite != shopSpace && _spaceType.sprite != potionSpace && _spaceType.sprite != specialSpace) 
-        //     {
-        //         PathFollower p = other.GetComponent<PathFollower>();
-        //         p.IN_CONTACT();
-        //         STEALING_AURA(p);   // DOES PLAYER HAVE STEALING EFFECT ACTIVE
 
-        //         _soundNode.Play();
-        //     }
-        //     // AT MAGIC ORB SPACE
-        //     else if (_spaceType.sprite == orbSpace && magicOrb.activeSelf)  // BUY A MAGIC ORB
-        //     {
-        //         PathFollower p = other.GetComponent<PathFollower>();
-        //         p.isAtMagicOrb = true;
-        //     }
-        //     // AT SHOP
-        //     else if (_spaceType.sprite == shopSpace)                         // BUY SPELL(S)
-        //     {
-        //         PathFollower p = other.GetComponent<PathFollower>();
-        //         if (whoIsTheSeller == 1) p.shop1 = true;    // MANUALLY EDIT IN INSPECTOR
-        //         if (whoIsTheSeller == 2) p.shop2 = true;    // MANUALLY EDIT IN INSPECTOR
-        //         if (whoIsTheSeller == 3) p.shop3 = true;    // MANUALLY EDIT IN INSPECTOR
-        //         if (whoIsTheSeller == 4) p.shop4 = true;    // MANUALLY EDIT IN INSPECTOR
-        //         p.isAtShop = true;
-        //         p.RESET_PURCHASES();
-        //         p.PURCHASES_LEFT();
-        //     }
-        //     // AT ITEM SHOP
-        //     else if (_spaceType.sprite == potionSpace)                       // BUY ITEM(S)
-        //     {
-        //         PathFollower p = other.GetComponent<PathFollower>();
-        //         if (whoIsTheSeller == 4) p.shop4 = true;    // MANUALLY EDIT IN INSPECTOR
-        //         p.isAtShop = true;
-        //         p.RESET_PURCHASES();
-        //         p.PURCHASES_LEFT();
-        //     }
-        //     // AT FREE SPELL SPACE
-        //     else if (_spaceType.sprite == freeSpace)
-        //     {
-        //         PathFollower p = other.GetComponent<PathFollower>();
-        //         p.isAtFree = true;
-        //         StartCoroutine( p.GAIN_FREE_SPELL() );
-        //     }
-        //     // AT BOAT MAGIC SPACE
-        //     else if (_spaceType.sprite == specialSpace)                      // MULTIPLE EVENTS
-        //     {
-        //         PathFollower p = other.GetComponent<PathFollower>();
-        //         if (!p.isBoat) p.MANAGER_EVENT();
-        //     }
-        // }
-    }
 
-    // TRUE = DECREASE MOVEMENTS
-    // FALSK = EMPTY
+
+    // TRUE  = DECREASE MOVEMENTS
+    // FALSE = EMPTY
     public bool DOES_SPACE_DECREASE_MOVEMENT() 
     {
+        if (magicGate != null) return false;    //! MAGIC GATE
+
         return !noCostSpace.Contains(_spaceType.sprite);
     }
     // todo WHEN CROSSING OVER A SPACE THAT DOES NOT DECREMENT MOVEMENT //? (SPECIAL SPACES)
     public bool TYPE_OF_SPECIAL_SPACE(string space)
     {
-        switch (space) 
+        switch (space.ToLower()) 
         {
             case "free" :   return (_spaceType.sprite == freeSpace);
             case "shop" :   return (_spaceType.sprite == shopSpace);
             case "potion" : return (_spaceType.sprite == potionSpace);
             case "orb" :    return (_spaceType.sprite == orbSpace);
             case "spec" :   return (_spaceType.sprite == specialSpace);
+            case "gate" :   return (magicGate != null);
         }
         Debug.LogError("ERROR: not a registered space");
         return false;
     }
 
 
+    public void OPEN_MAGIC_GATE()
+    {
+        if (gateAnim != null) {
+            gateAnim.SetTrigger("Open");
+        }
+    }
     // NORMAL SPACE
     public bool SPACE_LANDED()
     {
+        if (magicGate != null) return false;    //! MAGIC GATE
+
         return (_spaceType.sprite == blueSpace || _spaceType.sprite == redSpace ||
             _spaceType.sprite == goldSpace || _spaceType.sprite == eventSpace);
     }
 
+    // TODO - landed on (no longer moving)
     public bool IS_GREEN() { 
+        if (magicGate != null) return false;    //! MAGIC GATE
+
         if (greenSpaces.Contains(_spaceType.sprite)) {
             var eff = Instantiate(instanGreenEffect, transform.position, instanGreenEffect.transform.rotation);
             Destroy(eff, 4);
@@ -310,13 +279,13 @@ public class Node : MonoBehaviour
             || _spaceType.sprite == sweeterellaOrb || _spaceType.sprite == thanatosOrb || _spaceType.sprite == charlotteOrb);
     }
     public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
-    
 
     //* EVENT SPACES
     public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
     public bool IS_BOAT() { return (_spaceType.sprite == boatSpace); }
     public bool IS_ROTATE() { return (_spaceType.sprite == rotateSpace); }
     public bool IS_SPEED_UP() { return (_spaceType.sprite == speedUpSpace); }
+
 
 
     // todo CRYSTAL CAVERNS 
@@ -370,6 +339,8 @@ public class Node : MonoBehaviour
 
     private void CHANGE_ANIMATION()
     {
+        if (magicGate != null) return;    //! MAGIC GATE
+
         if (_anim == null) { _anim = this.GetComponentInChildren<Animator>(); }
 
         magicOrb.SetActive(false);
@@ -414,6 +385,8 @@ public class Node : MonoBehaviour
     // SPACES WHERE YOU CAN CAST EFFECTS
     public bool VALID_NODE_TO_CAST_EFFECT()
     {
+        if (magicGate != null) return false;    //! MAGIC GATE
+
         return (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace && _spaceType.sprite != shopSpace
             && _spaceType.sprite != potionSpace);
     }
@@ -424,6 +397,8 @@ public class Node : MonoBehaviour
     // SPACES THAT CAN BE TURNED INTO TRAPS (ie NOT EVENTS, EMPTY, ORB, SHOP)
     public bool VALID_NODE_TO_TRANSFORM()
     {
+        if (magicGate != null) return false;    //! MAGIC GATE
+
         return trapSpaces.Contains(_spaceType.sprite);
         // return (_spaceType.sprite == blueSpace || _spaceType.sprite == redSpace);
         // return (_spaceType.sprite != emptySpace && _spaceType.sprite != orbSpace && _spaceType.sprite != eventSpace
@@ -487,6 +462,8 @@ public class Node : MonoBehaviour
     // PLAYER'S TRAP TO CARRY OVER (FROM GAME_CONTROLLER)
     public void CHANGE_SPACE_TYPE(Sprite spaceType)
     {
+        if (magicGate != null) return;    //! MAGIC GATE
+
         if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
         _spaceType.sprite = spaceType;
 

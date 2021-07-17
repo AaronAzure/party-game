@@ -179,7 +179,7 @@ public class MinigameControls : MonoBehaviour
     [SerializeField] private GameObject floatingSpellTextPrefab;
     [SerializeField] private Sprite titanSpellIcon;
     private float accRate = 0.3f;
-    private float accSpeed = 30;
+    private float accSpeed = 35;
     private float titanFactor = 3;
     private float oldSize;
     private bool  canAcc;
@@ -421,6 +421,7 @@ public class MinigameControls : MonoBehaviour
         }
         else if (sceneName == "Stamp-By-Me" || sceneName == "Stamp By Me")
         {
+            CREATE_CHARACTER();
             if (characterName == "Felix")               { _anim.Play("Felix_Invisible", -1, 0); }
             else if (characterName == "Jacob")          { _anim.Play("Jacob_Invisible", -1, 0); }
             else if (characterName == "Laurel")         { _anim.Play("Laurel_Invisible", -1, 0); }
@@ -576,8 +577,10 @@ public class MinigameControls : MonoBehaviour
 
 
         if (whoPaused != null) whoPaused.text = characterName + " Paused";
+        if (rInput.RewiredPlayerIds != null) {
+            rInput.RewiredPlayerIds[0] = playerID;
+        }
         rInput.RewiredInputManager = GameObject.Find("Rewired_Input_Manager").GetComponent<InputManager>();
-        if (rInput.RewiredPlayerIds != null) rInput.RewiredPlayerIds[0] = playerID;
         if (!controller.minigameMode) { 
             foreach (GameObject button in freePlayButtons) { button.SetActive(false); }
         }
@@ -587,7 +590,7 @@ public class MinigameControls : MonoBehaviour
     }
 
     // * SHOOTER, CURSOR, CHARACTER
-    public void CREATE_CHARACTER(string characterStyle)
+    public void CREATE_CHARACTER(string characterStyle="")
     {
         characterCreated = true;    // DO NOT CREATE ACTUAL PERSON CHARACTER
         // SHOOTER
@@ -2221,7 +2224,7 @@ public class MinigameControls : MonoBehaviour
         }
         isTitan = true;
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(3.5f);
         isTitan = false;
 
         while (this.transform.localScale.y > oldSize)
@@ -2489,10 +2492,18 @@ public class MinigameControls : MonoBehaviour
 
         if (manager != null) points = Mathf.Abs( count - manager.correctAns );
         if (pw != null) {
-            points = Mathf.Abs( count - pw.timeToStop );
+            points = Mathf.Abs( count - pw.correctAns );
             scoreHead.text = points.ToString();
         }
         score.text = points.ToString();
+    }
+
+    void DONE_COUNTING() 
+    {
+        if (!isOut && player.GetButtonDown("Y")) {
+            isOut = true;
+            manager.CheckIfEveyoneIsOut(0);
+        }
     }
 
 
@@ -2507,7 +2518,7 @@ public class MinigameControls : MonoBehaviour
             var blast = Instantiate(targetBlast, characterShooter.transform.position, Quaternion.identity);
             blast.GetComponent<TargetBlast>().player = this;
             StartCoroutine( blast.GetComponent<TargetBlast>().MOVE_TO_POSITION(this.transform.position, 0.25f) );
-            StartCoroutine( RELOAD(0.2f) );
+            StartCoroutine( RELOAD(0.3f) );
         }
     }
 

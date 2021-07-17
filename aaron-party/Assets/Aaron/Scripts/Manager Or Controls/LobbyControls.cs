@@ -45,6 +45,7 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private TextMeshProUGUI gameStyle;
     [SerializeField] private TextMeshProUGUI gameDifficulty;
     [SerializeField] private TextMeshProUGUI orderStyle;
+    [SerializeField] private TextMeshProUGUI restoreMpTurn;
     [SerializeField] private TextMeshPro backToCharacter;
 
     private int nSetting = 0;
@@ -194,8 +195,8 @@ public class LobbyControls : MonoBehaviour
                     if (i==0) currentSetting[i].SetActive(true);
                     else currentSetting[i].SetActive(false);
                 }
-                foreach (Image setting in settings)  { setting.color = new Color(1,1,1,0.3f); }
-                settings[nSetting].color = new Color(1,1,1,1);
+                // foreach (Image setting in settings)  { setting.color = new Color(1,1,1,0.3f); }
+                // settings[nSetting].color = new Color(1,1,1,1);
                 DISPLAY_DIFFICULTY();
             }
             else if (player.GetButtonDown("X")) moveSpeed = 55;
@@ -377,6 +378,7 @@ public class LobbyControls : MonoBehaviour
     }
 
 
+    // PRESS 'L' OR 'R' BUTTON
     private void ADJUST_SETTINGS()
     {
         // STOP ADJUSTING SETTING
@@ -411,6 +413,7 @@ public class LobbyControls : MonoBehaviour
                     case "Style_Panel":         CHANGE_GAME_STYLE(); break;
                     case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(true); break;
                     case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
+                    case "MP_Restore_Panel":    CHANGE_N_TURN_TO_RECOVER_MP(true); break;
                 }
             }
             else if (player.GetButtonDown("L")) {
@@ -420,6 +423,7 @@ public class LobbyControls : MonoBehaviour
                     case "Style_Panel":         CHANGE_GAME_STYLE(); break;
                     case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(false); break;
                     case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
+                    case "MP_Restore_Panel":    CHANGE_N_TURN_TO_RECOVER_MP(false); break;
                 }
             }
             // LONG PRESS
@@ -465,6 +469,7 @@ public class LobbyControls : MonoBehaviour
         DISPLAY_DIFFICULTY();
     }
 
+    // LONG PRESS
     void INCREMENT_TURN()
     {
         timer += Time.deltaTime;
@@ -483,6 +488,7 @@ public class LobbyControls : MonoBehaviour
         }
     }
 
+    // LONG PRESS
     void DECREMENT_TURN()
     {
         if (controller.maxTurns > 1)
@@ -537,12 +543,24 @@ public class LobbyControls : MonoBehaviour
         }
     }
 
+    private void CHANGE_N_TURN_TO_RECOVER_MP(bool increase=true)
+    {
+        if (controller.restoreMpTurn < 10 && increase) {
+            controller.restoreMpTurn++;
+        }
+        else if (controller.restoreMpTurn > 0 && !increase) {
+            controller.restoreMpTurn--;
+        }
+    }
+
     private void RESTART_GAME()
     {
         Destroy(controller.gameObject);    
         SceneManager.LoadScene(0);
     }
 
+
+    // todo ---------------------------------------------------------------
     void DISPLAY_SETTINGS()
     {
         // NUMBER OF TURNS
@@ -556,6 +574,11 @@ public class LobbyControls : MonoBehaviour
         // PLAYER ORDER STYLE ( DETERMINED BY SIDE QUEST RANKING )
         if (controller.isSetOrder) { orderStyle.text = "Fixed"; }
         else                       { orderStyle.text = "Flexible"; }
+
+        // EVERY X TURNS TO RESTORE MP
+        restoreMpTurn.text = "Every " + controller.restoreMpTurn + " Turns";
+        if (controller.restoreMpTurn == 1) restoreMpTurn.text = "Every Turn";
+        if (controller.restoreMpTurn == 0) restoreMpTurn.text = "Never";
 
         DISPLAY_DIFFICULTY();
     }

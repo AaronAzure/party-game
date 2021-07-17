@@ -81,6 +81,7 @@ public class PathFollower : MonoBehaviour
     public  bool isAtShop;                  // (OPT. STATE)  AT SPELL STORE
     public  bool isAtFree;                  // (OPT. STATE)  AT FREE SPELL NODE
     public  bool isAtPotion;                  // (OPT. STATE)  AT ITEM STORE
+    public  bool isAtGate;                  // (OPT. STATE)  AT ITEM STORE
     public  bool isAtMagicOrb;             // (OPT. STATE)  AT MAGIC ORB
     public  bool isAtSpecial;               // (OPT. STATE)  AT SPECIAL (END OF MAP [MULTI-EVENTS] )
     public  bool isBoat;                    // MAKE SURE BOAT HAPPENING OCCURS ONCE
@@ -93,8 +94,12 @@ public class PathFollower : MonoBehaviour
     private bool isAside;
     public  bool diceRolled;                // excludes movement from spells
 
+    [SerializeField] private GameObject gateUi;
+    [SerializeField] private GameObject gateCannotOpenUi;
+    private bool openingGate;
 
-    [Header("PLAYER GAME DATA")]
+
+    [Header("Sound or Ui")]
     [SerializeField] private AudioSource coinPickup;
     [SerializeField] private AudioSource coinLoss;
     [SerializeField] private AudioSource orbPickup;
@@ -104,6 +109,9 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private AudioSource spellPickup;
     [SerializeField] private AudioSource manaUsed;
     [SerializeField] private GameObject layout;
+
+
+    [Header("PLAYER GAME DATA")]
     public int coins;
     public int orbs;   // MARIO PARTY STARS
     public TextMeshProUGUI ranking;
@@ -957,8 +965,29 @@ public class PathFollower : MonoBehaviour
         {
             UserViewMap();
         }
+        else if (isAtGate)
+        {
+            if (gateCannotOpenUi.activeSelf && player.GetButtonDown("A")) {
+                nextNode = null;
+                isAtGate = false;
+                gateUi.SetActive(false);
+                gateCannotOpenUi.SetActive(false);
+            }
+            else if (gateUi.activeSelf) {
+                if (player.GetButtonDown("A")) {
+                    gateUi.SetActive(false);
+                    StartCoroutine( OPEN_MAGIC_GATE() );
+                }
+                else if (player.GetButtonDown("B")) {
+                    nextNode = null;
+                    gateUi.SetActive(false);
+                    isAtGate = false;
+                }
+            }
+        }
         //* THERE IS A FORK IN THE PATH (SPLIT IN PATH)
-        else if (isAtFork) {
+        else if (isAtFork) 
+        {
             UserPathForkMenu();
         }
         //* AT SHOP SPACE
@@ -973,7 +1002,7 @@ public class PathFollower : MonoBehaviour
                 _animator.SetBool("IsWalking", false);
                 manager.HIDE_UI();
                 shopUI.SetActive(true); 
-                if (!shopKeeperUI.activeSelf && !shopSpellUI.activeSelf)
+                if (!shopKeeperUI.activeSelf && shopSpellUI.activeSelf)
                 {
                     shopKeeperUI.SetActive(true); shopSpellUI.SetActive(false);
                 }
@@ -992,6 +1021,15 @@ public class PathFollower : MonoBehaviour
                     case 3 :  
                         shopKeeperImg.sprite = shopKeepers[3]; 
                         sellerGreetings.text = "One shall nev'r knoweth at which hour the tide shalt turneth.";
+                        shopKeeperUI.SetActive(true);
+                        shopSpellUI.SetActive(false);
+                        shop4 = true;
+                        break;
+                    default:
+                        shopKeeperImg.sprite = shopKeepers[3]; 
+                        sellerGreetings.text = "One shall nev'r knoweth at which hour the tide shalt turneth.";
+                        shopKeeperUI.SetActive(true);
+                        shopSpellUI.SetActive(false);
                         shop4 = true;
                         break;
                 }
@@ -1031,6 +1069,8 @@ public class PathFollower : MonoBehaviour
                 nextNode = currentNode.nexts[0].node.GetComponent<Node>();
                 PATH_BLOCKED_MOVE_TO_ALTERNATE();
                 WHERE_TO_FACE();
+
+                IS_AT_GATE();
             }
             // PATH SPLITS/FORKS
             else {
@@ -1139,7 +1179,7 @@ public class PathFollower : MonoBehaviour
         SHOW_ARROWS();
     }
 
-    //** WHICH PATH TO TAKE IN FORKS
+    //* WHICH PATH TO TAKE IN FORKS
     private void CHOOSING_PATH_AT_FORK()
     {
         if (!isViewingMap && isAtFork) {
@@ -1164,6 +1204,9 @@ public class PathFollower : MonoBehaviour
                     arrowUp.gameObject.SetActive(false);
                     arrowDown.gameObject.SetActive(false);
                     WHERE_TO_FACE();
+
+                    IS_AT_GATE();
+
                     break;
                 }
             }
@@ -1199,21 +1242,25 @@ public class PathFollower : MonoBehaviour
             if (currentNode.nexts[i].direction == Node.Directions.left && 
                 !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED())  
             { 
+                // if (CAN_OPEN_GATE(currentNode.nexts[i].node)) continue;
                 arrowLeft.gameObject.SetActive(true); continue; 
             }
             if (currentNode.nexts[i].direction == Node.Directions.right && 
-                !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED()) 
+                !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED())
             { 
+                // if (CAN_OPEN_GATE(currentNode.nexts[i].node)) continue;
                 arrowRight.gameObject.SetActive(true); continue; 
             }
             if (currentNode.nexts[i].direction == Node.Directions.up && 
                 !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED())  
             { 
+                // if (CAN_OPEN_GATE(currentNode.nexts[i].node)) continue;
                 arrowUp.gameObject.SetActive(true); continue; 
             }
             if (currentNode.nexts[i].direction == Node.Directions.down && 
                 !currentNode.nexts[i].node.GetComponent<Node>().IS_BLOCKED())  
             { 
+                // if (CAN_OPEN_GATE(currentNode.nexts[i].node)) continue;
                 arrowDown.gameObject.SetActive(true); continue; 
             }
         }
@@ -1227,6 +1274,42 @@ public class PathFollower : MonoBehaviour
         }
     }
     
+    // IS NEXT NODE A MAGIC GATE
+    private void IS_AT_GATE()
+    {
+        if (nextNode.TYPE_OF_SPECIAL_SPACE("gate")) { 
+            isAtGate = true; 
+            _animator.SetBool("IsWalking", false);
+            _animator.speed = 1;
+            if (mpBar.value >= 4)   gateUi.SetActive(true);
+            else                    gateCannotOpenUi.SetActive(true);
+        }
+    }
+
+    // IF NEXT NODE IS A MAGIC GATE, RETURN TRUE IF THE PLAYER HAS ENOUGH MP
+    private bool CAN_OPEN_GATE(GameObject node)
+    {
+        return (node.GetComponent<Node>().TYPE_OF_SPECIAL_SPACE("gate") && mpBar.value >= 4);
+    }
+
+    IEnumerator OPEN_MAGIC_GATE(int cost=4)
+    {
+        openingGate = true;
+        nextNode.OPEN_MAGIC_GATE();
+        gateUi.SetActive(false);
+        LOSE_MP(cost);
+        for (int i=0 ; i<cost ; i++) {
+            manaUsed.Play();
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        yield return new WaitForSeconds(1);
+        _animator.SetBool("IsWalking", true);
+        _animator.speed = _moveSpeed;
+        isAtGate = false;
+        openingGate = false;
+    }
+
     //* SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
     private void SPACE_END()
     {
@@ -1387,8 +1470,8 @@ public class PathFollower : MonoBehaviour
         {
             // TAKE A LOOK AT STOCK
             if      (player.GetButtonDown("A")) { 
-                if (!shop4) { shopKeeperUI.SetActive(false); shopSpellUI.SetActive(true); } 
-                else        { shopKeeperUI.SetActive(false); shopItemUI.SetActive(true); }
+                if (!shop4) { shopKeeperUI.SetActive(false); shopSpellUI.SetActive(true); shopItemUI.SetActive(false); } 
+                else        { shopKeeperUI.SetActive(false); shopItemUI.SetActive(true);  shopSpellUI.SetActive(false); }
             }
             // VIEW MAP
             else if (player.GetButtonDown("X")) { 
@@ -1549,15 +1632,9 @@ public class PathFollower : MonoBehaviour
         }
         isPlayerTurn = true;           // THIS PLAYER'S TURN
 
-        // RESTORE 1 MP (EVERY ODD TURNS)     ( COMPETITIVE )
-        if (mpBar.value < 5 && controller.turnNumber % 2 == 1 && !controller.isCasual) 
-        { 
-            mpBar.value += 1; 
-            var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
-            go.GetComponent<TextMeshPro>().text    = "+1";
-        }
-        // RESTORE 1 MP (EVERY TURN)        ( CASUAL )
-        else if (mpBar.value < 5 && controller.isCasual) 
+        // RESTORE 1 MP (EVERY (by settings) TURNS)
+        float x = controller.restoreMpTurn;
+        if (x != 0 && mpBar.value < 5 && (controller.turnNumber - 1) % x == 0) 
         { 
             mpBar.value += 1; 
             var go = Instantiate(floatingManaTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
@@ -1801,6 +1878,13 @@ public class PathFollower : MonoBehaviour
             else {              // PAY WHAT YOU HAVE
                 manager.PAYING_SOMEONE(toWhom, tempGold);
             }
+        }
+        else if (isPayingSomeone && tempGold == 0) {
+            yield return new WaitForSeconds(1);
+            StartCoroutine( PLAYER_CAM_OFF(0) );
+            string toWhom = currentNode.WHOS_TRAP();
+            // CANNOT PAY ANYTHING
+            manager.PAYING_SOMEONE(toWhom, tempGold);
         }
         // MOVE PLAYER TO THE SIDE
         if (_movesRemaining == 0 && isPlayerTurn) {

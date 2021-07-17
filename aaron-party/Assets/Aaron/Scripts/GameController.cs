@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
 
     [Header("Board Settings")]
     public int maxTurns = 15;       // ** SET BY PLAYER 1 (LobbyControls)
+    public int restoreMpTurn = 1;
     public bool isCasual = false;   // ** SET BY PLAYER 1 (LobbyControls) {true = casual | false = competitive}
     public bool easy;
     public bool norm = true;
@@ -369,6 +370,7 @@ public class GameController : MonoBehaviour
     }
 
 
+
     // ************ MAP SELECTION ************ //
     public void LOAD_BOARD(string boardName)
     {  
@@ -406,6 +408,14 @@ public class GameController : MonoBehaviour
     public void GAME_START() {  hasStarted = true; }
 
     public void NEXT_TURN() { turnNumber++; }
+
+
+    public void SAVE_GAME()
+    {
+        // playerpre
+    }
+
+
 
 
 

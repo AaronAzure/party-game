@@ -193,7 +193,8 @@ public class MinigameManager : MonoBehaviour
         }
         else if (sceneName == "County-Bounty") 
         {
-            timer = 30;
+            timer = 20;
+            if (controller != null && controller.hard) timer = 30;
             SpawnPlayers();
         }
         else if (sceneName == "Slay-The-Shades") 
@@ -243,7 +244,7 @@ public class MinigameManager : MonoBehaviour
             {
                 var player = Instantiate(spawnPlayers, 
                         Vector3.Lerp(_A.position, _B.position, (float) (i+1)/(controller.nPlayers+1) ), Quaternion.identity);
-                player.transform.parent = instances.transform;
+                // player.transform.parent = instances.transform;
                 player.transform.localScale *= ratio;
                 player.playerID = i; 
                 player.name = "Player_" + (i+1); 
@@ -266,7 +267,7 @@ public class MinigameManager : MonoBehaviour
             {
                 var player = Instantiate(spawnPlayers, 
                         Vector3.Lerp(_A.position, _B.position, (float) (i)/(controller.nPlayers-1) ), Quaternion.identity);
-                player.transform.parent = instances.transform;
+                // player.transform.parent = instances.transform;
                 player.transform.localScale *= ratio;
                 player.playerID = i; 
                 player.name = "Player_" + (i+1); 
@@ -292,7 +293,7 @@ public class MinigameManager : MonoBehaviour
         for ( int i=0 ; i<controller.nPlayers ; i++ )
         {
             var player = Instantiate(spawnPlayers, spawnPos[i].position, Quaternion.identity);
-            player.transform.parent = instances.transform;
+            // player.transform.parent = instances.transform;
             player.transform.localScale *= ratio;
             player.playerID = i; 
             player.name = "Player_" + (i+1); 
@@ -321,7 +322,7 @@ public class MinigameManager : MonoBehaviour
             
             /* Now spawn */
             var player = Instantiate(spawnPlayers, spawnPos , Quaternion.identity);
-            player.transform.parent = instances.transform;
+            // player.transform.parent = instances.transform;
             player.transform.localScale *= ratio;
             player.playerID = i; 
             player.name = "Player_" + (i+1); 
@@ -506,7 +507,7 @@ public class MinigameManager : MonoBehaviour
 
     private IEnumerator EventGameOver()
     {
-        if (sceneName == "Stop_Watchers")
+        if      (sceneName == "Stop_Watchers")
         {
             for (int i=0 ; i<players.Length ; i++)
             {
@@ -645,7 +646,7 @@ public class MinigameManager : MonoBehaviour
             // DETERMINE ORDER OF PLAYERS WHO TIED, BASED ON PREVIOUS PLAYER ORDER
             if (tied.Count > 0) {
                 List<int> newOrder = sortAccording(tied, controller.playerOrder, tied.Count, controller.playerOrder.Length);
-                
+
                 for (int i=0; i<origTied.Count ; i++)
                 {
                     int ind = System.Array.LastIndexOf(pid, origTied[i]);

@@ -43,7 +43,7 @@ public class Shade : MonoBehaviour
         _collider.enabled = false;
 
         if (isRed)  { radius = 2;}
-        if (isGold) { radius = 3.5f;  health = 1; transform.localScale /= 1.5f;}
+        if (isGold) { radius = 3.5f; transform.localScale /= 1.5f;}
 
         if (transform.position.x < 0) {
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);

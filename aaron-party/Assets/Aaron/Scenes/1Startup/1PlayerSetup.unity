@@ -3184,7 +3184,7 @@ PrefabInstance:
     - target: {fileID: 2864894284712624756, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}
       propertyPath: infiniteMovement
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2864894284890189609, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}
@@ -3999,7 +3999,7 @@ GameObject:
   - component: {fileID: 1814102905}
   - component: {fileID: 1814102909}
   m_Layer: 5
-  m_Name: Main_Canvas
+  m_Name: Player_Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

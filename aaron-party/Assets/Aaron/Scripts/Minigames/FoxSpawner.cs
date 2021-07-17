@@ -15,9 +15,9 @@ public class FoxSpawner : MonoBehaviour
     {
         if (GameObject.Find("Game_Controller") != null && GameObject.Find("Game_Controller").TryGetComponent(out GameController ctr))
         {
-            if (ctr.easy) nSpawn = Random.Range(10,16);
-            if (ctr.norm) nSpawn = Random.Range(12,19);
-            if (ctr.hard) nSpawn = Random.Range(16,25);
+            if (ctr.easy) nSpawn = Random.Range(12,19);
+            if (ctr.norm) nSpawn = Random.Range(15,26);
+            if (ctr.hard) nSpawn = Random.Range(15,26);
         }
 
         for (int i=0 ; i<nSpawn ; i++) {
