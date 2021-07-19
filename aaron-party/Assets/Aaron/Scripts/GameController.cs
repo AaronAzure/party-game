@@ -44,27 +44,28 @@ public class GameController : MonoBehaviour
     public string characterName8;
     private string[] characterNames;
 
-    private List<PlayerPrevData>[] playersData;
-    public List<PlayerPrevData> p1;
-    public List<PlayerPrevData> p2;
-    public List<PlayerPrevData> p3;
-    public List<PlayerPrevData> p4;
-    public List<PlayerPrevData> p5;
-    public List<PlayerPrevData> p6;
-    public List<PlayerPrevData> p7;
-    public List<PlayerPrevData> p8;
+    public List<PlayerPrevData> playerData;
+    // public List<PlayerPrevData> p1;
+    // public List<PlayerPrevData> p2;
+    // public List<PlayerPrevData> p3;
+    // public List<PlayerPrevData> p4;
+    // public List<PlayerPrevData> p5;
+    // public List<PlayerPrevData> p6;
+    // public List<PlayerPrevData> p7;
+    // public List<PlayerPrevData> p8;
 
-    public List<List<PlayerBuffData>> buffDatas;
+    public List<PlayerBuffData> buffDatas;
 
 
-    public List<SpellType> spells1;
-    public List<SpellType> spells2;
-    public List<SpellType> spells3;
-    public List<SpellType> spells4;
-    public List<SpellType> spells5;
-    public List<SpellType> spells6;
-    public List<SpellType> spells7;
-    public List<SpellType> spells8;
+    public List<List<SpellType>> playerSpells;
+    // public List<SpellType> spells1;
+    // public List<SpellType> spells2;
+    // public List<SpellType> spells3;
+    // public List<SpellType> spells4;
+    // public List<SpellType> spells5;
+    // public List<SpellType> spells6;
+    // public List<SpellType> spells7;
+    // public List<SpellType> spells8;
 
     public List<SpellType> randomSpells;
     public List<SpellType> randomGoodSpells;
@@ -76,6 +77,9 @@ public class GameController : MonoBehaviour
     private List<NodeSpace> changedSpaces;
     private int currentMagicOrbIndex = -1;
     private List<NodeSpace> magicOrbSpace;
+
+    [SerializeField] private Sprite[] trapSprites;
+    private bool justResumed;
 
 
     [Header("Crystal Caverns")]
@@ -147,23 +151,28 @@ public class GameController : MonoBehaviour
             }
         }
 
-        spells1 = new List<SpellType>();
-        spells2 = new List<SpellType>();
-        spells3 = new List<SpellType>();
-        spells4 = new List<SpellType>();
-        spells5 = new List<SpellType>();
-        spells6 = new List<SpellType>();
-        spells7 = new List<SpellType>();
-        spells8 = new List<SpellType>();
+        playerData = new List<PlayerPrevData>();
+        //! DELETE
+        // p1 = new List<PlayerPrevData>();
+        // p2 = new List<PlayerPrevData>();
+        // p3 = new List<PlayerPrevData>();
+        // p4 = new List<PlayerPrevData>();
+        // p5 = new List<PlayerPrevData>();
+        // p6 = new List<PlayerPrevData>();
+        // p7 = new List<PlayerPrevData>();
+        // p8 = new List<PlayerPrevData>();
 
-        p1 = new List<PlayerPrevData>();
-        p2 = new List<PlayerPrevData>();
-        p3 = new List<PlayerPrevData>();
-        p4 = new List<PlayerPrevData>();
-        p5 = new List<PlayerPrevData>();
-        p6 = new List<PlayerPrevData>();
-        p7 = new List<PlayerPrevData>();
-        p8 = new List<PlayerPrevData>();
+        playerSpells = new List<List<SpellType>>();
+        //! DELETE
+        // spells1 = new List<SpellType>();
+        // spells2 = new List<SpellType>();
+        // spells3 = new List<SpellType>();
+        // spells4 = new List<SpellType>();
+        // spells5 = new List<SpellType>();
+        // spells6 = new List<SpellType>();
+        // spells7 = new List<SpellType>();
+        // spells8 = new List<SpellType>();
+
 
         randomSpells   = new List<SpellType>();
         randomGoodSpells   = new List<SpellType>();
@@ -228,9 +237,9 @@ public class GameController : MonoBehaviour
         spellBook.Add( new SpellType("Spell_Move_Orb", 3, "Move") );
     }
 
-    public void SET_PLAYER_CHARACTER(int playerNumber, string newCharacterName)
+    public void SET_PLAYER_CHARACTER(int playerID, string newCharacterName)
     {
-        switch (playerNumber)
+        switch (playerID)
         {
             case 0:     characterName1 = newCharacterName; break;
             case 1:     characterName2 = newCharacterName; break;
@@ -241,6 +250,7 @@ public class GameController : MonoBehaviour
             case 6:     characterName7 = newCharacterName; break;
             case 7:     characterName8 = newCharacterName; break;
         }
+        characterNames[playerID] = newCharacterName;
     }
 
     // **** AFTER DETERMINING NO. OF PLAYERS **** //
@@ -248,18 +258,23 @@ public class GameController : MonoBehaviour
     {
         if (nPlayers >= 1 && nPlayers == nReady)
         {
+            // PLAYER BUFFS
             if (buffDatas == null) {
-                buffDatas = new List<List<PlayerBuffData>>();
+                buffDatas = new List<PlayerBuffData>();
             }
             for (int i=0 ; i<nPlayers ; i++) {
-                buffDatas.Add( new List<PlayerBuffData>() ); 
-                buffDatas[i].Add (new PlayerBuffData(false,false,false,false,false) );
+                // buffDatas.Add( new List<PlayerBuffData>() ); 
+                buffDatas.Add( new PlayerBuffData(false,false,false,false,false) );
             }
+
+            // PLAYER ORDER DURING EACH TURN
             playerOrder     = new int[nPlayers];
             for (int i=0 ; i<playerOrder.Length ; i++)
             {
                 playerOrder[i] = i;
             }
+
+            // BONUS ORB
             richOrb         = new int[nPlayers];
             questOrb        = new int[nPlayers];
             blueOrb         = new int[nPlayers];
@@ -267,14 +282,24 @@ public class GameController : MonoBehaviour
             shopOrb         = new int[nPlayers];
             eventOrb        = new int[nPlayers];
             slowOrb         = new int[nPlayers];
-            p1.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            p2.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            p3.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            p4.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            p5.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            p6.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            p7.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            p8.Add(new PlayerPrevData("Path_0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+
+            // PLAYER STATS/DATA
+            for (int i=0 ; i<nPlayers ; i++) {
+                playerData.Add( new PlayerPrevData("path-0", new Vector3(0,0), 10, 0, 5, 0, false) );
+            }
+
+            for (int i=0 ; i<nPlayers ; i++) {
+                playerSpells.Add( new List<SpellType>() ); 
+            }
+            //! DELETE
+            // p1.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+            // p2.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+            // p3.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+            // p4.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+            // p5.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+            // p6.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+            // p7.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
+            // p8.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
             SceneManager.LoadScene("2Lobby");
         }
     }
@@ -390,7 +415,7 @@ public class GameController : MonoBehaviour
         else Debug.LogError("HAVEN'T ADDED MAP TO - GameController.LOAD_BOARD() ");
         SceneManager.LoadScene(boardName); 
     }
-    public void LOAD_GAME_BOARD() { if(boardSceneName != null)  SceneManager.LoadScene(boardSceneName); }
+    public void LOAD_GAME_BOARD()   { if(boardSceneName != null)  SceneManager.LoadScene(boardSceneName); }
     public void LOAD_CUTAWAY()      { if(introSceneName != null)  SceneManager.LoadScene(introSceneName); }
 
     public void LOAD_MINIGAMES_BOARD()
@@ -413,58 +438,178 @@ public class GameController : MonoBehaviour
     // todo -----------------------------------------------------------------------------------
     public void SAVE_GAME()
     {
+        if (justResumed) { justResumed = false; return;}
         int[] boardSettings = new int[]{turnNumber, maxTurns, restoreMpTurn, nPlayers};
         PlayerPrefsElite.SetIntArray("board-settings", boardSettings);
+        PlayerPrefsElite.SetIntArray("board-player-order", playerOrder);
+        PlayerPrefsElite.SetInt("board-magic-orb-ind", currentMagicOrbIndex);
+        PlayerPrefsElite.SetInt("board-n-magic-orb", magicOrbSpace.Count);
+        for (int i=0 ; i<magicOrbSpace.Count ; i++) {
+            string[] mOrbs = new string[]{
+                magicOrbSpace[i].parentPath, magicOrbSpace[i].childNode
+            };
+            PlayerPrefsElite.SetStringArray("magic-orb-spaces-" + (i+1), mOrbs );
+        }
 
-        List<PlayerPrevData> p = new List<PlayerPrevData>();
-        if (p1 != null && p1.Count >= 1 && p1[0] != null) p.Add(p1[0]);
-        if (p2 != null && p2.Count >= 1 && p2[0] != null) p.Add(p2[0]);
-        if (p3 != null && p3.Count >= 1 && p3[0] != null) p.Add(p3[0]);
-        if (p4 != null && p4.Count >= 1 && p4[0] != null) p.Add(p4[0]);
-        if (p5 != null && p5.Count >= 1 && p5[0] != null) p.Add(p5[0]);
-        if (p6 != null && p6.Count >= 1 && p6[0] != null) p.Add(p6[0]);
-        if (p7 != null && p7.Count >= 1 && p7[0] != null) p.Add(p7[0]);
-        if (p8 != null && p8.Count >= 1 && p8[0] != null) p.Add(p8[0]);
+        //* MAP-EXCLUSIVE
+        if (boardSceneName == "Crystal_Caverns") {
+            PlayerPrefsElite.SetInt("n-can-be-caved", canBeCavedSpaces.Count);
+            for (int i=0 ; i<canBeCavedSpaces.Count ; i++) {
+                string[] toBeCaved = new string[]{
+                    canBeCavedSpaces[i].parentPath, canBeCavedSpaces[i].childNode, canBeCavedSpaces[i].cavedSection.ToString()
+                };
+                PlayerPrefsElite.SetStringArray("can-be-caved" + (i+1), toBeCaved );
+            }
+            PlayerPrefsElite.SetInt("n-already-caved", cavedInSpaces.Count);
+            for (int i=0 ; i<cavedInSpaces.Count ; i++) {
+                string[] toBeCaved = new string[]{
+                    cavedInSpaces[i].parentPath, cavedInSpaces[i].childNode
+                };
+                PlayerPrefsElite.SetStringArray("already-caved" + (i+1), toBeCaved );
+            }
+        }
+        
+        // TRAPS
+        string[] trapParentNames    = new string[changedSpaces.Count];
+        string[] trapchildNames     = new string[changedSpaces.Count];
+        string[] trapNodeNames      = new string[changedSpaces.Count];
+        for (int i=0 ; i<changedSpaces.Count ; i++) {
+            trapParentNames[i]  = changedSpaces[i].parentPath;
+            trapchildNames[i]   = changedSpaces[i].childNode;
+            trapNodeNames[i]    = changedSpaces[i].nodeType.name;
+        }
+        PlayerPrefsElite.SetStringArray("traps-parent-names", trapParentNames);
+        PlayerPrefsElite.SetStringArray("traps-child-names", trapchildNames);
+        PlayerPrefsElite.SetStringArray("traps-node-names", trapNodeNames);
+
 
         for (int i=0 ; i<nPlayers ; i++)
         {
-            int[] playerStats = new int[]{p[i].coins, p[i].orbs, p[i].mp};
+            int[] playerStats = new int[]{playerData[i].coins, playerData[i].orbs, playerData[i].mp};
 
             //* GOLDS, ORBS, MP
-            PlayerPrefsElite.SetIntArray("pathfollower-stats-" + (i+1), playerStats);
+            PlayerPrefsElite.SetIntArray("pathfollower-" + (i+1) + "-stats", playerStats);
             //* STRING PATH ( TO GameObject.Find() )
-            PlayerPrefsElite.SetString("pathfollower-path-" + (i+1), p[i].path);
+            PlayerPrefsElite.SetString("pathfollower-" + (i+1) + "-path", playerData[i].path);
             //* Vector3 position
-            PlayerPrefsElite.SetVector3("pathfollower-pos-" + (i+1), p[i].pos);
+            PlayerPrefsElite.SetVector3("pathfollower-" + (i+1) + "-pos", playerData[i].pos);
             //* SPELLS
-            // PlayerPrefsElite.setB
+            PlayerPrefsElite.SetInt("pathfollower-" + (i+1) + "-no-of-spells", playerSpells[i].Count);
+            for (int j=0 ; j<playerSpells[i].Count ; j++) {
+                string[] spells = new string[]{
+                    playerSpells[i][j].spellName, playerSpells[i][j].spellCost.ToString(), playerSpells[i][j].spellKind
+                };
+                PlayerPrefsElite.SetStringArray("pathfollower-" + (i+1) + "-spells-" + (j+1), spells );
+            }
             //* BUFFD
-            // PlayerPrefsX.SetBoolArray("pathfollower-buff-" + (i+1), buffDatas[i].);
+            bool[] buffs = new bool[]{
+                buffDatas[i].slowed, buffDatas[i].barrier, buffDatas[i].move15, buffDatas[i].range2, buffDatas[i].extraBuy
+            };
+            PlayerPrefsX.SetBoolArray("pathfollower-" + (i+1) + "-buff", buffs);
         }
+
+        PlayerPrefs.Save(); 
     }
 
     public void RESUME_LAST_GAME()
     {
         // GET PREVIOUS BOARD SETTINGS
+        boardSceneName = PlayerPrefs.GetString("sceneName");
+        introSceneName = boardSceneName + " Intro";
+
         if (PlayerPrefsElite.VerifyArray("board-settings")) {
+            justResumed = true;
             int[] lastBoardSettings = PlayerPrefsElite.GetIntArray("board-settings");
             turnNumber = lastBoardSettings[0]; maxTurns = lastBoardSettings[1]; restoreMpTurn = lastBoardSettings[2];
-            int prevNPlayers = lastBoardSettings[3];
             if (turnNumber != 1) hasStarted = true;
-            for (int i=0 ; i<nPlayers ; i++) {
-                if (i >= prevNPlayers) {
+            int prevNPlayers = lastBoardSettings[3];
 
+            // REMEMBER MAGIC ORB RELATED
+            int prevNofOrbSpaces = PlayerPrefsElite.GetInt("board-n-magic-orb");
+            currentMagicOrbIndex = PlayerPrefsElite.GetInt("board-magic-orb-ind");
+            for (int i=0 ; i<prevNofOrbSpaces ; i++) {
+                string[] prevOrbSpace  = PlayerPrefsElite.GetStringArray("magic-orb-spaces-" + (i+1));
+                NewOrbSpace( prevOrbSpace[0], prevOrbSpace[1] );
+            }
+
+            if (boardSceneName == "Crystal_Caverns") {
+                int nCanBeCaved = PlayerPrefsElite.GetInt("n-can-be-caved");
+                for (int i=0 ; i<nCanBeCaved ; i++) {
+                    if (PlayerPrefsElite.VerifyArray("can-be-caved" + (i+1))) {
+                        string[] canBeCaved = PlayerPrefsElite.GetStringArray("can-be-caved" + (i+1));
+                        NewCavedInSpace( canBeCaved[0], canBeCaved[1], int.Parse(canBeCaved[2]) );
+                    }
                 }
-                else {
+                int nAlreadyCaved = PlayerPrefsElite.GetInt("n-already-caved");
+                for (int i=0 ; i<nAlreadyCaved ; i++) {
+                    if (PlayerPrefsElite.VerifyArray("already-caved" + (i+1))) {
+                        string[] canBeCaved = PlayerPrefsElite.GetStringArray("already-caved" + (i+1));
+                        NewBoulder( canBeCaved[0], canBeCaved[1] );
+                    }
+                }
+            }
+
+            // REMEMBER LAST PLAYER ORDER
+            int[] prevPlayerOrder = PlayerPrefsElite.GetIntArray("board-player-order");
+            for (int i=0 ; i<playerOrder.Length ; i++) {
+                if (i >= prevPlayerOrder.Length)  { playerOrder[i] = i; }
+                else                    { playerOrder[i] = prevPlayerOrder[i]; }
+            }
+
+            string[] prevTrapsParent = PlayerPrefsElite.GetStringArray("traps-parent-names");
+            string[] prevTrapsChild = PlayerPrefsElite.GetStringArray("traps-child-names");
+            string[] prevTrapsNode = PlayerPrefsElite.GetStringArray("traps-node-names");
+
+            //* REMEMBER LAST TRAPS
+            // Debug.Log("-- recreating " + prevTrapsParent.Length + " traps.");
+            for (int i=0 ; i<prevTrapsParent.Length ; i++) {
+                foreach (Sprite tpSp in trapSprites) {
+                    if (tpSp.name.Contains(prevTrapsNode[i])) {
+                        // Debug.Log("-- trap created");
+                        NewTrap(prevTrapsParent[i], prevTrapsChild[i], tpSp);
+                        break;
+                    }
+                }
+            }
+
+            // REMEMBER LAST PLAYER STATS
+            for (int i=0 ; i<nPlayers ; i++) {
+
+                if (i < prevNPlayers) {
+                    int[] prevIntData = PlayerPrefsElite.GetIntArray("pathfollower-" + (i+1) + "-stats");
+                    //// Debug.Log("-- restoring ID=" + i + " data");
+                    playerData[i].coins = prevIntData[0];
+                    playerData[i].orbs  = prevIntData[1];
+                    playerData[i].mp    = prevIntData[2];
+                    playerData[i].path  = PlayerPrefsElite.GetString("pathfollower-" + (i+1) + "-path");
+                    playerData[i].pos   = PlayerPrefsElite.GetVector3("pathfollower-" + (i+1) + "-pos");
                     
+                    // REMEMBER LAST PLAYER SPELLS
+                    int nPrevSpells     = PlayerPrefsElite.GetInt("pathfollower-" + (i+1) + "-no-of-spells");
+                    //// Debug.Log("-- restoring " + nPrevSpells + " spells.");
+                    for (int j=0 ; j<nPrevSpells ; j++) {
+                        //// Debug.Log("-- id=" + i + " spell restored.");
+                        string[] prevSpell  = PlayerPrefsElite.GetStringArray("pathfollower-" + (i+1) + "-spells-" + (j+1));
+                        ADD_SINGLE_SPELL(i, new SpellType(prevSpell[0], int.Parse(prevSpell[1]), prevSpell[2]) );
+                    }
+                }
+                // COPY LAST PLAYER STATS
+                else {
+                    int somePlayer = Random.Range(0, prevNPlayers);
+                    Debug.Log(somePlayer.ToString());
+                    int[] prevIntData = PlayerPrefsElite.GetIntArray("pathfollower-" + (somePlayer+1) + "-stats");
+                    playerData[i].coins = prevIntData[0];
+                    playerData[i].orbs  = prevIntData[1];
+                    playerData[i].mp    = prevIntData[2];
+                    playerData[i].path  = PlayerPrefsElite.GetString("pathfollower-" + (somePlayer+1) + "-path");
+                    playerData[i].pos   = PlayerPrefsElite.GetVector3("pathfollower-" + (somePlayer+1) + "-pos");
                 }
             }
 
         }
 
         // LOAD PREVIOUS BOARD (MAP)
-        string lastBoardName = PlayerPrefs.GetString("sceneName");
-        SceneManager.LoadScene(lastBoardName);
+        SceneManager.LoadScene(boardSceneName);
     }
 
 
@@ -474,130 +619,144 @@ public class GameController : MonoBehaviour
     /* ---------------------------- */
     /* ----- ACCESSOR METHODS ----- */
     
-    public List<SpellType> GET_SPELLS(int player)
+    public List<SpellType> GET_SPELLS(int playerID)
     {
-        switch (player)
-        {
-            case 0:     return (spells1);
-            case 1:     return (spells2);
-            case 2:     return (spells3);
-            case 3:     return (spells4);
-            case 4:     return (spells5);
-            case 5:     return (spells6);
-            case 6:     return (spells7);
-            case 7:     return (spells8);
-            default:    return null;
-        }
+        if (playerID >= playerSpells.Count) return null;
+        return playerSpells[playerID];
+        //! DELETE
+        // switch (player)
+        // {
+        //     case 0:     return (spells1);
+        //     case 1:     return (spells2);
+        //     case 2:     return (spells3);
+        //     case 3:     return (spells4);
+        //     case 4:     return (spells5);
+        //     case 5:     return (spells6);
+        //     case 6:     return (spells7);
+        //     case 7:     return (spells8);
+        //     default:    return null;
+        // }
     }
     
-    public List<PlayerPrevData> GET_PLAYER_DATA(int playerID)
+    public PlayerPrevData GET_PLAYER_DATA(int playerID)
     {
-        switch (playerID)
-        {
-            case 0 : return p1;
-            case 1 : return p2;
-            case 2 : return p3;
-            case 3 : return p4;
-            case 4 : return p5;
-            case 5 : return p6;
-            case 6 : return p7;
-            case 7 : return p8;
-        }
-        return null;
+        if (playerID >= playerData.Count) return null;
+        return playerData[playerID];
+        //! DELETE
+        // switch (playerID)
+        // {
+        //     case 0 : return p1;
+        //     case 1 : return p2;
+        //     case 2 : return p3;
+        //     case 3 : return p4;
+        //     case 4 : return p5;
+        //     case 5 : return p6;
+        //     case 6 : return p7;
+        //     case 7 : return p8;
+        // }
     }
 
     public int GET_PLAYER_GOLD(int playerID)
     {
-        switch (playerID)
-        {
-            case 0 : return p1[0].coins;
-            case 1 : return p2[0].coins;
-            case 2 : return p3[0].coins;
-            case 3 : return p4[0].coins;
-            case 4 : return p5[0].coins;
-            case 5 : return p6[0].coins;
-            case 6 : return p7[0].coins;
-            case 7 : return p8[0].coins;
-        }
-        Debug.LogError("controller - NON-EXISTANT PLAYER");
-        return 0;
-    }
-    public Vector3 GET_PLAYER_POS(int playerID)
-    {
-        switch (playerID)
-        {
-            case 0 : return p1[0].posAside;
-            case 1 : return p2[0].posAside;
-            case 2 : return p3[0].posAside;
-            case 3 : return p4[0].posAside;
-            case 4 : return p5[0].posAside;
-            case 5 : return p6[0].posAside;
-            case 6 : return p7[0].posAside;
-            case 7 : return p8[0].posAside;
-        }
-        Debug.LogError("controller - NON-EXISTANT PLAYER");
-        return (new Vector3(0,0,0));
+        if (playerID >= playerData.Count) return 0;
+        return playerData[playerID].coins;
+        //! DELETE
+        // switch (playerID)
+        // {
+        //     case 0 : return p1[0].coins;
+        //     case 1 : return p2[0].coins;
+        //     case 2 : return p3[0].coins;
+        //     case 3 : return p4[0].coins;
+        //     case 4 : return p5[0].coins;
+        //     case 5 : return p6[0].coins;
+        //     case 6 : return p7[0].coins;
+        //     case 7 : return p8[0].coins;
+        // }
+        // Debug.LogError("controller - NON-EXISTANT PLAYER");
+        // return 0;
     }
 
     /* --------------------------- */
     /* ----- MUTATOR METHODS ----- */
 
-    public void SET_PLAYER_DATA(int playerID, string newPath, int newNode,
-            Vector3 newPos, Vector3 newAside, int newCoins, int newOrbs, int newMP)
+    public void SET_PLAYER_DATA(int playerID, string newPath, Vector3 newPos, int newCoins, int newOrbs, int newMP)
     {
-        switch (playerID)
-        {
-            case 0 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p1.Clear(); p1.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-            case 1 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p2.Clear(); p2.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-            case 2 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p3.Clear(); p3.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-            case 3 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p4.Clear(); p4.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-            case 4 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p5.Clear(); p5.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-            case 5 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p6.Clear(); p6.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-            case 6 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p7.Clear(); p7.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-            case 7 : { Debug.Log("Player " + (playerID+1) + " updating info");
-                p8.Clear(); p8.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
-            }
-        }
+        if (playerID >= playerData.Count) return;
+        Debug.Log("-- updating playerID = " + playerID + "'s path " + newPath);
+        playerData[playerID].path   = newPath;
+        playerData[playerID].pos    = newPos;
+        Debug.Log("-- updating playerID = " + playerID + "'s coin " + newCoins);
+        playerData[playerID].coins  = newCoins;
+        playerData[playerID].orbs   = newOrbs;
+        playerData[playerID].mp     = newMP;
+        playerData[playerID].prize  = 0;
+        playerData[playerID].firstPlace  = false;
+        //! DELETE
+        // switch (playerID)
+        // {
+        //     case 0 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p1.Clear(); p1.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        //     case 1 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p2.Clear(); p2.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        //     case 2 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p3.Clear(); p3.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        //     case 3 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p4.Clear(); p4.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        //     case 4 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p5.Clear(); p5.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        //     case 5 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p6.Clear(); p6.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        //     case 6 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p7.Clear(); p7.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        //     case 7 : { Debug.Log("Player " + (playerID+1) + " updating info");
+        //         p8.Clear(); p8.Add(new PlayerPrevData(newPath,newNode,newPos,newAside,newCoins,newOrbs,newMP,0,false)); break;
+        //     }
+        // }
     }
 
 
     public void SET_PLAYER_BUFFS(int playerID, bool newSlowed, bool newBarrier, bool newMove15, bool newRange2, bool newExtraBuy)
     {
-        buffDatas[playerID][0].slowed   = newSlowed;
-        buffDatas[playerID][0].barrier  = newBarrier;
-        buffDatas[playerID][0].move15   = newMove15;
-        buffDatas[playerID][0].range2   = newRange2;
-        buffDatas[playerID][0].extraBuy = newExtraBuy;
+        buffDatas[playerID].slowed   = newSlowed;
+        buffDatas[playerID].barrier  = newBarrier;
+        buffDatas[playerID].move15   = newMove15;
+        buffDatas[playerID].range2   = newRange2;
+        buffDatas[playerID].extraBuy = newExtraBuy;
     }
 
-    public void SET_SPELLS(int player, List<SpellType> newSpells)
+    public void ADD_SINGLE_SPELL(int playerID, SpellType newSpell) 
     {
-        switch (player)
-        {
-            case 0:     { spells1.Clear();   foreach (SpellType sp in newSpells) { spells1.Add( sp ); }   break; }
-            case 1:     { spells2.Clear();   foreach (SpellType sp in newSpells) { spells2.Add( sp ); }   break; }
-            case 2:     { spells3.Clear();   foreach (SpellType sp in newSpells) { spells3.Add( sp ); }   break; }
-            case 3:     { spells4.Clear();   foreach (SpellType sp in newSpells) { spells4.Add( sp ); }   break; }
-            case 4:     { spells5.Clear();   foreach (SpellType sp in newSpells) { spells5.Add( sp ); }   break; }
-            case 5:     { spells6.Clear();   foreach (SpellType sp in newSpells) { spells6.Add( sp ); }   break; }
-            case 6:     { spells7.Clear();   foreach (SpellType sp in newSpells) { spells7.Add( sp ); }   break; }
-            case 7:     { spells8.Clear();   foreach (SpellType sp in newSpells) { spells8.Add( sp ); }   break; }
-            default:    Debug.LogError("SETTING SPELLS FAILED"); break;
+        if (playerID >= playerSpells.Count || playerSpells[playerID].Count >= 3) return;
+        playerSpells[playerID].Add( newSpell ); 
+    }   
+    
+    public void SET_SPELLS(int playerID, List<SpellType> newSpells)
+    {
+        if (playerID >= playerSpells.Count) return;
+        playerSpells[playerID].Clear();
+        foreach (SpellType sp in newSpells) { 
+            playerSpells[playerID].Add( sp ); 
         }
+        //! DELETE
+        // switch (playerID)
+        // {
+        //     case 0:     { spells1.Clear();   foreach (SpellType sp in newSpells) { spells1.Add( sp ); }   break; }
+        //     case 1:     { spells2.Clear();   foreach (SpellType sp in newSpells) { spells2.Add( sp ); }   break; }
+        //     case 2:     { spells3.Clear();   foreach (SpellType sp in newSpells) { spells3.Add( sp ); }   break; }
+        //     case 3:     { spells4.Clear();   foreach (SpellType sp in newSpells) { spells4.Add( sp ); }   break; }
+        //     case 4:     { spells5.Clear();   foreach (SpellType sp in newSpells) { spells5.Add( sp ); }   break; }
+        //     case 5:     { spells6.Clear();   foreach (SpellType sp in newSpells) { spells6.Add( sp ); }   break; }
+        //     case 6:     { spells7.Clear();   foreach (SpellType sp in newSpells) { spells7.Add( sp ); }   break; }
+        //     case 7:     { spells8.Clear();   foreach (SpellType sp in newSpells) { spells8.Add( sp ); }   break; }
+        //     default:    Debug.LogError("SETTING SPELLS FAILED"); break;
+        // }
     }
 
 
@@ -751,21 +910,6 @@ public class GameController : MonoBehaviour
         }
         changedSpaces.Add( new NodeSpace(parentName, childName, spaceType) );
     }
-    public void NewBoulder(string parentName, string childName, Sprite spaceType)
-    {
-        foreach (NodeSpace node in cavedInSpaces)
-        {
-            if (node.parentPath == parentName && node.childNode == childName) { cavedInSpaces.Remove(node); break; }
-        }
-        cavedInSpaces.Add( new NodeSpace(parentName, childName, spaceType) );
-    }
-    public void RemoveBoulder(string parentName, string childName)
-    {
-        foreach (NodeSpace node in cavedInSpaces)
-        {
-            if (node.parentPath == parentName && node.childNode == childName) { cavedInSpaces.Remove(node); break; }
-        }
-    }
 
     public void ResetAllTraps()
     {
@@ -776,11 +920,11 @@ public class GameController : MonoBehaviour
             Node node = GameObject.Find(space.parentPath + "/" + space.childNode).GetComponent<Node>();
             node.CHANGE_SPACE_TYPE(space.nodeType);
         }
-        //* ALL CAVED IN SPOTS
+        //* ALL CAVED IN SPOTS (already caved)
         foreach(NodeSpace space in cavedInSpaces)
         {
             Node node = GameObject.Find(space.parentPath + "/" + space.childNode).GetComponent<Node>();
-            node.CHANGE_SPACE_TYPE(space.nodeType);
+            node.BACK_TO_BEING_A_BOULDER();
         }
     }
 
@@ -791,9 +935,9 @@ public class GameController : MonoBehaviour
 
 
     // FILL LIST WITH THE NODE(S) THAT ARE MAGIC ORB SPACES 
-    public void NewOrbSpace(string parentName, string childName, Sprite spaceType)
+    public void NewOrbSpace(string parentName, string childName, Sprite spaceType=null)
     {
-        magicOrbSpace.Add( new NodeSpace(parentName, childName, spaceType) );
+        magicOrbSpace.Add( new NodeSpace(parentName, childName, null) );
     }
 
     // START OF NEXT TURN, RETAIN THE NODE THAT HAS THE PREVIOUSLY ACTIVE MAGIC ORB SPACE
@@ -830,8 +974,6 @@ public class GameController : MonoBehaviour
         }
         currentMagicOrbIndex = r;
 
-        // Debug.Log(magicOrbSpace[r].parentPath + "  -  " + magicOrbSpace[r].childNode);
-        // Node node = GameObject.Find("/PATHS/" + magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         Node node = GameObject.Find(magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         camNode = node;
         node.TURN_INTO_ORB_SPACE();
@@ -869,11 +1011,25 @@ public class GameController : MonoBehaviour
         canBeCavedSpaces.Add( new CavedSpace(parentName, childName, cavedSection) );
     }
 
-
+    public void NewBoulder(string parentName, string childName, Sprite spaceType=null)
+    {
+        foreach (NodeSpace node in cavedInSpaces)
+        {
+            if (node.parentPath == parentName && node.childNode == childName) { cavedInSpaces.Remove(node); break; }
+        }
+        cavedInSpaces.Add( new NodeSpace(parentName, childName, null) );
+    }
+    public void RemoveBoulder(string parentName, string childName)
+    {
+        foreach (NodeSpace node in cavedInSpaces)
+        {
+            if (node.parentPath == parentName && node.childNode == childName) { cavedInSpaces.Remove(node); break; }
+        }
+    }
+    
     public IEnumerator CAVING_IN()
     {
         for (int i=0 ; i<cavingInCamera.Length ; i++) {
-            Debug.Log("Caving in camera " + (i+1));
             cavingInCamera[i].gameObject.SetActive(true);
 
             // GET THE POSSIBLE CAVE IN SPOTS IN CAMERA AREA
@@ -892,7 +1048,6 @@ public class GameController : MonoBehaviour
             int blocked = -1;
             for (int j=0 ; j<nodes.Count ; j++) {
                 if (nodes[j].IS_BLOCKED()) {
-                    Debug.LogError("--    " + j + " is blocked");
                     blocked = j; 
                     nodes[blocked].UNBLOCK();
                     break;
@@ -912,7 +1067,6 @@ public class GameController : MonoBehaviour
             }
 
             // BLOCK NEW SPOT
-            Debug.Log("      r  =  " + r + ",    nodes.Count  =  " + nodes.Count);
             if (nodes[r] != null) {
                 nodes[r].BLOCK(); 
                 var quake = Instantiate(collapsePrefab, nodes[r].transform.position, Quaternion.identity);
@@ -937,19 +1091,23 @@ public class GameController : MonoBehaviour
     /* ---------------------------------------------------------------- */
     /* ---------------------------- SPELLS ---------------------------- */
 
-    public void AddSpell(string player, string newSpellName, int newSpellCost, string newSpellKind)
+    public void AddSpell(int playerID, string newSpellName, int newSpellCost, string newSpellKind)
     {
-        switch (player)
-        {
-            case "Player_1":   spells1.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-            case "Player_2":   spells2.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-            case "Player_3":   spells3.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-            case "Player_4":   spells4.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-            case "Player_5":   spells5.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-            case "Player_6":   spells6.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-            case "Player_7":   spells7.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-            case "Player_8":   spells8.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
-        }
+        if (playerID >= playerSpells.Count) { Debug.LogError("-- ERROR: spell count not be added"); return;}
+        playerSpells[playerID].Add( new SpellType(newSpellName, newSpellCost, newSpellKind) );
+
+        //! DELETE
+        // switch (playerID)
+        // {
+        //     case "Player_1":   spells1.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        //     case "Player_2":   spells2.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        //     case "Player_3":   spells3.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        //     case "Player_4":   spells4.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        //     case "Player_5":   spells5.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        //     case "Player_6":   spells6.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        //     case "Player_7":   spells7.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        //     case "Player_8":   spells8.Add( new SpellType(newSpellName, newSpellCost, newSpellKind));    break;
+        // }
     }
 
 
@@ -970,17 +1128,29 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene( quests[quests.Count - 1].questReal ); 
     }
 
-    public void MINIGAME_PRIZE(int coin1, int coin2, int coin3, int coin4, int coin5, int coin6, int coin7, int coin8)
+    public void MINIGAME_PRIZE(int[] coins)
+    // public void MINIGAME_PRIZE(int coin1, int coin2, int coin3, int coin4, int coin5, int coin6, int coin7, int coin8)
     {
         // Debug.Log("-- showing prize money");
-        if (nPlayers >= 1)    { p1[0].coins += coin1;   questOrb[0] += coin1; }
-        if (nPlayers >= 2)    { p2[0].coins += coin2;   questOrb[1] += coin2; }
-        if (nPlayers >= 3)    { p3[0].coins += coin3;   questOrb[2] += coin3; }
-        if (nPlayers >= 4)    { p4[0].coins += coin4;   questOrb[3] += coin4; }
-        if (nPlayers >= 5)    { p5[0].coins += coin5;   questOrb[4] += coin5; }
-        if (nPlayers >= 6)    { p6[0].coins += coin6;   questOrb[5] += coin6; }
-        if (nPlayers >= 7)    { p7[0].coins += coin7;   questOrb[6] += coin7; }
-        if (nPlayers >= 8)    { p8[0].coins += coin8;   questOrb[7] += coin8; }
+        for (int i=0 ; i<nPlayers ; i++) {
+            if (playerData[i] == null) {
+                Debug.LogError("-- ERROR: Player Does not exist");
+            }
+            else {
+                playerData[i].coins += coins[i];
+                questOrb[i] += coins[i];    // BONUS ORB
+            }
+        }
+
+        //! DELETE
+        // if (nPlayers >= 1)    { p1[0].coins += coin1;   questOrb[0] += coin1; }
+        // if (nPlayers >= 2)    { p2[0].coins += coin2;   questOrb[1] += coin2; }
+        // if (nPlayers >= 3)    { p3[0].coins += coin3;   questOrb[2] += coin3; }
+        // if (nPlayers >= 4)    { p4[0].coins += coin4;   questOrb[3] += coin4; }
+        // if (nPlayers >= 5)    { p5[0].coins += coin5;   questOrb[4] += coin5; }
+        // if (nPlayers >= 6)    { p6[0].coins += coin6;   questOrb[5] += coin6; }
+        // if (nPlayers >= 7)    { p7[0].coins += coin7;   questOrb[6] += coin7; }
+        // if (nPlayers >= 8)    { p8[0].coins += coin8;   questOrb[7] += coin8; }
     }
 
 
@@ -998,14 +1168,18 @@ public class GameController : MonoBehaviour
         for (int i=0 ; i<nPlayers ; i++) { pid[i] = i; }
 
         // RANGE OF SCORES/POINTS
-        if (nPlayers > 0 && p1.Count > 0)  {  arr[0] += p1[0].coins;   arr[0] += (p1[0].orbs * 1000);  }
-        if (nPlayers > 1 && p2.Count > 0)  {  arr[1] += p2[0].coins;   arr[1] += (p2[0].orbs * 1000);  }
-        if (nPlayers > 2 && p3.Count > 0)  {  arr[2] += p3[0].coins;   arr[2] += (p3[0].orbs * 1000);  }
-        if (nPlayers > 3 && p4.Count > 0)  {  arr[3] += p4[0].coins;   arr[3] += (p4[0].orbs * 1000);  }
-        if (nPlayers > 4 && p5.Count > 0)  {  arr[4] += p5[0].coins;   arr[4] += (p5[0].orbs * 1000);  }
-        if (nPlayers > 5 && p6.Count > 0)  {  arr[5] += p6[0].coins;   arr[5] += (p6[0].orbs * 1000);  }
-        if (nPlayers > 6 && p7.Count > 0)  {  arr[6] += p7[0].coins;   arr[6] += (p7[0].orbs * 1000);  }
-        if (nPlayers > 7 && p8.Count > 0)  {  arr[7] += p8[0].coins;   arr[7] += (p8[0].orbs * 1000);  }
+        for (int i=0 ; i<nPlayers ; i++) {
+            arr[i] += playerData[i].coins + (playerData[i].orbs * 1000);
+        }
+        //! DELETE
+        // if (nPlayers > 0 && p1.Count > 0)  {  arr[0] += p1[0].coins;   arr[0] += (p1[0].orbs * 1000);  }
+        // if (nPlayers > 1 && p2.Count > 0)  {  arr[1] += p2[0].coins;   arr[1] += (p2[0].orbs * 1000);  }
+        // if (nPlayers > 2 && p3.Count > 0)  {  arr[2] += p3[0].coins;   arr[2] += (p3[0].orbs * 1000);  }
+        // if (nPlayers > 3 && p4.Count > 0)  {  arr[3] += p4[0].coins;   arr[3] += (p4[0].orbs * 1000);  }
+        // if (nPlayers > 4 && p5.Count > 0)  {  arr[4] += p5[0].coins;   arr[4] += (p5[0].orbs * 1000);  }
+        // if (nPlayers > 5 && p6.Count > 0)  {  arr[5] += p6[0].coins;   arr[5] += (p6[0].orbs * 1000);  }
+        // if (nPlayers > 6 && p7.Count > 0)  {  arr[6] += p7[0].coins;   arr[6] += (p7[0].orbs * 1000);  }
+        // if (nPlayers > 7 && p8.Count > 0)  {  arr[7] += p8[0].coins;   arr[7] += (p8[0].orbs * 1000);  }
 
         /// SORT EVERYONE'S SCORES (DESCENDING)
         for ( int i=0 ; i<arr.Length ; i++ )
@@ -1050,14 +1224,19 @@ public class GameController : MonoBehaviour
         for (int i=0 ; i<nPlayers ; i++) { pid[i] = i; }
 
         // RANGE OF SCORES/POINTS
-        if (p1.Count > 0 && nPlayers > 0)  {  arr[0] += p1[0].coins; arr[0] += (p1[0].orbs * 1000);  unsorted[0] = arr[0];  }
-        if (p2.Count > 0 && nPlayers > 1)  {  arr[1] += p2[0].coins; arr[1] += (p2[0].orbs * 1000);  unsorted[1] = arr[1];  }
-        if (p3.Count > 0 && nPlayers > 2)  {  arr[2] += p3[0].coins; arr[2] += (p3[0].orbs * 1000);  unsorted[2] = arr[2];  }
-        if (p4.Count > 0 && nPlayers > 3)  {  arr[3] += p4[0].coins; arr[3] += (p4[0].orbs * 1000);  unsorted[3] = arr[3];  }
-        if (p5.Count > 0 && nPlayers > 4)  {  arr[4] += p5[0].coins; arr[4] += (p5[0].orbs * 1000);  unsorted[4] = arr[4];  }
-        if (p6.Count > 0 && nPlayers > 5)  {  arr[5] += p6[0].coins; arr[5] += (p6[0].orbs * 1000);  unsorted[5] = arr[5];  }
-        if (p7.Count > 0 && nPlayers > 6)  {  arr[6] += p7[0].coins; arr[6] += (p7[0].orbs * 1000);  unsorted[6] = arr[6];  }
-        if (p8.Count > 0 && nPlayers > 7)  {  arr[7] += p8[0].coins; arr[7] += (p8[0].orbs * 1000);  unsorted[7] = arr[7];  }
+        for (int i=0 ; i<nPlayers ; i++) {
+            arr[i] += playerData[i].coins + (playerData[i].orbs * 1000);
+            unsorted[i] = arr[i];
+        }
+        //! DELETE
+        // if (p1.Count > 0 && nPlayers > 0)  {  arr[0] += p1[0].coins; arr[0] += (p1[0].orbs * 1000);  unsorted[0] = arr[0];  }
+        // if (p2.Count > 0 && nPlayers > 1)  {  arr[1] += p2[0].coins; arr[1] += (p2[0].orbs * 1000);  unsorted[1] = arr[1];  }
+        // if (p3.Count > 0 && nPlayers > 2)  {  arr[2] += p3[0].coins; arr[2] += (p3[0].orbs * 1000);  unsorted[2] = arr[2];  }
+        // if (p4.Count > 0 && nPlayers > 3)  {  arr[3] += p4[0].coins; arr[3] += (p4[0].orbs * 1000);  unsorted[3] = arr[3];  }
+        // if (p5.Count > 0 && nPlayers > 4)  {  arr[4] += p5[0].coins; arr[4] += (p5[0].orbs * 1000);  unsorted[4] = arr[4];  }
+        // if (p6.Count > 0 && nPlayers > 5)  {  arr[5] += p6[0].coins; arr[5] += (p6[0].orbs * 1000);  unsorted[5] = arr[5];  }
+        // if (p7.Count > 0 && nPlayers > 6)  {  arr[6] += p7[0].coins; arr[6] += (p7[0].orbs * 1000);  unsorted[6] = arr[6];  }
+        // if (p8.Count > 0 && nPlayers > 7)  {  arr[7] += p8[0].coins; arr[7] += (p8[0].orbs * 1000);  unsorted[7] = arr[7];  }
 
         /// SORT EVERYONE'S SCORES (DESCENDING)
         for ( int i=0 ; i<arr.Length ; i++ )
@@ -1102,46 +1281,51 @@ public class GameController : MonoBehaviour
         float[]  arr   = new float[nPlayers];
         string[] names = new string[nPlayers];
 
-        if (p1.Count > 0 && nPlayers > 0) {
-            arr[0] += p1[0].coins;
-            arr[0] += (p1[0].orbs * 1000);
-            names[0] = characterName1;
+        for (int i=0 ; i<nPlayers ; i++) {
+            arr[i] += playerData[i].coins + (playerData[i].orbs * 1000);
+            names[i] = characterNames[i];
         }
-        if (p2.Count > 0 && nPlayers > 1) {
-            arr[1] += p2[0].coins;
-            arr[1] += (p2[0].orbs * 1000);
-            names[1] = characterName2;
-        }
-        if (p3.Count > 0 && nPlayers > 2) {
-            arr[2] += p3[0].coins;
-            arr[2] += (p3[0].orbs * 1000);
-            names[2] = characterName3;
-        }
-        if (p4.Count > 0 && nPlayers > 3) {
-            arr[3] += p4[0].coins;
-            arr[3] += (p4[0].orbs * 1000);
-            names[3] = characterName4;
-        }
-        if (p5.Count > 0 && nPlayers > 4) {
-            arr[4] += p5[0].coins;
-            arr[4] += (p5[0].orbs * 1000);
-            names[4] = characterName5;
-        }
-        if (p6.Count > 0 && nPlayers > 5) {
-            arr[5] += p6[0].coins;
-            arr[5] += (p6[0].orbs * 1000);
-            names[5] = characterName6;
-        }
-        if (p7.Count > 0 && nPlayers > 6) {
-            arr[6] += p7[0].coins;
-            arr[6] += (p7[0].orbs * 1000);
-            names[6] = characterName7;
-        }
-        if (p8.Count > 0 && nPlayers > 7) {
-            arr[7] += p8[0].coins;
-            arr[7] += (p8[0].orbs * 1000);
-            names[7] = characterName8;
-        }
+        //! DELETE
+        // if (p1.Count > 0 && nPlayers > 0) {
+        //     arr[0] += p1[0].coins;
+        //     arr[0] += (p1[0].orbs * 1000);
+        //     names[0] = characterName1;
+        // }
+        // if (p2.Count > 0 && nPlayers > 1) {
+        //     arr[1] += p2[0].coins;
+        //     arr[1] += (p2[0].orbs * 1000);
+        //     names[1] = characterName2;
+        // }
+        // if (p3.Count > 0 && nPlayers > 2) {
+        //     arr[2] += p3[0].coins;
+        //     arr[2] += (p3[0].orbs * 1000);
+        //     names[2] = characterName3;
+        // }
+        // if (p4.Count > 0 && nPlayers > 3) {
+        //     arr[3] += p4[0].coins;
+        //     arr[3] += (p4[0].orbs * 1000);
+        //     names[3] = characterName4;
+        // }
+        // if (p5.Count > 0 && nPlayers > 4) {
+        //     arr[4] += p5[0].coins;
+        //     arr[4] += (p5[0].orbs * 1000);
+        //     names[4] = characterName5;
+        // }
+        // if (p6.Count > 0 && nPlayers > 5) {
+        //     arr[5] += p6[0].coins;
+        //     arr[5] += (p6[0].orbs * 1000);
+        //     names[5] = characterName6;
+        // }
+        // if (p7.Count > 0 && nPlayers > 6) {
+        //     arr[6] += p7[0].coins;
+        //     arr[6] += (p7[0].orbs * 1000);
+        //     names[6] = characterName7;
+        // }
+        // if (p8.Count > 0 && nPlayers > 7) {
+        //     arr[7] += p8[0].coins;
+        //     arr[7] += (p8[0].orbs * 1000);
+        //     names[7] = characterName8;
+        // }
 
         // SORT THE HIGHEST POINT VALUES (ASCENDING ORDER)
         for ( int i=0 ; i<arr.Length ; i++ )
@@ -1167,46 +1351,51 @@ public class GameController : MonoBehaviour
         int[] arr = new int[nPlayers];  // SCORE
         int[] pid = new int[nPlayers];  // player ID
 
-        if (p1.Count > 0 && nPlayers > 0) {
-            arr[0] += p1[0].coins;
-            arr[0] += (p1[0].orbs * 1000);
-            pid[0] = 0;
+        for (int i=0 ; i<nPlayers ; i++) {
+            arr[i] += playerData[i].coins + (playerData[i].orbs * 1000);
+            pid[i] = 0;
         }
-        if (p2.Count > 0 && nPlayers > 1) {
-            arr[1] += p2[0].coins;
-            arr[1] += (p2[0].orbs * 1000);
-            pid[1] = 1;
-        }
-        if (p3.Count > 0 && nPlayers > 2) {
-            arr[2] += p3[0].coins;
-            arr[2] += (p3[0].orbs * 1000);
-            pid[2] = 2;
-        }
-        if (p4.Count > 0 && nPlayers > 3) {
-            arr[3] += p4[0].coins;
-            arr[3] += (p4[0].orbs * 1000);
-            pid[3] = 3;
-        }
-        if (p5.Count > 0 && nPlayers > 4) {
-            arr[4] += p5[0].coins;
-            arr[4] += (p5[0].orbs * 1000);
-            pid[4] = 4;
-        }
-        if (p6.Count > 0 && nPlayers > 5) {
-            arr[5] += p6[0].coins;
-            arr[5] += (p6[0].orbs * 1000);
-            pid[5] = 5;
-        }
-        if (p7.Count > 0 && nPlayers > 6) {
-            arr[6] += p7[0].coins;
-            arr[6] += (p7[0].orbs * 1000);
-            pid[6] = 6;
-        }
-        if (p8.Count > 0 && nPlayers > 7) {
-            arr[7] += p8[0].coins;
-            arr[7] += (p8[0].orbs * 1000);
-            pid[7] = 7;
-        }
+        //! DELETE
+        // if (p1.Count > 0 && nPlayers > 0) {
+        //     arr[0] += p1[0].coins;
+        //     arr[0] += (p1[0].orbs * 1000);
+        //     pid[0] = 0;
+        // }
+        // if (p2.Count > 0 && nPlayers > 1) {
+        //     arr[1] += p2[0].coins;
+        //     arr[1] += (p2[0].orbs * 1000);
+        //     pid[1] = 1;
+        // }
+        // if (p3.Count > 0 && nPlayers > 2) {
+        //     arr[2] += p3[0].coins;
+        //     arr[2] += (p3[0].orbs * 1000);
+        //     pid[2] = 2;
+        // }
+        // if (p4.Count > 0 && nPlayers > 3) {
+        //     arr[3] += p4[0].coins;
+        //     arr[3] += (p4[0].orbs * 1000);
+        //     pid[3] = 3;
+        // }
+        // if (p5.Count > 0 && nPlayers > 4) {
+        //     arr[4] += p5[0].coins;
+        //     arr[4] += (p5[0].orbs * 1000);
+        //     pid[4] = 4;
+        // }
+        // if (p6.Count > 0 && nPlayers > 5) {
+        //     arr[5] += p6[0].coins;
+        //     arr[5] += (p6[0].orbs * 1000);
+        //     pid[5] = 5;
+        // }
+        // if (p7.Count > 0 && nPlayers > 6) {
+        //     arr[6] += p7[0].coins;
+        //     arr[6] += (p7[0].orbs * 1000);
+        //     pid[6] = 6;
+        // }
+        // if (p8.Count > 0 && nPlayers > 7) {
+        //     arr[7] += p8[0].coins;
+        //     arr[7] += (p8[0].orbs * 1000);
+        //     pid[7] = 7;
+        // }
         // SORT THE HIGHEST POINT VALUES (DESCENDING ORDER)
         for ( int i=0 ; i<arr.Length ; i++ )
         {
@@ -1231,35 +1420,36 @@ public class GameController : MonoBehaviour
         return (losing);
     }
 
-    public void RICH_ORB_UPDATE(int x)
+    public void RICH_ORB_UPDATE(int playerID)
     {
         if (richOrb == null)    { richOrb = new int[nPlayers]; }
 
-        switch (x)
-        {
-            case 0 :    if (p1[0].coins > richOrb[x])   richOrb[x] = p1[0].coins; break;
-            case 1 :    if (p2[0].coins > richOrb[x])   richOrb[x] = p2[0].coins; break;
-            case 2 :    if (p3[0].coins > richOrb[x])   richOrb[x] = p3[0].coins; break;
-            case 3 :    if (p4[0].coins > richOrb[x])   richOrb[x] = p4[0].coins; break;
-            case 4 :    if (p5[0].coins > richOrb[x])   richOrb[x] = p5[0].coins; break;
-            case 5 :    if (p6[0].coins > richOrb[x])   richOrb[x] = p6[0].coins; break;
-            case 6 :    if (p7[0].coins > richOrb[x])   richOrb[x] = p7[0].coins; break;
-            case 7 :    if (p8[0].coins > richOrb[x])   richOrb[x] = p8[0].coins; break;
-        }
+        if (playerData[playerID].coins > richOrb[playerID]) richOrb[playerID] = playerData[playerID].coins;
+        //! DELETE
+        // switch (playerID)
+        // {
+        //     case 0 :    if (p1[0].coins > richOrb[x])   richOrb[x] = p1[0].coins; break;
+        //     case 1 :    if (p2[0].coins > richOrb[x])   richOrb[x] = p2[0].coins; break;
+        //     case 2 :    if (p3[0].coins > richOrb[x])   richOrb[x] = p3[0].coins; break;
+        //     case 3 :    if (p4[0].coins > richOrb[x])   richOrb[x] = p4[0].coins; break;
+        //     case 4 :    if (p5[0].coins > richOrb[x])   richOrb[x] = p5[0].coins; break;
+        //     case 5 :    if (p6[0].coins > richOrb[x])   richOrb[x] = p6[0].coins; break;
+        //     case 6 :    if (p7[0].coins > richOrb[x])   richOrb[x] = p7[0].coins; break;
+        //     case 7 :    if (p8[0].coins > richOrb[x])   richOrb[x] = p8[0].coins; break;
+        // }
         string rich = "-- rich update  ";
         for (int i=0 ; i<nPlayers ; i++)
         {
-            if (i==0)   rich += p1[0].coins.ToString() + ", ";
-            if (i==1)   rich += p2[0].coins.ToString() + ", ";
-            if (i==2)   rich += p3[0].coins.ToString() + ", ";
-            if (i==3)   rich += p4[0].coins.ToString() + ", ";
-            if (i==4)   rich += p5[0].coins.ToString() + ", ";
-            if (i==5)   rich += p6[0].coins.ToString() + ", ";
-            if (i==6)   rich += p7[0].coins.ToString() + ", ";
-            if (i==7)   rich += p8[0].coins.ToString() + ", ";   
+            rich += playerData[i].coins.ToString() + ", ";
+            // if (i==0)   rich += p1[0].coins.ToString() + ", ";
+            // if (i==1)   rich += p2[0].coins.ToString() + ", ";
+            // if (i==2)   rich += p3[0].coins.ToString() + ", ";
+            // if (i==3)   rich += p4[0].coins.ToString() + ", ";
+            // if (i==4)   rich += p5[0].coins.ToString() + ", ";
+            // if (i==5)   rich += p6[0].coins.ToString() + ", ";
+            // if (i==6)   rich += p7[0].coins.ToString() + ", ";
+            // if (i==7)   rich += p8[0].coins.ToString() + ", ";   
         }
-
-        // Debug.Log(rich); //! DELETE
     }
 
     public void EVENT_ORB_UPDATE(int playerIndex)
@@ -1288,45 +1478,34 @@ public class GameController : MonoBehaviour
         shopOrb[playerIndex] += amount;
     }
 
-    private void ALL_PLAYER_DATA()
-    {
-        if (playersData == null)    playersData = new List<PlayerPrevData>[nPlayers];
-        for ( int i=0 ; i<nPlayers ; i++ )
-        {
-            switch (i)
-            {
-                case 0 :    playersData[i] = p1; break;
-                case 1 :    playersData[i] = p2; break;
-                case 2 :    playersData[i] = p3; break;
-                case 3 :    playersData[i] = p4; break;
-                case 4 :    playersData[i] = p5; break;
-                case 5 :    playersData[i] = p6; break;
-                case 6 :    playersData[i] = p7; break;
-                case 7 :    playersData[i] = p8; break;
-            }
-        }
-    }
-
     public void Finalise_Data()
     {
         allGold = new List<int>();
-        if (nPlayers >= 1)  allGold.Add( p1[0].coins );
-        if (nPlayers >= 2)  allGold.Add( p2[0].coins );
-        if (nPlayers >= 3)  allGold.Add( p3[0].coins );
-        if (nPlayers >= 4)  allGold.Add( p4[0].coins );
-        if (nPlayers >= 5)  allGold.Add( p5[0].coins );
-        if (nPlayers >= 6)  allGold.Add( p6[0].coins );
-        if (nPlayers >= 7)  allGold.Add( p7[0].coins );
-        if (nPlayers >= 8)  allGold.Add( p8[0].coins );
+        for (int i=0 ; i<playerData.Count ; i++) {
+            allGold.Add( playerData[i].coins );
+        }
+        //! DELETE
+        // if (nPlayers >= 1)  allGold.Add( p1[0].coins );
+        // if (nPlayers >= 2)  allGold.Add( p2[0].coins );
+        // if (nPlayers >= 3)  allGold.Add( p3[0].coins );
+        // if (nPlayers >= 4)  allGold.Add( p4[0].coins );
+        // if (nPlayers >= 5)  allGold.Add( p5[0].coins );
+        // if (nPlayers >= 6)  allGold.Add( p6[0].coins );
+        // if (nPlayers >= 7)  allGold.Add( p7[0].coins );
+        // if (nPlayers >= 8)  allGold.Add( p8[0].coins );
         allOrb  = new List<int>();
-        if (nPlayers >= 1)  allOrb.Add( p1[0].orbs );
-        if (nPlayers >= 2)  allOrb.Add( p2[0].orbs );
-        if (nPlayers >= 3)  allOrb.Add( p3[0].orbs );
-        if (nPlayers >= 4)  allOrb.Add( p4[0].orbs );
-        if (nPlayers >= 5)  allOrb.Add( p5[0].orbs );
-        if (nPlayers >= 6)  allOrb.Add( p6[0].orbs );
-        if (nPlayers >= 7)  allOrb.Add( p7[0].orbs );
-        if (nPlayers >= 8)  allOrb.Add( p8[0].orbs );
+        for (int i=0 ; i<playerData.Count ; i++) {
+            allOrb.Add( playerData[i].orbs );
+        }
+        //! DELETE
+        // if (nPlayers >= 1)  allOrb.Add( p1[0].orbs );
+        // if (nPlayers >= 2)  allOrb.Add( p2[0].orbs );
+        // if (nPlayers >= 3)  allOrb.Add( p3[0].orbs );
+        // if (nPlayers >= 4)  allOrb.Add( p4[0].orbs );
+        // if (nPlayers >= 5)  allOrb.Add( p5[0].orbs );
+        // if (nPlayers >= 6)  allOrb.Add( p6[0].orbs );
+        // if (nPlayers >= 7)  allOrb.Add( p7[0].orbs );
+        // if (nPlayers >= 8)  allOrb.Add( p8[0].orbs );
         trapOrb   = new int[nPlayers];
         foreach (NodeSpace trap in changedSpaces)
         {
@@ -1586,17 +1765,19 @@ public class GameController : MonoBehaviour
 
     public void BONUS_PRIZE(int index)
     {
-        switch (index)
-        {
-            case 0 : p1[0].orbs++; break;
-            case 1 : p2[0].orbs++; break;
-            case 2 : p3[0].orbs++; break;
-            case 3 : p4[0].orbs++; break;
-            case 4 : p5[0].orbs++; break;
-            case 5 : p6[0].orbs++; break;
-            case 6 : p7[0].orbs++; break;
-            case 7 : p8[0].orbs++; break;
-        }
+        playerData[index].orbs++;
+        //! DELETE
+        // switch (index)
+        // {
+        //     case 0 : p1[0].orbs++; break;
+        //     case 1 : p2[0].orbs++; break;
+        //     case 2 : p3[0].orbs++; break;
+        //     case 3 : p4[0].orbs++; break;
+        //     case 4 : p5[0].orbs++; break;
+        //     case 5 : p6[0].orbs++; break;
+        //     case 6 : p7[0].orbs++; break;
+        //     case 7 : p8[0].orbs++; break;
+        // }
     }
 
     public string ID_TO_NAME(int index)
@@ -1643,33 +1824,28 @@ public class GameController : MonoBehaviour
         return "0rd";
     }
 
-
-
 }
 
 
 // ************************************************************************************************
 // ************************************************************************************************
 
+[System.Serializable]
 public class PlayerPrevData
 {
-    public string path;     // PLAYER'S CURRENT PATH
-    public int    node;    // PLAYER'S CURRENT POSITION IN PATH (NODE)
+    public string  path;     // PLAYER'S CURRENT PATH
     public Vector3 pos;    // LAST VECTOR 3 POSITION
-    public Vector3 posAside;   // PLAYER'S ASIDE POSITION
     public int     coins;
     public int     orbs;
     public int     mp;
     public int     prize;   // GOLD WON FROM MINIGAME (QUESTS)
     public bool    firstPlace;   // CAME FIRST IN MINIGAME (QUESTS)
 
-    public PlayerPrevData(string newPath, int newNode, Vector3 newPos, 
-            Vector3 newPosAside, int newCoins, int newOrbs, int newMp, int newPrize, bool first)
+
+    public PlayerPrevData(string newPath, Vector3 newPos, int newCoins, int newOrbs, int newMp, int newPrize=0, bool first=false)
     {
         path        = newPath;
-        node        = newNode;  //! DELETE
         pos         = newPos;
-        posAside    = newPosAside;
         coins       = newCoins;
         orbs        = newOrbs;
         mp          = newMp;
@@ -1695,19 +1871,6 @@ public class PlayerBuffData
         move15  = newMove15;
         range2  = newRange2;
         extraBuy = newExtraBuy;
-    }
-}
-
-
-public class ImportantData
-{
-    public int orbs;
-    public int golds;
-
-    public ImportantData(int newOrbs, int newGolds)
-    {
-        orbs    = newOrbs;
-        golds   = newGolds;
     }
 }
 

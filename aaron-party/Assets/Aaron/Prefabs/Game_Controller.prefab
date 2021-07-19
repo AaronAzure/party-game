@@ -348,7 +348,12 @@ MonoBehaviour:
   pSpeed: 7.5
   minigameMode: 0
   questToPlay: 
+  skipSideQuest: 0
+  slowerDice: 0
+  infiniteMovement: 0
+  playLatestQuest: 0
   maxTurns: 15
+  restoreMpTurn: 1
   isCasual: 0
   easy: 0
   norm: 1
@@ -364,6 +369,34 @@ MonoBehaviour:
   characterName8: 
   playerOrder: 
   hasStarted: 0
+  trapSprites:
+  - {fileID: 21300000, guid: 99e36675cab654d22b6bb18d89f5db6a, type: 3}
+  - {fileID: 21300000, guid: 034e3d3bce191482696e0bd5a1f91a32, type: 3}
+  - {fileID: 21300000, guid: 99a3d800631fd4545b134aa220787d69, type: 3}
+  - {fileID: 21300000, guid: cfaf60a47487a4ead83cc61aae9cc9c6, type: 3}
+  - {fileID: 21300000, guid: e4ad9f103abab46b49862420247e8e7f, type: 3}
+  - {fileID: 21300000, guid: 6a7e3d6b1e78549f4a962ef02ebdb2ff, type: 3}
+  - {fileID: 21300000, guid: 95b2df6ee2c634ee08cee8ba10f155d0, type: 3}
+  - {fileID: 21300000, guid: 9b433ebc24f3e49efb443a8c0b0d081c, type: 3}
+  - {fileID: 21300000, guid: 0b9f1fdf484c84b6084d1eca77f75589, type: 3}
+  - {fileID: 21300000, guid: 0784bda1e357346e8a6cc916fe49631a, type: 3}
+  - {fileID: 21300000, guid: a057fb31f4cba47ce9c7c1ae425d70ae, type: 3}
+  - {fileID: 21300000, guid: 1682128402ccb48048942edc11564cfd, type: 3}
+  - {fileID: 21300000, guid: 123729a4364c4430c97db2f3b14bf439, type: 3}
+  - {fileID: 21300000, guid: 60e5a01fe598a4f8baf2766b6909a913, type: 3}
+  - {fileID: 21300000, guid: f80ea47ebab984101a7756b353354de9, type: 3}
+  - {fileID: 21300000, guid: d3289c2629cf049188ee8e60d0283f1a, type: 3}
+  - {fileID: 21300000, guid: 0c8d5d1d0fe7a4184ad3862cf92023b6, type: 3}
+  - {fileID: 21300000, guid: 3dd3e3bba8b42409facb5763e4715383, type: 3}
+  - {fileID: 21300000, guid: de74265d9b5db4c8a9c050de92935d22, type: 3}
+  - {fileID: 21300000, guid: 4f93114dcc1e640a097e1ef4018cc60f, type: 3}
+  - {fileID: 21300000, guid: 1b4af07aea3614ed1bf256549b6aa64c, type: 3}
+  - {fileID: 21300000, guid: 1113d16b5bf2d443385cbd99e90a60a9, type: 3}
+  - {fileID: 21300000, guid: 4c35803b55c1b46079a74ea26a3ed717, type: 3}
+  - {fileID: 21300000, guid: 56d1a965685b74079b8cf6694f59e5be, type: 3}
+  - {fileID: 21300000, guid: 06d0ee429d6ff49f89a5582ad4b13d17, type: 3}
+  - {fileID: 21300000, guid: 013ce443995014b3e832b357da638800, type: 3}
+  - {fileID: 21300000, guid: cece8c78ce85343a9a56bdb9359ae60c, type: 3}
   cavingInCamera:
   - {fileID: 7404214357750977724}
   - {fileID: 8553057140118471772}

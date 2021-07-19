@@ -47,6 +47,9 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private TextMeshProUGUI orderStyle;
     [SerializeField] private TextMeshProUGUI restoreMpTurn;
     [SerializeField] private TextMeshPro backToCharacter;
+    [SerializeField] private TextMeshPro resumeLastGame;
+    private bool resuming;
+    private bool canResume;
 
     private int nSetting = 0;
     [Header("Board Settings")]
@@ -146,6 +149,9 @@ public class LobbyControls : MonoBehaviour
 
         player = ReInput.players.GetPlayer(playerID);
         
+        if (PlayerPrefsElite.VerifyArray("board-settings")) {
+            canResume = true;
+        }
     }
 
     // Update is called once per frame
@@ -154,7 +160,7 @@ public class LobbyControls : MonoBehaviour
         if (!_settings.activeSelf && !_quests.activeSelf) MOVEMENT();
 
         // LOBBY SCENE
-        if (playerID == 0 && sceneName == "2Lobby")
+        if (playerID == 0 && sceneName == "2Lobby" && !resuming)
         {
             // ADJUSTING SETTINGS
             if (_settings.activeSelf)
@@ -165,6 +171,12 @@ public class LobbyControls : MonoBehaviour
             else if (backToCharacter.gameObject.activeSelf && player.GetButtonDown("A"))
             {
                 Debug.Log("restarting"); RESTART_GAME();
+            }
+            // RESUME LAST GAME
+            else if (resumeLastGame.gameObject.activeSelf && player.GetButtonDown("A") && !resuming && canResume)
+            {
+                resuming = true;
+                Debug.Log(" resuming last game"); controller.RESUME_LAST_GAME();
             }
             // GO INTO MINIGAME TENT
             else if (minigame.activeSelf && player.GetButtonDown("A"))
@@ -698,6 +710,11 @@ public class LobbyControls : MonoBehaviour
         {
             questToPlay = other.GetComponent<Minigame>();
         }    
+        // TIME MASTER
+        if (other.tag == "Respawn" && playerID == 0)
+        {
+            resumeLastGame.gameObject.SetActive(true);
+        }    
     }
     private void OnTriggerExit2D(Collider2D other) 
     {
@@ -713,6 +730,11 @@ public class LobbyControls : MonoBehaviour
         if (other.tag == "Special" && playerID == 0)
         {
             questToPlay = null;
+        }    
+        // TIME MASTER
+        if (other.tag == "Respawn" && playerID == 0)
+        {
+            resumeLastGame.gameObject.SetActive(false);
         }    
     }
 

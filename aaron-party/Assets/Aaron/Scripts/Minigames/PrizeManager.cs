@@ -24,7 +24,7 @@ public class PrizeManager : MonoBehaviour
     [SerializeField] private AudioSource     coinCollectSound;
     [SerializeField] private AudioSource     manaCollectSound;
     [SerializeField] private TextMeshProUGUI ranking;
-    private List<PlayerPrevData> data;
+    private PlayerPrevData data;
 
     // Start is called before the first frame update
     void Start()
@@ -37,15 +37,16 @@ public class PrizeManager : MonoBehaviour
             SET_PLAYER_HEAD();
             
             data = controller.GET_PLAYER_DATA(uiNumber - 1);
-            coins.text = (data[0].coins - data[0].prize).ToString();
-            orbs.text  = data[0].orbs.ToString();
-            mana.text  = data[0].mp + "/5";
-            mpBar.value = data[0].mp;
-            prizeAmount.text = "+" + (data[0].prize).ToString();
+            // controller.playerData[uiNumber - 1].coins += data.prize;
+            coins.text = (data.coins - data.prize).ToString();
+            orbs.text  = data.orbs.ToString();
+            mana.text  = data.mp + "/5";
+            mpBar.value = data.mp;
+            prizeAmount.text = "+" + (data.prize).ToString();
             
-            if (data[0].firstPlace) {
+            if (data.firstPlace) {
                 manaPrizePrefab.SetActive(true);
-                mana.text  = (data[0].mp) + "/5";
+                mana.text  = (data.mp) + "/5";
                 manaPrizeAmount.text = "+1";
             }
 
@@ -83,29 +84,32 @@ public class PrizeManager : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
 
-        for (int i=1; i<=data[0].prize ; i++) 
+        for (int i=1; i<=data.prize ; i++) 
         {
             yield return new WaitForSeconds(0.1f);
             coinCollectSound.Play();
-            coins.text = (data[0].coins - data[0].prize + i).ToString();
-            prizeAmount.text = "+" + (data[0].prize - i).ToString();
+            coins.text = (data.coins - data.prize + i).ToString();
+            prizeAmount.text = "+" + (data.prize - i).ToString();
         }
         prizePrefab.SetActive(false);
 
-        if (data[0].firstPlace) {
+        // FIRST PLACE GAINS AN EXTRA MP
+        if (data.firstPlace) {
             yield return new WaitForSeconds(0.1f);
-            if (controller.p1[0].mp != 5 && uiNumber == 1) controller.p1[0].mp++;
-            if (controller.p2[0].mp != 5 && uiNumber == 2) controller.p2[0].mp++;
-            if (controller.p3[0].mp != 5 && uiNumber == 3) controller.p3[0].mp++;
-            if (controller.p4[0].mp != 5 && uiNumber == 4) controller.p4[0].mp++;
-            if (controller.p5[0].mp != 5 && uiNumber == 5) controller.p5[0].mp++;
-            if (controller.p6[0].mp != 5 && uiNumber == 6) controller.p6[0].mp++;
-            if (controller.p7[0].mp != 5 && uiNumber == 7) controller.p7[0].mp++;
-            if (controller.p8[0].mp != 5 && uiNumber == 8) controller.p8[0].mp++;
-            mana.text  = (data[0].mp) + "/5";
+            if (controller.playerData[uiNumber - 1].mp != 5) controller.playerData[uiNumber - 1].mp++;
+            //! DELETE
+            // if (controller.p1[0].mp != 5 && uiNumber == 1) controller.p1[0].mp++;
+            // if (controller.p2[0].mp != 5 && uiNumber == 2) controller.p2[0].mp++;
+            // if (controller.p3[0].mp != 5 && uiNumber == 3) controller.p3[0].mp++;
+            // if (controller.p4[0].mp != 5 && uiNumber == 4) controller.p4[0].mp++;
+            // if (controller.p5[0].mp != 5 && uiNumber == 5) controller.p5[0].mp++;
+            // if (controller.p6[0].mp != 5 && uiNumber == 6) controller.p6[0].mp++;
+            // if (controller.p7[0].mp != 5 && uiNumber == 7) controller.p7[0].mp++;
+            // if (controller.p8[0].mp != 5 && uiNumber == 8) controller.p8[0].mp++;
+            mana.text  = (data.mp) + "/5";
             prizeAmount.text = "+0";
             manaCollectSound.Play();
-            mpBar.value = data[0].mp;
+            mpBar.value = data.mp;
             manaPrizePrefab.SetActive(false);
         }
         ranking.gameObject.SetActive(true);

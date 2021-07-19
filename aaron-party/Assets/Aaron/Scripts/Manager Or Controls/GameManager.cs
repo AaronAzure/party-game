@@ -184,6 +184,7 @@ public class GameManager : MonoBehaviour
             controller.ResetAllTraps();
             if (sceneName != "Shogun_Seaport") StartCoroutine( DelayChoosingMagicOrbSpace(1) );
             gamers[ controller.playerOrder[playerOrder] ].BEGIN(); 
+            StartCoroutine( TELL_CONTROLLER_TO_SAVE_GAME() );
             StartCoroutine( CAMERA_TRANSITION(0.5f, 1f, false));
             // StartCoroutine(CAMERA_TRANSITION());
             // SCREEN_TRANSITION("Oval_Transition", 0.5f);
@@ -208,7 +209,6 @@ public class GameManager : MonoBehaviour
 
             HIDE_UI();
             currentTurn = 1;
-            // UPDATE_ALL_INFO();
             if (sceneName == "Crystal_Caverns")
             {
                 if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
@@ -454,11 +454,16 @@ public class GameManager : MonoBehaviour
         // SCREEN FADES FROM BLACK
         else
         {
-            Debug.Log("MANAGER - TRANSITION");
             transitionAnim.Play("Oval_Transition", -1, normTime);
             yield return new WaitForSeconds(delay);
             NEXT_PLAYER_TURN();
         }
+    }
+
+    public IEnumerator TELL_CONTROLLER_TO_SAVE_GAME()
+    {
+        yield return new WaitForSeconds(0.5f);
+        controller.SAVE_GAME();
     }
 
     // NO FADING, JUST NEXT PLAYER TURN

@@ -100,13 +100,13 @@ public class EffectSpell : MonoBehaviour
         if (nodeLocked && spellCasterPlayer.mpBar.value >= spellCasterPlayer.spellMpCost)
         {
             Vector3 tempPos     = spellCasterPlayer.transform.position;
-            string  tempPath    = spellCasterPlayer.data[0].path;
+            string  tempPath    = spellCasterPlayer.data.path;
             
             // SET CASTER'S NEW LOCATION
-            string newPath                          = targetedPlayer.data[0].path;
+            string newPath                          = targetedPlayer.data.path;
 
             spellCasterPlayer.SET_NEW_PATH(newPath);
-            spellCasterPlayer.currentNode          = targetedPlayer.currentNode;
+            spellCasterPlayer.currentNode           = targetedPlayer.currentNode;
             spellCasterPlayer.transform.position    = targetedPlayer.currentNode.transform.position;
             spellCasterPlayer.currentNode.transform.position = spellCasterPlayer.transform.position;
             spellCasterPlayer.RESET_TARGET_SPELL_CAM();
@@ -116,9 +116,9 @@ public class EffectSpell : MonoBehaviour
             // SET TARGET'S NEW LOCATION
             string oldPath                      = tempPath; 
             targetedPlayer.SET_NEW_PATH(oldPath);
-            targetedPlayer.data[0].pos          = tempPos;
+            targetedPlayer.data.pos             = tempPos;
             targetedPlayer.transform.position   = tempPos + asideDif;
-            targetedPlayer.currentNode.transform.position = targetedPlayer.data[0].pos;
+            targetedPlayer.currentNode.transform.position = targetedPlayer.data.pos;
 
 
             spellCasterPlayer.USE_MP(spellCasterPlayer.spellMpCost);

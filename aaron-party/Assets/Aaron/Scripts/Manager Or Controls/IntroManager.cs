@@ -174,20 +174,20 @@ public class IntroManager : MonoBehaviour
         }
     }
 
-    void SpawnAtNodes()
-    {
-        for ( int i=0 ; i<controller.nPlayers ; i++ )
-        {
-            var player = Instantiate(playerPrefab, controller.GET_PLAYER_POS(i), Quaternion.identity);
-            player.name = "Player_" + (i+1); 
-            players[i]  = player.gameObject;
-            gamers[i]   = player.GetComponent<CharacterHolder>();
-            gamers[i].intro = this.GetComponent<IntroManager>();
-            gamers[i].introMode = true;
-            gamers[i].playerID = i; gamers[i].movable = true; gamers[i].minSpeed = 10;
-            if (mtCam != null) { mtCam.targets.Add(player.transform); }
-        }
-    }
+    // void SpawnAtNodes()
+    // {
+    //     for ( int i=0 ; i<controller.nPlayers ; i++ )
+    //     {
+    //         var player = Instantiate(playerPrefab, controller.GET_PLAYER_POS(i), Quaternion.identity);
+    //         player.name = "Player_" + (i+1); 
+    //         players[i]  = player.gameObject;
+    //         gamers[i]   = player.GetComponent<CharacterHolder>();
+    //         gamers[i].intro = this.GetComponent<IntroManager>();
+    //         gamers[i].introMode = true;
+    //         gamers[i].playerID = i; gamers[i].movable = true; gamers[i].minSpeed = 10;
+    //         if (mtCam != null) { mtCam.targets.Add(player.transform); }
+    //     }
+    // }
 
     private void Update() {
         if (player.GetAnyButtonDown() && textUI.activeSelf && !choosingCards) 
@@ -231,6 +231,7 @@ public class IntroManager : MonoBehaviour
                 case 0 :   { 
                     if (sceneName == "Crystal Caverns") { aaronText.text = "Welcome to the <b><#ff68f7>" + sceneName + "</color>."; }
                     if (sceneName == "Shogun Seaport") { aaronText.text = "Welcome to <b><#68b8ff>" + sceneName + "</color>."; }
+                    if (sceneName == "Plasma Palace") { aaronText.text = "Welcome to <b><#68b8ff>" + sceneName + "</color>."; }
                     break;
                 }
                 case 1 :   { aaronText.text = "I'll let my <b>doppelgänger</b> explain the rest."; break; }

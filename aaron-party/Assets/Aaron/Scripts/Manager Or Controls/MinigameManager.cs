@@ -13,6 +13,7 @@ public class MinigameManager : MonoBehaviour
     public bool canPlay;
     public bool timeUp;
     public int nPlayersOut = 0;
+    // private int[] coinPrize;
     private int c1 = 0;
     private int c2 = 0;
     private int c3 = 0;
@@ -443,7 +444,7 @@ public class MinigameManager : MonoBehaviour
                 players[i].COIN_MINIGAME();
             }
             CALCULATE_MOST_GOLD();
-            controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);     // COINS WON IN MINIGAME (QUEST)
+            controller.MINIGAME_PRIZE( new int[]{c1,c2,c3,c4,c5,c6,c7,c8} );     // COINS WON IN MINIGAME (QUEST)
             winMusic.Play();
         }
         else if (sceneName == "Money_Belt")
@@ -454,7 +455,7 @@ public class MinigameManager : MonoBehaviour
                 players[i].COIN_MINIGAME();
             }
             CALCULATE_MOST_GOLD();
-            controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);
+            controller.MINIGAME_PRIZE( new int[]{c1,c2,c3,c4,c5,c6,c7,c8} );
             winMusic.Play();
             DISPLAY_PLAYER_RANKINGS();
         }
@@ -466,7 +467,7 @@ public class MinigameManager : MonoBehaviour
                 players[i].COIN_MINIGAME();
             }
             CALCULATE_MOST_GOLD();
-            controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);
+            controller.MINIGAME_PRIZE( new int[]{c1,c2,c3,c4,c5,c6,c7,c8} );
             winMusic.Play();
             DISPLAY_PLAYER_RANKINGS();
         }
@@ -477,7 +478,7 @@ public class MinigameManager : MonoBehaviour
             if (sceneName == "County-Bounty") CALCULATE_LEAST_POINTS();
             else CALCULATE_MOST_POINTS();
 
-            controller.MINIGAME_PRIZE(c1,c2,c3,c4,c5,c6,c7,c8);     // COINS WON IN MINIGAME (QUEST)
+            controller.MINIGAME_PRIZE( new int[]{c1,c2,c3,c4,c5,c6,c7,c8} );     // COINS WON IN MINIGAME (QUEST)
             yield return new WaitForSeconds(1);
             if (winnerNames != "Draw!" && winnerNames != "Too Bad!") { winnerNames += "\nWins!"; winMusic.Play(); }
             else { drawMusic.Play(); }
@@ -665,37 +666,24 @@ public class MinigameManager : MonoBehaviour
 
     // ------------------------------------------------------------------------------------------
 
-    public void PLAYER_WON_N_COINS(int coins, string name)
+    public void PLAYER_WON_N_COINS(int coins, int playerID)
     {
-        switch (name)
-        {
-            case "Player_1" :   c1 = coins;   controller.p1[0].prize = coins; break;
-            case "Player_2" :   c2 = coins;   controller.p2[0].prize = coins; break;
-            case "Player_3" :   c3 = coins;   controller.p3[0].prize = coins; break;
-            case "Player_4" :   c4 = coins;   controller.p4[0].prize = coins; break;
-            case "Player_5" :   c5 = coins;   controller.p5[0].prize = coins; break;
-            case "Player_6" :   c6 = coins;   controller.p6[0].prize = coins; break;
-            case "Player_7" :   c7 = coins;   controller.p7[0].prize = coins; break;
-            case "Player_8" :   c8 = coins;   controller.p8[0].prize = coins; break;
-            default : Debug.LogError("-- WRONG PLAYER NAME (MINIGAME)"); break;
+        if (playerID >= controller.playerData.Count) {
+            Debug.LogError("-- ERROR: playerID out of range in playerData");
+            return;
         }
+        controller.playerData[playerID].prize = coins;
+        controller.playerData[playerID].coins += coins;
     }
 
     // FIRST PLACE WINNER RECOVERS A MANA POINT 
-    public void FIRST_PLACE_PRIZE(string name)
+    public void FIRST_PLACE_PRIZE(int playerID)
     {
-        switch (name)
-        {
-            case "Player_1" :   controller.p1[0].firstPlace = true;  break;
-            case "Player_2" :   controller.p2[0].firstPlace = true;  break;
-            case "Player_3" :   controller.p3[0].firstPlace = true;  break;
-            case "Player_4" :   controller.p4[0].firstPlace = true;  break;
-            case "Player_5" :   controller.p5[0].firstPlace = true;  break;
-            case "Player_6" :   controller.p6[0].firstPlace = true;  break;
-            case "Player_7" :   controller.p7[0].firstPlace = true;  break;
-            case "Player_8" :   controller.p8[0].firstPlace = true;  break;
-            default : Debug.LogError("-- WRONG PLAYER NAME (MINIGAME)"); break;
+        if (playerID >= controller.playerData.Count) {
+            Debug.LogError("-- ERROR: playerID out of range in playerData");
+            return;
         }
+        controller.playerData[playerID].firstPlace = true;
     }
 
     private void CALCULATE_MOST_POINTS()
@@ -734,19 +722,19 @@ public class MinigameManager : MonoBehaviour
                     { 
                         if (players[j].points >= 0 && sceneName != "Lilypad_Leapers")
                         {
-                            FIRST_PLACE_PRIZE( players[j].name ); 
+                            FIRST_PLACE_PRIZE( players[j].playerID ); 
                             winnerNames += players[j].characterName + " ";
                         }
                         else if (sceneName == "Lilypad_Leapers")
                         {
-                            FIRST_PLACE_PRIZE( players[j].name ); 
+                            FIRST_PLACE_PRIZE( players[j].playerID ); 
                             winnerNames += players[j].characterName + " ";
                         }
 
                         // IF PLAYER IN FIRST ALSO GOT ELIMINATED AT THE SAME TIME
                         if (players[j].points < 0) {
                             int tied = PLAYER_RANKING(i - 1);
-                            PLAYER_WON_N_COINS(tied, players[j].name);
+                            PLAYER_WON_N_COINS(tied, players[j].playerID);
                             if (bossBattle) winnerNames = "Too Bad!";
                             else winnerNames = "Draw!";
                             continue;
@@ -754,7 +742,7 @@ public class MinigameManager : MonoBehaviour
                     }
 
                     int prize = PLAYER_RANKING(i);
-                    PLAYER_WON_N_COINS(prize, players[j].name);
+                    PLAYER_WON_N_COINS(prize, players[j].playerID);
                 }
             }
         }
@@ -795,7 +783,7 @@ public class MinigameManager : MonoBehaviour
                     // FIRST PLAYER GETS AN EXTRA MP
                     if (i == controller.nPlayers - 1) 
                     { 
-                        FIRST_PLACE_PRIZE( players[j].name ); 
+                        FIRST_PLACE_PRIZE( players[j].playerID ); 
 
                         // IF PLAYER IN FIRST ALSO GOT ELIMINATED AT THE SAME TIME
                         if (players[j].points < 0) {
@@ -844,20 +832,20 @@ public class MinigameManager : MonoBehaviour
                     // FIRST PLAYER GETS AN EXTRA MP
                     if (i == controller.nPlayers - 1) 
                     { 
-                        FIRST_PLACE_PRIZE( players[j].name ); 
+                        FIRST_PLACE_PRIZE( players[j].playerID ); 
                         winnerNames += players[j].characterName + " ";
 
                         // IF PLAYER IN FIRST ALSO GOT ELIMINATED AT THE SAME TIME
                         if (players[j].points < 0) {
                             int tied = PLAYER_RANKING(i - 1);
-                            PLAYER_WON_N_COINS(tied, players[j].name);
+                            PLAYER_WON_N_COINS(tied, players[j].playerID);
                             winnerNames = "Draw!";
                             continue;
                         }
                     }
 
                     int prize = PLAYER_RANKING(i);
-                    PLAYER_WON_N_COINS(prize, players[j].name);
+                    PLAYER_WON_N_COINS(prize, players[j].playerID);
                 }
             }
         }

@@ -2730,6 +2730,71 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad967a85cc705da40bd22bd1cf7e6e96, type: 3}
+--- !u!1001 &1141877833
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 100000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_Name
+      value: SecureKeysManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_RootOrder
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: keys.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
+      propertyPath: keys.Array.data[0]
+      value: bZzYZRpP9ln
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 227d4d4a559f647509d4f1c4f3dd9a40, type: 3}
 --- !u!1001 &1150264463
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3184,7 +3249,7 @@ PrefabInstance:
     - target: {fileID: 2864894284712624756, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}
       propertyPath: infiniteMovement
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2864894284890189609, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}
@@ -3523,7 +3588,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1681587363}
   - component: {fileID: 1681587362}
-  - component: {fileID: 1681587364}
   m_Layer: 0
   m_Name: BG_MUSIC
   m_TagString: Untagged
@@ -3641,18 +3705,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1681587364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681587361}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f0f5221ff8f2455ba74cbcee6cb1ab0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1712747317
 PrefabInstance:
   m_ObjectHideFlags: 0

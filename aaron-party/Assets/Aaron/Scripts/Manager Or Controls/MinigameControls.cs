@@ -2571,7 +2571,7 @@ public class MinigameControls : MonoBehaviour
                 score.color = new Color (0,1,0);
                 scoreHead.text = coins.ToString();
                 scoreHead.color = new Color (0,1,0);
-                manager.PLAYER_WON_N_COINS(coins, name);
+                manager.PLAYER_WON_N_COINS(coins, playerID);
                 manager.CheckIfEveyoneIsOut(0);
             }
         }
@@ -3406,8 +3406,8 @@ public class MinigameControls : MonoBehaviour
         // scoreHead.text = coins.ToString();
         // scoreHead.color = new Color (0,1,0);
         points = coins;
-        if (crystalised.activeSelf) manager.PLAYER_WON_N_COINS(0, name);
-        else manager.PLAYER_WON_N_COINS(coins, name);
+        if (crystalised.activeSelf) manager.PLAYER_WON_N_COINS(0, playerID);
+        else manager.PLAYER_WON_N_COINS(coins, playerID);
     }
 
 }

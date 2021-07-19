@@ -292,7 +292,7 @@ public class Node : MonoBehaviour
     public void BLOCK() { 
         _spaceType.sprite = boulders; 
         _anim.Play("Empty", -1 ,0); CHANGE_ANIMATION(); 
-        controller.NewBoulder(transform.parent.name, this.name, _spaceType.sprite); 
+        controller.NewBoulder(transform.parent.name, this.name); 
     }
     public void UNBLOCK() { 
         Debug.Log("         unblocked");
@@ -308,21 +308,21 @@ public class Node : MonoBehaviour
     {
         if (_spaceType.sprite == blueSpace)
         {
-            Debug.Log("  Landed on BLUE");
+            // Debug.Log("  Landed on BLUE");
             var eff = Instantiate(instanBlueEffect, transform.position, instanBlueEffect.transform.rotation);
             Destroy(eff, 4);
             return 3;
         }
         else if (_spaceType.sprite == redSpace)
         {
-            Debug.Log("  Landed on RED");
+            // Debug.Log("  Landed on RED");
             var eff = Instantiate(instanRedEffect, transform.position, instanRedEffect.transform.rotation);
             Destroy(eff, 4);
             return -3;
         }
         else if (_spaceType.sprite == goldSpace)
         {
-            Debug.Log("  Landed on FORTUNE");
+            // Debug.Log("  Landed on FORTUNE");
             var eff = Instantiate(instanGoldEffect, transform.position, instanGoldEffect.transform.rotation);
             Destroy(eff, 4);
             int[] fortune = new int[]{10,10,10,10,10,15,15,15,20,30};
@@ -466,6 +466,15 @@ public class Node : MonoBehaviour
 
         if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
         _spaceType.sprite = spaceType;
+
+        if (_anim == null) { _anim = this.GetComponentInChildren<Animator>(); }
+        _anim.SetTrigger("isTrap");
+    }
+
+    public void BACK_TO_BEING_A_BOULDER()
+    {
+        if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
+        _spaceType.sprite = boulders;
 
         if (_anim == null) { _anim = this.GetComponentInChildren<Animator>(); }
         _anim.SetTrigger("isTrap");

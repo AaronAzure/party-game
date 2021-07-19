@@ -7,7 +7,6 @@ public class SpellType
     public string spellName;
     public int    spellCost;
     public string spellKind;
-    public string spellDesc;
 
     public SpellType(string newSpellName, int newSpellCost, string newSpellKind)
     {

@@ -18,7 +18,7 @@ public class PathFollower : MonoBehaviour
     [Header("Data to save across Scenes")]
     [SerializeField] private int playerID;
     [SerializeField] private Player player;
-    public List<PlayerPrevData> data;
+    public PlayerPrevData data;
     private List<PlayerBuffData> stat;
     
     //! DELETE
@@ -393,21 +393,20 @@ public class PathFollower : MonoBehaviour
         // TURN 2+
         if (controller.hasStarted)
         {
-
             // GET PREVIOUS VALUES (LAST SCENE) FROM GAME_CONTROLLER
             data = controller.GET_PLAYER_DATA(playerID);
 
-            string newPath  = data[0].path;
-            currentNode = GameObject.Find(newPath).GetComponent<Node>();
-            transform.position  = data[0].pos;
-            mpBar.value         = data[0].mp;
-            coins               = data[0].coins;
-            orbs                = data[0].orbs;
+            // string newPath      = data.path;
+            currentNode         = GameObject.Find( data.path ).GetComponent<Node>();
+            transform.position  = data.pos;
+            mpBar.value         = data.mp;
+            coins               = data.coins;
+            orbs                = data.orbs;
 
             // IF PLAYER IS NOT FIRST, STAND ASIDE
             if (controller.playerOrder[0] != playerID) { 
-                float playerX = transform.position.x;
-                float playerY = transform.position.y;
+                // float playerX = transform.position.x;
+                // float playerY = transform.position.y;
                 float scale   = 1.5f;
 
                 float radians = 2 * Mathf.PI / controller.nPlayers * playerID;
@@ -415,16 +414,15 @@ public class PathFollower : MonoBehaviour
                 float vertical   = Mathf.Sin(radians) * scale;
                 float horizontal = Mathf.Cos(radians) * scale; 
                 
-                Vector3 aside = new Vector3 (playerX - horizontal, playerY + vertical);
-                transform.position += aside; 
+                transform.position += new Vector3 (-horizontal, vertical);
             }
 
             // STATUS EFFECTS / ITEMS FROM LAST TURN
-            playerSlowed    = controller.buffDatas[playerID][0].slowed;
-            playerBarrier   = controller.buffDatas[playerID][0].barrier;
-            playerMove15    = controller.buffDatas[playerID][0].move15;
-            playerRange2    = controller.buffDatas[playerID][0].range2;
-            playerExtraBuy  = controller.buffDatas[playerID][0].extraBuy;
+            playerSlowed    = controller.buffDatas[playerID].slowed;
+            playerBarrier   = controller.buffDatas[playerID].barrier;
+            playerMove15    = controller.buffDatas[playerID].move15;
+            playerRange2    = controller.buffDatas[playerID].range2;
+            playerExtraBuy  = controller.buffDatas[playerID].extraBuy;
 
             if (playerSlowed) { 
                 slowed.SetActive(true); slowed.transform.parent = character.transform; 
@@ -466,25 +464,8 @@ public class PathFollower : MonoBehaviour
             maxNPurchases = 1;
         }
         
-        // UPDATE SPELL BOOK (GRIMOIRE)
-        switch (name) {
-            case "Player_1" : 
-                foreach (SpellType sp in controller.spells1) { spells.Add(sp); }    break;
-            case "Player_2" : 
-                foreach (SpellType sp in controller.spells2) { spells.Add(sp); }    break;
-            case "Player_3" : 
-                foreach (SpellType sp in controller.spells3) { spells.Add(sp); }    break;
-            case "Player_4" : 
-                foreach (SpellType sp in controller.spells4) { spells.Add(sp); }    break;
-            case "Player_5" : 
-                foreach (SpellType sp in controller.spells5) { spells.Add(sp); }    break;
-            case "Player_6" : 
-                foreach (SpellType sp in controller.spells6) { spells.Add(sp); }    break;
-            case "Player_7" : 
-                foreach (SpellType sp in controller.spells7) { spells.Add(sp); }    break;
-            case "Player_8" : 
-                foreach (SpellType sp in controller.spells8) { spells.Add(sp); }    break;
-        }
+        // REMEMBER SPELL BOOK (GRIMOIRE)
+        foreach (SpellType sp in controller.playerSpells[playerID]) { spells.Add(sp); }
         UPDATE_SPELLS_UI();
 
         RESET_PLAYER_UI();
@@ -1620,7 +1601,7 @@ public class PathFollower : MonoBehaviour
         _cam.gameObject.SetActive(true);
 
         // MOVE BACK (UNASIDE)
-        if (controller.hasStarted) { transform.position = data[0].pos; }
+        if (controller.hasStarted) { transform.position = data.pos; }
         manager.CHECK_RANKINGS();
         manager.UNHIDE_UI();
         // manager.FADE_FROM_BLACK();
@@ -1628,7 +1609,7 @@ public class PathFollower : MonoBehaviour
         // LOSE BARRIER
         if (playerBarrier) {
             playerBarrier = false;
-            controller.buffDatas[playerID][0].barrier = false;
+            controller.buffDatas[playerID].barrier = false;
             barrier.SetActive(false);
             hurtBox.SetActive(true);
         }
@@ -1666,8 +1647,7 @@ public class PathFollower : MonoBehaviour
         string newPath = currentNode.transform.parent.name + "/" + currentNode.name;
 
         // SET ALL VALUES OF PLAYER
-        controller.SET_PLAYER_DATA(playerID, newPath, 0, currentNode.transform.position, transform.position,
-            coins, orbs, (int) mpBar.value);
+        controller.SET_PLAYER_DATA(playerID, newPath, currentNode.transform.position, coins, orbs, (int) mpBar.value);
 
         // STORE DATA ON THE CURRENT PLAYER'S SPELLS
         if (updateSpells) { controller.SET_SPELLS (playerID, spells); }
