@@ -451,6 +451,17 @@ public class GameController : MonoBehaviour
             PlayerPrefsElite.SetStringArray("magic-orb-spaces-" + (i+1), mOrbs );
         }
 
+        // SAVE BONUS ORB SCORES
+        PlayerPrefsElite.SetIntArray("rich-orb", richOrb);
+        PlayerPrefsElite.SetIntArray("quest-orb", questOrb);
+        PlayerPrefsElite.SetIntArray("trap-orb", trapOrb);
+        PlayerPrefsElite.SetIntArray("event-orb", eventOrb);
+        PlayerPrefsElite.SetIntArray("blue-orb", blueOrb);
+        PlayerPrefsElite.SetIntArray("red-orb", redOrb);
+        PlayerPrefsElite.SetIntArray("slow-orb", slowOrb);
+        PlayerPrefsElite.SetIntArray("shop-orb", shopOrb);
+
+
         //* MAP-EXCLUSIVE
         if (boardSceneName == "Crystal_Caverns") {
             PlayerPrefsElite.SetInt("n-can-be-caved", canBeCavedSpaces.Count);
@@ -523,6 +534,24 @@ public class GameController : MonoBehaviour
             turnNumber = lastBoardSettings[0]; maxTurns = lastBoardSettings[1]; restoreMpTurn = lastBoardSettings[2];
             if (turnNumber != 1) hasStarted = true;
             int prevNPlayers = lastBoardSettings[3];
+
+            // BONUS ORB
+            int[] richTemp = PlayerPrefsElite.GetIntArray("rich-orb");
+            for (int i=0 ; i<richTemp.Length ; i++)    richOrb[i] = richTemp[i];
+            int[] questTemp = PlayerPrefsElite.GetIntArray("quest-orb");
+            for (int i=0 ; i<questTemp.Length ; i++)    questOrb[i] = questTemp[i];
+            int[] trapTemp = PlayerPrefsElite.GetIntArray("trap-orb");
+            for (int i=0 ; i<trapTemp.Length ; i++)    trapOrb[i] = trapTemp[i];
+            int[] eventTemp = PlayerPrefsElite.GetIntArray("event-orb");
+            for (int i=0 ; i<eventTemp.Length ; i++)    eventOrb[i] = eventTemp[i];
+            int[] blueTemp = PlayerPrefsElite.GetIntArray("blue-orb");
+            for (int i=0 ; i<blueTemp.Length ; i++)    blueOrb[i] = blueTemp[i];
+            int[] redTemp = PlayerPrefsElite.GetIntArray("red-orb");
+            for (int i=0 ; i<redTemp.Length ; i++)    redOrb[i] = redTemp[i];
+            int[] slowTemp = PlayerPrefsElite.GetIntArray("slow-orb");
+            for (int i=0 ; i<slowTemp.Length ; i++)    slowOrb[i] = slowTemp[i];
+            int[] shopTemp = PlayerPrefsElite.GetIntArray("shop-orb");
+            for (int i=0 ; i<shopTemp.Length ; i++)    shopOrb[i] = shopTemp[i];
 
             // REMEMBER MAGIC ORB RELATED
             int prevNofOrbSpaces = PlayerPrefsElite.GetInt("board-n-magic-orb");
