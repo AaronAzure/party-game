@@ -960,6 +960,7 @@ public class PathFollower : MonoBehaviour
         {
             UserViewMap();
         }
+        //* IS AT MAGIC GATE
         else if (isAtGate)
         {
             if (gateCannotOpenUi.activeSelf && player.GetButtonDown("A")) {
@@ -1103,6 +1104,10 @@ public class PathFollower : MonoBehaviour
                 currentNode = nextNode;
                 nextNode = null;
                 _timer = 0;
+
+                if (stealMode) {
+                    currentNode.STEALING_COINS(this);
+                }
 
                 // todo SPECIAL NON-DECREMENTING SPACES
                 if (!currentNode.DOES_SPACE_DECREASE_MOVEMENT()) {

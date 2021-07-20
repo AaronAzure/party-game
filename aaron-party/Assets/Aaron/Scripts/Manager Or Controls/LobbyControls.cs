@@ -50,6 +50,8 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private TextMeshPro resumeLastGame;
     private bool resuming;
     private bool canResume;
+    [SerializeField] private GameObject timeCirclePrefab;
+    [SerializeField] private GameObject timeMaster;
 
     private int nSetting = 0;
     [Header("Board Settings")]
@@ -176,7 +178,7 @@ public class LobbyControls : MonoBehaviour
             else if (resumeLastGame.gameObject.activeSelf && player.GetButtonDown("A") && !resuming && canResume)
             {
                 resuming = true;
-                Debug.Log(" resuming last game"); controller.RESUME_LAST_GAME();
+                StartCoroutine( TIMEMASTER_MAGIC() );
             }
             // GO INTO MINIGAME TENT
             else if (minigame.activeSelf && player.GetButtonDown("A"))
@@ -194,7 +196,7 @@ public class LobbyControls : MonoBehaviour
             }
             else if (boardName != null && Application.CanStreamedLevelBeLoaded(boardName) && player.GetButtonDoublePressDown("X")) 
             {
-                if (controller.noList.Count < controller.quests.Count) StartCoroutine( manager.FADE(boardName) );
+                if (controller.noList.Count < controller.quests.Count) StartCoroutine( manager.FADE_AND_LOAD_BOARD(boardName) );
             }
             // PLAY BOARD, OPEN SETTINGS
             else if (player.GetButtonDown("A") && touchingBoard && !boardSelected && boardToPlay != null
@@ -323,7 +325,7 @@ public class LobbyControls : MonoBehaviour
             if(SceneUtility.GetBuildIndexByScenePath(boardToPlay) >= 0)
             {
                 boardSelected = false;
-                StartCoroutine( manager.FADE(boardToPlay) );
+                StartCoroutine( manager.FADE_AND_LOAD_BOARD(boardToPlay) );
             }
             else
             {
@@ -691,6 +693,27 @@ public class LobbyControls : MonoBehaviour
     }
 
 
+    private IEnumerator TIMEMASTER_MAGIC()
+    {
+        StartCoroutine( REWINDING_TIME() );
+        if (timeMaster != null && timeCirclePrefab != null) {
+            for (int i=0 ; i<100 ; i++) {
+                yield return new WaitForSeconds(0.2f);
+                Instantiate(timeCirclePrefab, timeMaster.transform.position, timeCirclePrefab.transform.rotation);
+            }
+        }
+
+    }
+
+    private IEnumerator REWINDING_TIME()
+    {
+        yield return new WaitForSeconds(2.5f);
+        StartCoroutine( manager.JUST_FADE() );
+
+        yield return new WaitForSeconds(0.8f);
+        Debug.Log(" resuming last game"); 
+        controller.RESUME_LAST_GAME();
+    }
 
 
     private void OnTriggerEnter2D(Collider2D other) 
@@ -713,6 +736,7 @@ public class LobbyControls : MonoBehaviour
         // TIME MASTER
         if (other.tag == "Respawn" && playerID == 0)
         {
+            if (timeMaster == null) timeMaster = other.gameObject;
             resumeLastGame.gameObject.SetActive(true);
         }    
     }

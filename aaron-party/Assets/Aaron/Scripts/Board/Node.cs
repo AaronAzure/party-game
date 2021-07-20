@@ -692,7 +692,7 @@ public class Node : MonoBehaviour
         }
     }
 
-    private void STEALING_MP(PathFollower p)
+    public void STEALING_COINS(PathFollower p)
     {
         if (p.stealMode)
         {

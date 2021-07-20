@@ -1059,6 +1059,8 @@ MonoBehaviour:
   restoreMpTurn: {fileID: 7503253774526199828}
   backToCharacter: {fileID: 8336710727251943}
   resumeLastGame: {fileID: 474835976575413939}
+  timeCirclePrefab: {fileID: 194966, guid: 644ecb149bc651142a6637ca6bb47dd6, type: 3}
+  timeMaster: {fileID: 0}
   _settings: {fileID: 2087588159518991972}
   settings:
   - {fileID: 2885856003277538114}
