@@ -451,7 +451,7 @@ public class GameController : MonoBehaviour
             PlayerPrefsElite.SetStringArray("magic-orb-spaces-" + (i+1), mOrbs );
         }
 
-        // SAVE BONUS ORB SCORES
+        //* SAVE BONUS ORB SCORES
         PlayerPrefsElite.SetIntArray("rich-orb", richOrb);
         PlayerPrefsElite.SetIntArray("quest-orb", questOrb);
         PlayerPrefsElite.SetIntArray("trap-orb", trapOrb);
@@ -480,7 +480,7 @@ public class GameController : MonoBehaviour
             }
         }
         
-        // TRAPS
+        //* SAVE TRAPS
         string[] trapParentNames    = new string[changedSpaces.Count];
         string[] trapchildNames     = new string[changedSpaces.Count];
         string[] trapNodeNames      = new string[changedSpaces.Count];
@@ -493,7 +493,7 @@ public class GameController : MonoBehaviour
         PlayerPrefsElite.SetStringArray("traps-child-names", trapchildNames);
         PlayerPrefsElite.SetStringArray("traps-node-names", trapNodeNames);
 
-
+        //* SAVE PLAYER STATS
         for (int i=0 ; i<nPlayers ; i++)
         {
             int[] playerStats = new int[]{playerData[i].coins, playerData[i].orbs, playerData[i].mp};
@@ -621,6 +621,13 @@ public class GameController : MonoBehaviour
                         string[] prevSpell  = PlayerPrefsElite.GetStringArray("pathfollower-" + (i+1) + "-spells-" + (j+1));
                         ADD_SINGLE_SPELL(i, new SpellType(prevSpell[0], int.Parse(prevSpell[1]), prevSpell[2]) );
                     }
+
+                    bool[] buffs = PlayerPrefsX.GetBoolArray("pathfollower-" + (i+1) + "-buff");
+                    buffDatas[i].slowed     = buffs[0];
+                    buffDatas[i].barrier    = buffs[1];
+                    buffDatas[i].move15     = buffs[2];
+                    buffDatas[i].range2     = buffs[3];
+                    buffDatas[i].extraBuy   = buffs[4];
                 }
                 // COPY LAST PLAYER STATS
                 else {
