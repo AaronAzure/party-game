@@ -28,11 +28,11 @@ public class Node : MonoBehaviour
 
     // TODO : which node each node connects to
     public enum Directions { none, left, right, up, down, blocked }
-    [System.Serializable] public class Nexts
-    {
+    [System.Serializable] public class Nexts {
         public GameObject node;
         public Directions direction;
         public GameObject alternative;
+        public bool dontCreateArrow;
     }
     [Header("Paths - next node(s)")]
     public Nexts[] nexts;

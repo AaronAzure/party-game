@@ -475,7 +475,7 @@ public class MinigameManager : MonoBehaviour
         else 
         {
             if (sceneName == "Stop_Watchers") CALCULATE_LEAST_POINTS();
-            if (sceneName == "County-Bounty") CALCULATE_LEAST_POINTS();
+            else if (sceneName == "County-Bounty") CALCULATE_LEAST_POINTS();
             else CALCULATE_MOST_POINTS();
 
             controller.MINIGAME_PRIZE( new int[]{c1,c2,c3,c4,c5,c6,c7,c8} );     // COINS WON IN MINIGAME (QUEST)

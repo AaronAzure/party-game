@@ -697,8 +697,8 @@ public class LobbyControls : MonoBehaviour
     {
         StartCoroutine( REWINDING_TIME() );
         if (timeMaster != null && timeCirclePrefab != null) {
-            for (int i=0 ; i<100 ; i++) {
-                yield return new WaitForSeconds(0.2f);
+            for (int i=0 ; i<10 ; i++) {
+                yield return new WaitForSeconds(0.5f);
                 Instantiate(timeCirclePrefab, timeMaster.transform.position, timeCirclePrefab.transform.rotation);
             }
         }

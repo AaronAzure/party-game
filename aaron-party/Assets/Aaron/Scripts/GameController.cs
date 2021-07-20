@@ -645,6 +645,7 @@ public class GameController : MonoBehaviour
         }
 
         // LOAD PREVIOUS BOARD (MAP)
+        SET_AVAILABLE_QUEST();
         SceneManager.LoadScene(boardSceneName);
     }
 

@@ -2488,6 +2488,7 @@ public class MinigameControls : MonoBehaviour
     {
         // DISPLAY ANSWER
         thoughtBubble.SetActive(true);
+        isOut = true;
         RESET_PLAYER_UI();
 
         if (manager != null) points = Mathf.Abs( count - manager.correctAns );
