@@ -36,6 +36,10 @@ public class AaronBoss2 : MonoBehaviour
     [SerializeField] private Slider slider;
     IEnumerator co;
 
+    private int easyHp = 100;
+    private int normHp = 150;
+    private int hardHp = 200;
+
     
 
 
@@ -63,9 +67,9 @@ public class AaronBoss2 : MonoBehaviour
         }
         ctr = GameObject.Find("Game_Controller").GetComponent<GameController>();
         
-        if      (ctr.hard) slider.maxValue = 300 * Mathf.Pow(1.5f, (ctr.nPlayers-1) );
-        else if (ctr.norm) slider.maxValue = 250 * Mathf.Pow(1.5f, (ctr.nPlayers-1) );
-        else                                 slider.maxValue = 200 * Mathf.Pow(1.5f, (ctr.nPlayers-1) );
+        if      (ctr.hard) slider.maxValue = hardHp * Mathf.Pow(1.5f, (ctr.nPlayers-1) );
+        else if (ctr.norm) slider.maxValue = normHp * Mathf.Pow(1.5f, (ctr.nPlayers-1) );
+        else               slider.maxValue = easyHp * Mathf.Pow(1.5f, (ctr.nPlayers-1) );
         slider.value = slider.maxValue;
         Debug.Log("multiplier = " + Mathf.Pow(1.5f, (ctr.nPlayers-1) ));
 

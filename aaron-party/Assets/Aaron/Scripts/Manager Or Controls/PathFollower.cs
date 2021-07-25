@@ -1076,19 +1076,21 @@ public class PathFollower : MonoBehaviour
         }
         //* MOVEMENT && SPECIAL SPACE EVENTS
         else {
-            // SOUND EFFECT
+            //* NEAR NODE
             if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && 
                 Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
+                // SOUND EFFECT
                     currentNode.PlaySound();   
             }
-            // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
             if (_movesRemaining != 1) {
                 if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && !noMovementLoss && !moveDecremented &&
                     Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
                         moveDecremented = true;
+                        // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
                         if (!controller.infiniteMovement) _movesRemaining--;
                 }
             }
+            
             // MOVING TO NEXT NODE
             if (this.transform.position != nextNode.transform.position) {
                 if (!_animator.GetBool("IsWalking")) {
@@ -2265,6 +2267,14 @@ public class PathFollower : MonoBehaviour
             isPlayerTurn = true;
         }
         manager.CHECK_RANKINGS();
+    }
+
+    // ACQUIRE EFFECT OF BUFF/POTION/ITEM IMMEDIATELY
+    public void POWER_UP()
+    {
+        if (playerExtraBuy) maxNPurchases = 3;
+        else                maxNPurchases = 1;
+        if (playerRange2)   areaOfEffect.transform.localScale *= 2;
     }
 
     public void PURCHASES_LEFT()

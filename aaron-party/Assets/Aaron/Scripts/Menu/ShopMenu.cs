@@ -209,8 +209,8 @@ public class ShopMenu : MonoBehaviour
                 switch (currentSelected.name)
                 {
                     case "move-potion"  :   player.playerMove15     = true;  break;
-                    case "range-potion" :   player.playerRange2     = true;  break;
-                    case "vip-badge"    :   player.playerExtraBuy   = true;  break;
+                    case "range-potion" :   player.playerRange2     = true; player.POWER_UP();  break;
+                    case "vip-badge"    :   player.playerExtraBuy   = true; player.POWER_UP();  break;
                     case "magic-orb"    :     break;
                     case "magic-orb (sale)" : break;
                 }

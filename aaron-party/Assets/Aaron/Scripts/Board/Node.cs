@@ -36,6 +36,7 @@ public class Node : MonoBehaviour
     }
     [Header("Paths - next node(s)")]
     public Nexts[] nexts;
+    // public bool mergeArrow;
 
 
     // MAGIC GATE = PATH IS LOCKED, UNLOCKED WITH 4 MANA CONSUMPTION
@@ -356,7 +357,9 @@ public class Node : MonoBehaviour
         else if (_spaceType.sprite == shopSpace)    {}
         else if (_spaceType.sprite == potionSpace)  {}
         else if (_spaceType.sprite == orbSpace)     {
-            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+            if (GameObject.Find("Game_Controller") != null) {
+                controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+            }
             this._anim.SetBool("isOrb", true);
             this._anim.SetBool("isOrb", false);
 
@@ -368,7 +371,7 @@ public class Node : MonoBehaviour
         // TRAP SPACES
         else { this._anim.SetTrigger("isTrap"); }
 
-        if (canBeCavedIn) {
+        if (canBeCavedIn && controller != null) {
             originalNode = _spaceType.sprite;
             controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
 
@@ -820,7 +823,8 @@ public class Node : MonoBehaviour
     
     void FREE_SPELL_SPACE_SETUP()
     {
-        GameController controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
-        // if (controller.is) 
+        if (GameObject.Find("Game_Controller") != null) {
+            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+        }
     }
 }
