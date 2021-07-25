@@ -1004,7 +1004,7 @@ public class GameController : MonoBehaviour
             for (int i=0 ; i<magicOrbs.Length ; i++) {
                 magicOrbs[i] = GameObject.Find(magicOrbSpace[i].parentPath + "/" + magicOrbSpace[i].childNode).GetComponent<Node>();
                 if (magicOrbs[i].firstMagicOrb) {
-                    Debug.Log("  FIRST MAGIC ORB LOCATION FOUND!!!");
+                    // Debug.Log("  FIRST MAGIC ORB LOCATION FOUND!!!");
                     r = i; break;
                 }
             }

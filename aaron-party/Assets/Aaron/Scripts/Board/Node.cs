@@ -371,12 +371,14 @@ public class Node : MonoBehaviour
         // TRAP SPACES
         else { this._anim.SetTrigger("isTrap"); }
 
-        if (canBeCavedIn && controller != null) {
+        if (canBeCavedIn) {
             originalNode = _spaceType.sprite;
-            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+            if (controller == null) controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+            Debug.Log("registering can be caved");
 
             // TURN 1 ONLY (REGISTER CAN BE CAVED-IN SPACES OF MAP)
             if (!controller.hasStarted && !haveNotCalled) {
+                Debug.Log("-- registering can be caved");
                 haveNotCalled = true;
                 controller.NewCavedInSpace(transform.parent.name, this.name, cavedSection);
             }
