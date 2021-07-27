@@ -697,17 +697,15 @@ public class LobbyControls : MonoBehaviour
     {
         StartCoroutine( REWINDING_TIME() );
         if (timeMaster != null && timeCirclePrefab != null) {
-            for (int i=0 ; i<10 ; i++) {
-                yield return new WaitForSeconds(0.5f);
-                Instantiate(timeCirclePrefab, timeMaster.transform.position, timeCirclePrefab.transform.rotation);
-            }
+            Instantiate(timeCirclePrefab, timeMaster.transform.position, timeCirclePrefab.transform.rotation);
+            yield return new WaitForSeconds(0.5f);
         }
 
     }
 
     private IEnumerator REWINDING_TIME()
     {
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(2f);
         StartCoroutine( manager.JUST_FADE() );
 
         yield return new WaitForSeconds(0.8f);

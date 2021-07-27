@@ -82,6 +82,9 @@ public class Spell : MonoBehaviour
             case "Key":     
                 _price = 20;    _mpCost = 0;    _spellKind = "Key";
                 _desc = "Key embuded with mana, used to unlock sealed doors.";  break;
+            case "Spell_Move_Titan":     
+                _price = 20;    _mpCost = 3;    _spellKind = "Move";
+                _desc = "Enlarge yourself, allowing you to move twice as far.";  break;
 
 
             case "move-potion":   

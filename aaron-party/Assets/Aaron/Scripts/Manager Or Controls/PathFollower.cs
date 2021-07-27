@@ -18,13 +18,29 @@ public class PathFollower : MonoBehaviour
     [Header("Data to save across Scenes")]
     [SerializeField] private int playerID;
     private Player player;
+
+
+    [Header("PLAYER GAME DATA")]
+    public int coins;
+    public int orbs;   // MARIO PARTY STARS
+    [Space]
     public PlayerPrevData data;
+    public TextMeshProUGUI ranking;
+
+    // ** PLAYER STATUS/BUFFS (TO UPDATE TO CONTROLLER)
+    public bool playerTitan     = false;
+    public bool playerSlowed    = false;
+    [SerializeField] private GameObject slowed;
+    public bool playerBarrier   = false;
+    [SerializeField] private GameObject barrier;
+    public bool playerMove15    = false;
+    public bool playerRange2    = false;
+    public bool playerExtraBuy  = false;
+    [HideInInspector] public bool boughtASpellBook;
+    [HideInInspector] public int  spellsLeftToGain = 0;
+    private SpellType newSpellToGain;
+    [SerializeField] private GameObject powerup;  //   RAINBOW SPARKLE EFFECT
     private List<PlayerBuffData> stat;
-    
-    //! DELETE
-    //// public Node[] _currentPath;                    // CURRENT NODE(PATH)    
-    //// public int _currentNode;                       // INDEX OF THE CURRENT SPACE ON NODE(PATH)  
-    //// public Vector3 _currentPositionHolder;         // POSITION OF THE CURRENT SPACE 
     private Vector3 asidePos;
 
 
@@ -33,6 +49,7 @@ public class PathFollower : MonoBehaviour
     private float lScale;
     public  Animator _animator;
     private GameObject character;
+    [SerializeField] private GameObject characterHolder;
     [SerializeField] private GameObject[] characters;   // ** inspector
     [SerializeField] private GameObject[] heads;        // ** inspector
     
@@ -111,29 +128,10 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private AudioSource gotAnOrb;
     [SerializeField] private AudioSource spellPickup;
     [SerializeField] private AudioSource manaUsed;
+    [SerializeField] private AudioSource powerupSound;  
     [SerializeField] private GameObject layout;
 
 
-    [Header("PLAYER GAME DATA")]
-    public int coins;
-    public int orbs;   // MARIO PARTY STARS
-    [Space]
-    public TextMeshProUGUI ranking;
-
-    // ** PLAYER STATUS/BUFFS (TO UPDATE TO CONTROLLER)
-    [SerializeField] private Slider[] movebars;
-    public bool playerSlowed    = false;
-    [SerializeField] private GameObject slowed;
-    public bool playerBarrier   = false;
-    [SerializeField] private GameObject barrier;
-    public bool playerMove15    = false;
-    public bool playerRange2    = false;
-    public bool playerExtraBuy  = false;
-    [HideInInspector] public bool boughtASpellBook;
-    [HideInInspector] public int  spellsLeftToGain = 0;
-    private SpellType newSpellToGain;
-    [SerializeField] private GameObject powerup;  //   RAINBOW SPARKLE EFFECT
-    [SerializeField] private AudioSource powerupSound;  
 
 
     [Header("Prefabs to Spawn")]
@@ -289,6 +287,7 @@ public class PathFollower : MonoBehaviour
     public Sprite spellMoveBarrier;
     public Sprite spellMoveSteal;
     public Sprite spellMoveOrb;
+    public Sprite spellMoveTitan;
     public Sprite keySprite;
     private bool slowDice;
 
@@ -335,9 +334,8 @@ public class PathFollower : MonoBehaviour
         // CHARACTER MOVER
         for (int i=0 ; i<characters.Length ; i++) {
             if (characterName == characters[i].name) {
-                var obj = Instantiate(characters[i], transform.position, Quaternion.identity, this.transform); 
+                var obj = Instantiate(characters[i], transform.position, Quaternion.identity, characterHolder.transform); 
                 character = obj.gameObject; 
-                obj.transform.parent = this.transform;  
                 _animator = obj.GetComponent<Animator>();
                 break;
             }
@@ -601,9 +599,18 @@ public class PathFollower : MonoBehaviour
                     radialBar.gameObject.SetActive(true);
                     radialBar.maxValue = 360;
                     radialBar.value = Random.Range(radialBar.minValue, radialBar.maxValue);
-                    if      (playerSlowed) { radialCircle.sprite = radialCircles[0]; }
-                    else if (playerMove15) { radialCircle.sprite = radialCircles[2]; }
-                    else                   { radialCircle.sprite = radialCircles[1]; }
+                    if      (playerSlowed) { 
+                        radialCircle.sprite = radialCircles[0]; 
+                        if (playerTitan) radialCircle.sprite = radialCircles[0+3]; 
+                    }
+                    else if (playerMove15) { 
+                        radialCircle.sprite = radialCircles[2]; 
+                        if (playerTitan) radialCircle.sprite = radialCircles[2+3]; 
+                    }
+                    else                   { 
+                        radialCircle.sprite = radialCircles[1]; 
+                        if (playerTitan) radialCircle.sprite = radialCircles[1+3]; 
+                    }
 
                     isRollingDice = true;
                 }
@@ -1192,6 +1199,11 @@ public class PathFollower : MonoBehaviour
         if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
             StartCoroutine(fadeMovesLeft());
         }
+        // SHIRNK IF PLAYER IS A LAGRE
+        if (playerTitan) {
+            playerTitan = false;
+            StartCoroutine( TITANIZE(false) );
+        }
 
         if (currentNode.IS_GREEN())  { controller.EVENT_ORB_UPDATE(playerID); }
         // LANDED ON BLUE | RED | EVENT (SO FAR)
@@ -1434,7 +1446,7 @@ public class PathFollower : MonoBehaviour
             for (int i=0 ; i<spells.Count ; i++) {
                 if (spells[i].spellKind == "Key") {
                     spellIndex = i;
-                    LOSE_SPELL(1, spellIndex);
+                    StartCoroutine( LOSE_SPELL(-1, spellIndex) );
                     break;
                 }
             }
@@ -1800,12 +1812,13 @@ public class PathFollower : MonoBehaviour
     IEnumerator DICE_ROLLED()
     {
         if (!pseudoMove) {
-            // int nMoves = (int)(moveBar.value + 10) / 10;
             int nMoves;
             if      (playerSlowed) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 5); }
             else if (playerMove15) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 15); }
             else                   { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 10); }
+            // TITAN = DOUBLE MOVEMENT
             _movesRemaining = (nMoves+1);
+            if (playerTitan) _movesRemaining *= 2;
             controller.SLOW_ORB_UPDATE(playerID, _movesRemaining);
             radialBar.GetComponent<Animator>().speed = 0;
         }
@@ -2351,6 +2364,10 @@ public class PathFollower : MonoBehaviour
             purchaseLeftText.color = new Color(1,0,0);
             purchaseLeftText2.color = new Color(1,0,0);
         }
+        else {
+            purchaseLeftText.color = new Color(1,1,1);
+            purchaseLeftText2.color = new Color(1,1,1);
+        }
     }
 
     public void FINISHED_SHOPPING()
@@ -2707,7 +2724,7 @@ public class PathFollower : MonoBehaviour
         REFRESH_SPELLS();
     }
 
-    Sprite GET_SPELL_ICON_SPRITE(string spellName)
+    Sprite GET_SPELL_ICON_SPRITE(string spellName, bool canReturnNull=false)
     {
         switch (spellName)
         {
@@ -2728,10 +2745,14 @@ public class PathFollower : MonoBehaviour
             case "Spell_Move_Steal" :       return spellMoveSteal;
             case "Spell_Move_Barrier" :     return spellMoveBarrier;
             case "Spell_Move_Orb" :         return spellMoveOrb;
+            case "Spell_Move_Titan" :       return spellMoveTitan;
             case "Key" :                    return keySprite;
             default :      
-                Debug.LogError("HAVE NOT ADD SPELL SPRITE");
+                if (canReturnNull) {
+                    return null;
+                }
                 return spellSlotEmpty;
+                // Debug.LogError("HAVE NOT ADD SPELL SPRITE");
         }
     }
 
@@ -2900,31 +2921,13 @@ public class PathFollower : MonoBehaviour
             // UP TO CURRENT NUMBER OF SPELLS
             grimoireUI._slots[i].name = spells[i].spellName;
             grimoireUI._slots[i].interactable = true; 
-            switch (spells[i].spellName)
-            {
-                case "Spell_Trap_10" :          grimoireUI._slots[i].GetComponent<Image>().sprite = spellTrap10;   break;
-                case "Spell_Trap_20" :          grimoireUI._slots[i].GetComponent<Image>().sprite = spellTrap20;   break;
-                case "Spell_Trap_Orb" :         grimoireUI._slots[i].GetComponent<Image>().sprite = spellTrapOrb;  break;
-                
-                case "Spell_Effect_10" :        grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffect10; break;
-                case "Spell_Effect_Mana_3" :    grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectMana3; break;
-                case "Spell_Effect_Spell_1" :   grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectSpell1; break;
-                case "Spell_Effect_Slow_1" :    grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectSlow1; break;
-                case "Spell_Effect_Swap" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectSwap; break;
-                
-                case "Spell_Move_Dash_5" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveDash5; break;
-                case "Spell_Move_Dash_8" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveDash8; break;
-                case "Spell_Move_Slow" :        grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveSlow; break;
-                case "Spell_Move_Slowgo" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveSlowgo; break;
-                case "Spell_Move_Steal" :       grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveSteal; break;
-                case "Spell_Move_Barrier" :     grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveBarrier; break;
-                case "Spell_Move_Orb" :         grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveOrb; break;
-
-                case "Key" :         grimoireUI._slots[i].GetComponent<Image>().sprite = keySprite; break;
-                default :                 
-                    grimoireUI._slots[i].GetComponent<Image>().sprite = spellNone;
-                    grimoireUI._slots[i].interactable = false; 
-                    break;
+            Sprite spellSprite = GET_SPELL_ICON_SPRITE(spells[i].spellName);
+            if (spellSprite != null) {
+                grimoireUI._slots[i].GetComponent<Image>().sprite = spellSprite;
+            }
+            else {
+                grimoireUI._slots[i].GetComponent<Image>().sprite = spellNone;
+                grimoireUI._slots[i].interactable = false; 
             }
         }
         REFRESH_SPELLS();
@@ -2968,6 +2971,9 @@ public class PathFollower : MonoBehaviour
                     return;
                 case "Spell_Move_Steal" : 
                     StartCoroutine(ANIMATE_MAGIC_CIRCLE("steal"));   
+                    return;
+                case "Spell_Move_Titan" : 
+                    StartCoroutine(ANIMATE_MAGIC_CIRCLE("titan"));   
                     return;
                 case "Spell_Move_Orb" : 
                     StartCoroutine( CHANGE_ORB_SPACE() );
@@ -3032,6 +3038,7 @@ public class PathFollower : MonoBehaviour
     // MOVE RELATED SPELLS
     private IEnumerator ANIMATE_MAGIC_CIRCLE(string effect)
     {
+        effect = effect.ToLower();
         yield return new WaitForEndOfFrame();
         USE_MP(spellMpCost); 
         grimoireUI.gameObject.SetActive(false);
@@ -3040,6 +3047,11 @@ public class PathFollower : MonoBehaviour
         yield return new WaitForSeconds(1);
         Destroy(mCircle.gameObject);
         var buff = Instantiate(blueBuffPrefab, transform.position, blueBuffPrefab.transform.rotation);
+        if (effect == "titan") {
+            playerTitan = true;
+            StartCoroutine( TITANIZE() );
+            yield return new WaitForSeconds(0.5f);
+        }
 
         yield return new WaitForSeconds(1);
         Destroy(buff.gameObject);
@@ -3109,6 +3121,28 @@ public class PathFollower : MonoBehaviour
             }
         }
         slowed.transform.parent = character.transform; 
+    }
+
+    IEnumerator TITANIZE(bool enlarge=true)
+    {
+        if (enlarge)
+        {
+            // GROW LARGE
+            while (characterHolder.transform.localScale.y < 2)
+            {
+                yield return new WaitForSeconds(0.01f);
+                characterHolder.transform.localScale += new Vector3(0.1f,0.1f,0.1f);
+            }
+        }
+        else
+        {
+            // SHRINK
+            while (characterHolder.transform.localScale.y > 1)
+            {
+                yield return new WaitForSeconds(0.01f);
+                characterHolder.transform.localScale -= new Vector3(0.1f,0.1f,0.1f);
+            }
+        }
     }
 
     // TELEPORTATION

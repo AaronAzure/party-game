@@ -2217,6 +2217,7 @@ public class MinigameControls : MonoBehaviour
         var eff = Instantiate(teleBlueEffect, transform.position, teleBlueEffect.transform.rotation);
         eff.transform.parent = this.transform; Destroy(eff, 0.6f);
 
+        // GROW LARGE
         while (this.transform.localScale.y < titanFactor)
         {
             yield return new WaitForEndOfFrame();
@@ -2227,6 +2228,7 @@ public class MinigameControls : MonoBehaviour
         yield return new WaitForSeconds(3.5f);
         isTitan = false;
 
+        // SHRINK
         while (this.transform.localScale.y > oldSize)
         {
             yield return new WaitForEndOfFrame();
