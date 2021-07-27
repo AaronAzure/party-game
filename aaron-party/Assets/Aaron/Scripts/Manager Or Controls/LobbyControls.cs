@@ -41,17 +41,21 @@ public class LobbyControls : MonoBehaviour
     private LobbyQuest playSideQuest;
     [SerializeField] private GameObject minigame;   // TENT
 
+    [Header("Button Text")]
     [SerializeField] private TextMeshProUGUI maxTurns;
     [SerializeField] private TextMeshProUGUI gameStyle;
     [SerializeField] private TextMeshProUGUI gameDifficulty;
     [SerializeField] private TextMeshProUGUI orderStyle;
     [SerializeField] private TextMeshProUGUI restoreMpTurn;
+    [SerializeField] private TextMeshProUGUI mercyRuleText;
     [SerializeField] private TextMeshPro backToCharacter;
     [SerializeField] private TextMeshPro resumeLastGame;
-    private bool resuming;
-    private bool canResume;
+
+    [Header("Resume Game")]
     [SerializeField] private GameObject timeCirclePrefab;
     [SerializeField] private GameObject timeMaster;
+    private bool resuming;
+    private bool canResume;
 
     private int nSetting = 0;
     [Header("Board Settings")]
@@ -392,6 +396,8 @@ public class LobbyControls : MonoBehaviour
     }
 
 
+    // todo ----------------------- SETTINGS -----------------------
+
     // PRESS 'L' OR 'R' BUTTON
     private void ADJUST_SETTINGS()
     {
@@ -428,6 +434,7 @@ public class LobbyControls : MonoBehaviour
                     case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(true); break;
                     case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
                     case "MP_Restore_Panel":    CHANGE_N_TURN_TO_RECOVER_MP(true); break;
+                    case "Mercy_Panel":         TOGGLE_MERCY_RULES(); break;
                 }
             }
             else if (player.GetButtonDown("L")) {
@@ -438,6 +445,7 @@ public class LobbyControls : MonoBehaviour
                     case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(false); break;
                     case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
                     case "MP_Restore_Panel":    CHANGE_N_TURN_TO_RECOVER_MP(false); break;
+                    case "Mercy_Panel":         TOGGLE_MERCY_RULES(); break;
                 }
             }
             // LONG PRESS
@@ -567,6 +575,12 @@ public class LobbyControls : MonoBehaviour
         }
     }
 
+    private void TOGGLE_MERCY_RULES()
+    {
+        // ON / OFF
+        controller.mercyRule = !controller.mercyRule;
+    }
+
     private void RESTART_GAME()
     {
         Destroy(controller.gameObject);    
@@ -593,6 +607,9 @@ public class LobbyControls : MonoBehaviour
         restoreMpTurn.text = "Every " + controller.restoreMpTurn + " Turns";
         if (controller.restoreMpTurn == 1) restoreMpTurn.text = "Every Turn";
         if (controller.restoreMpTurn == 0) restoreMpTurn.text = "Never";
+
+        if (controller.mercyRule) mercyRuleText.text = "On";
+        else                      mercyRuleText.text = "Off";
 
         DISPLAY_DIFFICULTY();
     }

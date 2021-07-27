@@ -93,7 +93,8 @@ public class IntroManager : MonoBehaviour
 
             if      (controller.turnNumber == 1)                        { isStart = true; }
             else if (controller.turnNumber == controller.maxTurns - 4)  { isBonus = true; }
-            else if (controller.turnNumber == controller.maxTurns + 1)  { isOutro = true; }
+            else if (controller.turnNumber >= controller.maxTurns + 1)  { isOutro = true; }
+            else    { isOutro = true; }
         }
 
         transitionAnim = transitionScreen.GetComponent<Animator>();
@@ -224,7 +225,24 @@ public class IntroManager : MonoBehaviour
 
     private void TextIndex()
     {
-        if (isStart)
+        // BOARD - END (MERCY RULE DOMINATING WINNER)
+        if (controller.mercyRule && controller.mercyWinner)
+        {
+            switch (nPrompt)
+            {
+                case 0 :  { aaronText.text = "That's the ball game."; break; }
+                case 1 :  { aaronText.text = "I have seen quite enough."; break; }
+                case 2 :  { aaronText.text = "You all have fought so splendidly."; break; }
+                case 3 :  { aaronText.text = "But one of you clearly outranks everyone else."; break; }
+                case 4 :  { aaronText.text = "Such that it would be cruel to let this competition continue."; break; }
+                case 5 :  { aaronText.text = "And that person is..."; break; }
+                case 6 :  {
+                    StartCoroutine( REVEAL_THE_WINNER() );  
+                    break; }
+            }
+        }
+        // BOARD - INTRO
+        else if (isStart)
         {
             switch (nPrompt)
             {
@@ -255,6 +273,7 @@ public class IntroManager : MonoBehaviour
                 case 19 :  { aaronText.text = "."; break; }
             }
         }
+        // BOARD - FIVE LAST TURN
         else if (isBonus)
         {
             switch (nPrompt)
@@ -287,6 +306,7 @@ public class IntroManager : MonoBehaviour
                 case 19 :  { aaronText.text = "."; break; }
             }
         }
+        // BOARD - END (FIXED BONUS ORBS)
         else if (isOutro && !controller.isCasual)
         {
             switch (nPrompt)
@@ -378,6 +398,7 @@ public class IntroManager : MonoBehaviour
                     break; }
             }
         }
+        // BOARD - END (RANDOM BONUS ORBS)
         else if (isOutro && controller.isCasual)
         {
             switch (nPrompt)

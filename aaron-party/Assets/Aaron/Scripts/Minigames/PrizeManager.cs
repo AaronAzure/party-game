@@ -37,7 +37,6 @@ public class PrizeManager : MonoBehaviour
             SET_PLAYER_HEAD();
             
             data = controller.GET_PLAYER_DATA(uiNumber - 1);
-            // controller.playerData[uiNumber - 1].coins += data.prize;
             coins.text = (data.coins - data.prize).ToString();
             orbs.text  = data.orbs.ToString();
             mana.text  = data.mp + "/5";
@@ -97,15 +96,6 @@ public class PrizeManager : MonoBehaviour
         if (data.firstPlace) {
             yield return new WaitForSeconds(0.1f);
             if (controller.playerData[uiNumber - 1].mp != 5) controller.playerData[uiNumber - 1].mp++;
-            //! DELETE
-            // if (controller.p1[0].mp != 5 && uiNumber == 1) controller.p1[0].mp++;
-            // if (controller.p2[0].mp != 5 && uiNumber == 2) controller.p2[0].mp++;
-            // if (controller.p3[0].mp != 5 && uiNumber == 3) controller.p3[0].mp++;
-            // if (controller.p4[0].mp != 5 && uiNumber == 4) controller.p4[0].mp++;
-            // if (controller.p5[0].mp != 5 && uiNumber == 5) controller.p5[0].mp++;
-            // if (controller.p6[0].mp != 5 && uiNumber == 6) controller.p6[0].mp++;
-            // if (controller.p7[0].mp != 5 && uiNumber == 7) controller.p7[0].mp++;
-            // if (controller.p8[0].mp != 5 && uiNumber == 8) controller.p8[0].mp++;
             mana.text  = (data.mp) + "/5";
             prizeAmount.text = "+0";
             manaCollectSound.Play();

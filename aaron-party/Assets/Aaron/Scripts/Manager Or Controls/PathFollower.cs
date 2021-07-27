@@ -69,7 +69,8 @@ public class PathFollower : MonoBehaviour
     public int _movesRemaining;
     private bool moveDecremented;
 
-    private float _moveSpeed = 5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
+    [Range(1,20)]
+    [SerializeField] private float _moveSpeed = 5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
     private float _timer;
 
     private GameManager manager;
@@ -2142,6 +2143,8 @@ public class PathFollower : MonoBehaviour
                 orbPickup.Play();
                 orbs++;
             }
+            UPDATE_INFORMATION(false);
+            manager.IS_MERCY_RULE_WINNER(playerID);
         }
         else
         {
@@ -2231,6 +2234,8 @@ public class PathFollower : MonoBehaviour
             orbPickup.Play();    
             orbs++;
         }
+        UPDATE_INFORMATION(false);
+        manager.IS_MERCY_RULE_WINNER(playerID);
 
         if (beingPayed) { 
             yield return new WaitForSeconds(1);
@@ -2428,6 +2433,8 @@ public class PathFollower : MonoBehaviour
                 orbPickup.Play();
                 orbs++;
             }
+            UPDATE_INFORMATION(false);
+            manager.IS_MERCY_RULE_WINNER(playerID);
         }
         manager.CHECK_RANKINGS();
 
@@ -2458,6 +2465,13 @@ public class PathFollower : MonoBehaviour
             _cam.orthographicSize = camSizeNormal;
         }
     }
+
+    // void DOMINATING_VICTORY()
+    // {
+    //     if (manager.MERCY_RULE(playerID)) {
+
+    //     }
+    // }
 
 
     /* ---------------------------------------------------------------- */

@@ -348,6 +348,50 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void IS_MERCY_RULE_WINNER(int playerID)
+    {
+        if (!controller.mercyRule || nPlayers <= 1) return;
+
+        int[] score = new int[nPlayers];
+        int[] pID   = new int[nPlayers];    // playerID
+
+        for (int i=0 ; i<pID.Length ; i++) { pID[i] = i; }
+        
+        for (int i=0 ; i<gamers.Length ; i++)
+        {
+            score[i] += gamers[i].coins;
+            score[i] += (gamers[i].orbs * 1000);
+        }
+
+        // SORT EVERYONE'S SCORES (DESCENDING)
+        for ( int i=0 ; i<score.Length ; i++ )
+        {
+            for ( int j=0 ; j<score.Length ; j++ )
+            {
+                if (score[i] > score[j])
+                {
+                    int temp = score[i];
+                    score[i] = score[j];
+                    score[j] = temp;
+
+                    int tempID = pID[i];
+                    pID[i] = pID[j];
+                    pID[j] = tempID;
+                }
+            }
+        }
+
+        // FIRST PLACE HAS MORE THAN THREE ORBS THAN THE PLAYER IN SECOND, IMMEDIATE VICTORY
+        Debug.Log(controller.playerData[ pID[0] ].orbs + "  :  " + (controller.playerData[ pID[1] ].orbs + 3));
+        if (pID.Length > 1 && pID[0] == playerID && 
+            controller.playerData[ pID[0] ].orbs >= (controller.playerData[ pID[1] ].orbs + 3) )
+            {
+                UPDATE_ALL_INFO();
+                controller.mercyWinner = true;
+                StartCoroutine( WE_HAVE_A_WINNER() );
+            }
+    }
+
     // todo ------------------------------------------------------------------------
     public void NEXT_PLAYER_TURN()
     {
@@ -614,6 +658,16 @@ public class GameManager : MonoBehaviour
 
     // WHEN NOT VIEWING MAP, UNHIDE UI
     public void UNHIDE_UI() { UIcanvas.SetActive(true); }
+
+
+    //* MERCY RULE WINNER
+    IEnumerator WE_HAVE_A_WINNER()
+    {
+        SCREEN_TRANSITION("Oval_Transition", 0);
+        yield return new WaitForSeconds(1);
+        controller.LOAD_CUTAWAY();
+    }
+
 
     // -------------------------------------------------------------------- //
     // -------------- PAYING SOMEONE COINS FROM TRAP ---------------------- //

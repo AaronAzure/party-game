@@ -31,6 +31,8 @@ public class GameController : MonoBehaviour
     public bool norm = true;
     public bool hard;
     public bool isSetOrder = true;    // ** SET BY PLAYER 1 (LobbyControls) {true = set player order | false = flex player order}
+    public bool mercyRule = true;   // ** {true = If player in first has more than 3 orbs than second place, They WIN }
+    public bool mercyWinner;
 
 
     [Header("Player Data")]
@@ -42,7 +44,7 @@ public class GameController : MonoBehaviour
     public string characterName6;
     public string characterName7;
     public string characterName8;
-    private string[] characterNames;
+    [SerializeField] private string[] characterNames;
 
     public List<PlayerPrevData> playerData;
     // public List<PlayerPrevData> p1;
@@ -266,6 +268,15 @@ public class GameController : MonoBehaviour
                 // buffDatas.Add( new List<PlayerBuffData>() ); 
                 buffDatas.Add( new PlayerBuffData(false,false,false,false,false) );
             }
+            characterNames = new string[nPlayers];
+            if (nPlayers >= 1) characterNames[0] = characterName1;
+            if (nPlayers >= 2) characterNames[1] = characterName2;
+            if (nPlayers >= 3) characterNames[2] = characterName3;
+            if (nPlayers >= 4) characterNames[3] = characterName4;
+            if (nPlayers >= 5) characterNames[4] = characterName5;
+            if (nPlayers >= 6) characterNames[5] = characterName6;
+            if (nPlayers >= 7) characterNames[6] = characterName7;
+            if (nPlayers >= 8) characterNames[7] = characterName8;
 
             // PLAYER ORDER DURING EACH TURN
             playerOrder     = new int[nPlayers];

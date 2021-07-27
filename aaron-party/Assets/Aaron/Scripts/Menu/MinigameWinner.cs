@@ -30,9 +30,11 @@ public class MinigameWinner : MonoBehaviour
 
         yield return new WaitForSeconds(transitionTime);
         
+        // FIVE TURNS LEFT
         if (controller.turnNumber == controller.maxTurns - 4) {
             controller.LOAD_CUTAWAY();
         }
+        // NORMAL TURN
         else if (controller.turnNumber <= controller.maxTurns) {
             string mySavedScene = PlayerPrefs.GetString("sceneName");
             SceneManager.LoadScene(mySavedScene);
