@@ -67,7 +67,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -1}
+  m_AnchoredPosition: {x: 0, y: -1.25}
   m_SizeDelta: {x: 3, y: 3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &8226665141313267642
@@ -24155,7 +24155,6 @@ MonoBehaviour:
   teleportEffect: {fileID: 145256, guid: 426d849a9ad6e4ea5a3fc0b68bede053, type: 3}
   nexts: []
   magicGate: {fileID: 0}
-  gateAnim: {fileID: 0}
   emptySpace: {fileID: 21300000, guid: e6e36cc42fd46491f8c3d8f81e9357d3, type: 3}
   blueSpace: {fileID: 21300000, guid: 27aac94e109c9834295990e95443b405, type: 3}
   redSpace: {fileID: 21300000, guid: 5d79994be1ee0c146933cba13474436a, type: 3}

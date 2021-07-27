@@ -480,7 +480,7 @@ public class MinigameManager : MonoBehaviour
 
             controller.MINIGAME_PRIZE( new int[]{c1,c2,c3,c4,c5,c6,c7,c8} );     // COINS WON IN MINIGAME (QUEST)
             yield return new WaitForSeconds(1);
-            if (winnerNames != "Draw!" && winnerNames != "Too Bad!") { winnerNames += "\nWins!"; winMusic.Play(); }
+            if (winnerNames != "Draw!" && winnerNames != "Quest Failed!") { winnerNames += "\nWins!"; winMusic.Play(); }
             else { drawMusic.Play(); }
             winnerText.text = winnerNames;
         }
@@ -735,7 +735,7 @@ public class MinigameManager : MonoBehaviour
                         if (players[j].points < 0) {
                             int tied = PLAYER_RANKING(i - 1);
                             PLAYER_WON_N_COINS(tied, players[j].playerID);
-                            if (bossBattle) winnerNames = "Too Bad!";
+                            if (bossBattle) winnerNames = "Quest Failed!";
                             else winnerNames = "Draw!";
                             continue;
                         }
@@ -787,7 +787,7 @@ public class MinigameManager : MonoBehaviour
 
                         // IF PLAYER IN FIRST ALSO GOT ELIMINATED AT THE SAME TIME
                         if (players[j].points < 0) {
-                            if (bossBattle) winnerNames = "Too Bad!";
+                            if (bossBattle) winnerNames = "Quest Failed!";
                             else winnerNames = "Draw!";
                             continue;
                         }
