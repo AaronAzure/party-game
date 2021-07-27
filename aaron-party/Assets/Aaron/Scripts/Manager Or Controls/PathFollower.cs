@@ -97,6 +97,7 @@ public class PathFollower : MonoBehaviour
     [Header("Magic Gate")]
     [SerializeField] private GameObject gateUi;             // ** INSPECTOR
     [SerializeField] private GameObject gateUiWithKey;      // ** INSPECTOR
+    [SerializeField] private Button gateMana;      // ** INSPECTOR
     [SerializeField] private GameObject gateCannotOpenUi;   // ** INSPECTOR
     private bool openingGate;
 
@@ -116,9 +117,8 @@ public class PathFollower : MonoBehaviour
     [Header("PLAYER GAME DATA")]
     public int coins;
     public int orbs;   // MARIO PARTY STARS
+    [Space]
     public TextMeshProUGUI ranking;
-
-
 
     // ** PLAYER STATUS/BUFFS (TO UPDATE TO CONTROLLER)
     [SerializeField] private Slider[] movebars;
@@ -971,6 +971,16 @@ public class PathFollower : MonoBehaviour
                 gateUi.SetActive(false);
                 gateCannotOpenUi.SetActive(false);
             }
+            // HAS KEY
+            else if (gateUiWithKey.activeSelf) {
+                // if (player.GetButtonDown("A")) //! CALLED WITH BUTTON
+                if (player.GetButtonDown("B")) {
+                    nextNode = null;
+                    gateUiWithKey.SetActive(false);
+                    isAtGate = false;
+                }
+            }
+            // HAS MANA
             else if (gateUi.activeSelf) {
                 if (player.GetButtonDown("A")) {
                     gateUi.SetActive(false);
@@ -1371,7 +1381,7 @@ public class PathFollower : MonoBehaviour
     // todo -------------------------- MAGIC GATE ------------------------------ *//
 
 
-    // IS NEXT NODE A MAGIC GATE
+    // IS NEXT NODE A MAGIC GATE (CALLED ONCE PER TIME)
     private void IS_AT_GATE()
     {
         if (nextNode.TYPE_OF_SPECIAL_SPACE("gate")) { 
@@ -1380,7 +1390,16 @@ public class PathFollower : MonoBehaviour
             _animator.speed = 1;
 
             if (PLAYER_HAS_A_KEY()) {
-
+                gateUiWithKey.SetActive(true);
+                // DON'T WANT TO USE KEY BUT DOES NOT HAVE ENOUGH MANA
+                if (mpBar.value < 4) {
+                    gateMana.interactable = false;
+                    gateMana.GetComponent<Image>().color = new Color(1, 0.1f, 0.1f, 1);
+                }
+                else {
+                    gateMana.interactable = true;
+                    gateMana.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+                }
             }
             else if (mpBar.value >= 4) {
                 gateUi.SetActive(true);
@@ -1408,16 +1427,41 @@ public class PathFollower : MonoBehaviour
         return (node.GetComponent<Node>().TYPE_OF_SPECIAL_SPACE("gate") && mpBar.value >= 4);
     }
 
+    public void BUTTON_OPEN_GATE(bool withKey)
+    {
+        if (withKey)
+        {
+            for (int i=0 ; i<spells.Count ; i++) {
+                if (spells[i].spellKind == "Key") {
+                    spellIndex = i;
+                    LOSE_SPELL(1, spellIndex);
+                    break;
+                }
+            }
+            StartCoroutine( OPEN_MAGIC_GATE(0) );
+
+        }
+        else
+        {
+            StartCoroutine( OPEN_MAGIC_GATE() );
+        }
+    }
     IEnumerator OPEN_MAGIC_GATE(int cost=4)
     {
         openingGate = true;
+        gateMana.interactable = true;
         nextNode.OPEN_MAGIC_GATE();
+        gateUiWithKey.SetActive(false);
         gateUi.SetActive(false);
-        LOSE_MP(cost);
-        for (int i=0 ; i<cost ; i++) {
+        if (cost > 0) LOSE_MP(cost);
+        for (int i=0 ; i<4 ; i++) {
             manaUsed.Play();
             yield return new WaitForSeconds(0.25f);
         }
+        // WAIT EXTRA TIME 
+        // if (cost < 4) {
+        //     yield return new WaitForSeconds(0.25f * (4 - cost));
+        // }
 
         yield return new WaitForSeconds(1);
         _animator.SetBool("IsWalking", true);
@@ -2025,26 +2069,42 @@ public class PathFollower : MonoBehaviour
         }
         mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
     }
-    public IEnumerator LOSE_SPELL(int n)
+    public IEnumerator LOSE_SPELL(int n, int ind=-1)
     {
         n = Mathf.Abs(n);
         
-        for ( int i=0 ; i<n ; i++ )
-        {
-            if (spells.Count > 0) {
+        if (ind == -1) {
+            for ( int i=0 ; i<n ; i++ )
+            {
+                if (spells.Count > 0) {
+                    var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+                    SpriteRenderer spellImg = go.GetComponentInChildren<SpriteRenderer>();
+                    int rng = Random.Range(0,spells.Count);
+                    spellImg.sprite = GET_SPELL_ICON_SPRITE(spells[rng].spellName);
+                    
+                    go.GetComponent<TextMeshPro>().text = "-1";
+                    Color top = new Color(1, 0.15f, 0.2f);
+                    Color bot = new Color(0.8f, 0, 0.05f);
+                    go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+                    spells.RemoveAt( rng );
+                    yield return new WaitForSeconds(0.5f);
+                }
+            } 
+        }
+        else {
+            if (spells.Count > spellIndex) {
                 var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
                 SpriteRenderer spellImg = go.GetComponentInChildren<SpriteRenderer>();
-                int rng = Random.Range(0,spells.Count);
-                spellImg.sprite = GET_SPELL_ICON_SPRITE(spells[rng].spellName);
+                spellImg.sprite = GET_SPELL_ICON_SPRITE(spells[spellIndex].spellName);
+                spells.RemoveAt( spellIndex );
                 
                 go.GetComponent<TextMeshPro>().text = "-1";
                 Color top = new Color(1, 0.15f, 0.2f);
                 Color bot = new Color(0.8f, 0, 0.05f);
                 go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-                spells.RemoveAt( rng );
                 yield return new WaitForSeconds(0.5f);
             }
-        } 
+        }
 
         UPDATE_SPELLS_UI();
     }
@@ -2806,7 +2866,7 @@ public class PathFollower : MonoBehaviour
             mpBar.value -= mpCost;
             mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
         }
-        manaUsed.Play();
+        if (mpCost > 0) manaUsed.Play();
         spells.RemoveAt(spellIndex);
         UPDATE_SPELLS_UI();
 
@@ -2859,7 +2919,7 @@ public class PathFollower : MonoBehaviour
                 case "Spell_Move_Steal" :       grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveSteal; break;
                 case "Spell_Move_Barrier" :     grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveBarrier; break;
                 case "Spell_Move_Orb" :         grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveOrb; break;
-                
+
                 case "Key" :         grimoireUI._slots[i].GetComponent<Image>().sprite = keySprite; break;
                 default :                 
                     grimoireUI._slots[i].GetComponent<Image>().sprite = spellNone;

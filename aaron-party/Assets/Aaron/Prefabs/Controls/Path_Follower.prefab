@@ -37583,6 +37583,7 @@ MonoBehaviour:
   diceRolled: 0
   gateUi: {fileID: 2052200533192769227}
   gateUiWithKey: {fileID: 6822954226664334111}
+  gateMana: {fileID: 4600357712151674857}
   gateCannotOpenUi: {fileID: 6555925147351999364}
   coinPickup: {fileID: 3505561664411237926}
   coinLoss: {fileID: 3489765844563405975}
@@ -40719,15 +40720,15 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2882453411669714690}
-        m_MethodName: CAST_MAGIC_SPELL
-        m_Mode: 3
+        m_MethodName: BUTTON_OPEN_GATE
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &8894320647979923540
 MonoBehaviour:
@@ -41444,8 +41445,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2882453411669714690}
-        m_MethodName: CAST_MAGIC_SPELL
-        m_Mode: 3
+        m_MethodName: BUTTON_OPEN_GATE
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -51865,7 +51866,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Consume 4<sprite="currency" index=1> to unlock gate
+  m_text: Use <sprite="key" index=0> or 4<sprite="currency" index=1> to unlock gate
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

@@ -169,6 +169,7 @@ public class ShopMenu : MonoBehaviour
                     foreach (Spell s in buttonSpells)
                     {
                         if (!s._interactable.interactable) { continue; }
+                        // CANNOT BE BOUGHT
                         if (s._price > player.coins) {
                             s._color.color = new Color(1, 0.1f, 0.1f, 1);
                         }
