@@ -23,62 +23,89 @@ public class Spell : MonoBehaviour
     {
         switch (this.name)
         {
-            case "Spell_Trap_10" :      _price = 5;     _mpCost = 1;    _spellKind = "Trap";
+            case "Spell_Trap_10" :      
+                _price = 5;     _mpCost = 1;    _spellKind = "Trap";
                 _desc = "Create a trap, steal 10 gold from any opponent that lands on the trap.";    break;
-            case "Spell_Trap_20" :      _price = 10;    _mpCost = 2;    _spellKind = "Trap";
+            case "Spell_Trap_20" :      
+                _price = 10;    _mpCost = 2;    _spellKind = "Trap";
                 _desc = "Create a trap, steal 20 gold from any opponent that lands on the trap.";    break;
-            case "Spell_Trap_Orb" :     _price = 20;    _mpCost = 3;    _spellKind = "Trap";
+            case "Spell_Trap_Orb" :     
+                _price = 20;    _mpCost = 3;    _spellKind = "Trap";
                 _desc = "Create a trap, steal an orb from any opponent that lands on the trap.";    break;
 
-            case "Spell_Effect_10" :    _price = 8;    _mpCost = 2;    _spellKind = "Effect";
+            case "Spell_Effect_10" :    
+                _price = 8;    _mpCost = 2;    _spellKind = "Effect";
                 _desc = "Destroy 15 gold to all opponents on a targeted space (within range).";  
                 if (SceneManager.GetActiveScene().name == "Crystal_Caverns") { 
                     _desc = "Destroy 15 gold to all opponents on a targeted space (within range). Also destroy boulders."; 
                 } break;
-            case "Spell_Effect_Mana_3": _price = 12;    _mpCost = 2;    _spellKind = "Effect";
+            case "Spell_Effect_Mana_3": 
+                _price = 12;    _mpCost = 2;    _spellKind = "Effect";
                 _desc = "Destroy 3 mana to all opponents on a targeted space (within range).";    break;
-            case "Spell_Effect_Spell_1": _price = 8;    _mpCost = 2;    _spellKind = "Effect";
+            case "Spell_Effect_Spell_1": 
+                _price = 8;    _mpCost = 2;    _spellKind = "Effect";
                 _desc = "Destroy a random spell to all opponents on a targeted space (within range).";    break;
-            case "Spell_Effect_Slow_1": _price = 12;    _mpCost = 2;    _spellKind = "Effect";
+            case "Spell_Effect_Slow_1": 
+                _price = 12;    _mpCost = 2;    _spellKind = "Effect";
                 _desc = "Reduce max movement to 5 for all opponents on a targeted space (within range).";    break;
-            case "Spell_Effect_Swap": _price = 20;    _mpCost = 3;    _spellKind = "Effect";
+            case "Spell_Effect_Swap": 
+                _price = 20;    _mpCost = 3;    _spellKind = "Effect";
                 _desc = "Swap places with a targeted opponent (within range).";    break;
 
-            case "Spell_Move_Dash_5":   _price = 12;    _mpCost = 2;    _spellKind = "Move";
+            case "Spell_Move_Dash_5":   
+                _price = 12;    _mpCost = 2;    _spellKind = "Move";
                 _desc = "Immediately advance 4 spaces. Then proceed with your turn.";  break;
-            case "Spell_Move_Dash_8":   _price = 25;    _mpCost = 3;    _spellKind = "Move";
+            case "Spell_Move_Dash_8":   
+                _price = 25;    _mpCost = 3;    _spellKind = "Move";
                 _desc = "Immediately advance 8 spaces. Then proceed with your turn.";    break;
-            case "Spell_Move_Slowgo":     _price = 12;    _mpCost = 2;    _spellKind = "Move";
+            case "Spell_Move_Slowgo":     
+                _price = 12;    _mpCost = 2;    _spellKind = "Move";
                 _desc = "Reduce max movement to 5, but with Slower magic circle rotation.";    break;
-            case "Spell_Move_Slow":     _price = 25;    _mpCost = 3;    _spellKind = "Move";
+            case "Spell_Move_Slow":     
+                _price = 25;    _mpCost = 3;    _spellKind = "Move";
                 _desc = "Slower magic circle rotation.";    break;
-            case "Spell_Move_Steal":     _price = 7;    _mpCost = 3;    _spellKind = "Move";
+            case "Spell_Move_Steal":     
+                _price = 7;    _mpCost = 3;    _spellKind = "Move";
                 _desc = "Steal 10 coins from all opponents you pass.";    break;
-            case "Spell_Move_Barrier":     _price = 10;    _mpCost = 2;    _spellKind = "Move";
+            case "Spell_Move_Barrier":     
+                _price = 10;    _mpCost = 2;    _spellKind = "Move";
                 _desc = "Nullify all effects of opponent's spells or traps until the start of next turn";    break;
-            case "Spell_Move_Orb":     _price = 25;    _mpCost = 3;    _spellKind = "Move";
+            case "Spell_Move_Orb":     
+                _price = 25;    _mpCost = 3;    _spellKind = "Move";
                 _desc = "Change the location of the Magic Orb space.";
                 if (SceneManager.GetActiveScene().name == "Shogun_Seaport") { _desc = "Change the current boat"; }    break;
 
 
-            case "SpellBook":     _price = 30;    _mpCost = 0;    _spellKind = "Item";
-                _desc = "Contains three random spells";  break;
+            case "SpellBook":     
+                _price = 30;    _mpCost = 0;    _spellKind = "Item";
+                _desc = "Contains up to three random spells.";  break;
+            case "Key":     
+                _price = 20;    _mpCost = 0;    _spellKind = "Key";
+                _desc = "Key embuded with mana, used to unlock sealed doors.";  break;
 
 
-            case "move-potion":   _price = 40;    _mpCost = 0;    _spellKind = "Item";
+            case "move-potion":   
+                _price = 40;    _mpCost = 0;    _spellKind = "Item";
                 _desc = "Permanently increases max movement by 5.";    break;
-            case "range-potion":   _price = 40;    _mpCost = 0;    _spellKind = "Item";
+            case "range-potion":   
+                _price = 40;    _mpCost = 0;    _spellKind = "Item";
                 _desc = "Permanently doubles your spell casting range.";    break;
-            case "vip-badge":   _price = 40;    _mpCost = 0;    _spellKind = "Item";
+            case "vip-badge":   
+                _price = 40;    _mpCost = 0;    _spellKind = "Item";
                 _desc = "VIP shop badge allows you to buy up to 3 spells per visit.";    break;
-            case "magic-orb":   _price = 40;    _mpCost = 0;    _spellKind = "Item";
+            case "magic-orb":   
+                _price = 40;    _mpCost = 0;    _spellKind = "Item";
                 _desc = "A more expensive winning condition.";
                 if (SceneManager.GetActiveScene().name == "Shogun_Seaport") { _price = 20;
                     this.name = "magic-orb (sale)"; }    break;
-            case "magic-orb (sale)":   _price = 40;    _mpCost = 0;    _spellKind = "Item";
+            case "magic-orb (sale)":   
+                _price = 40;    _mpCost = 0;    _spellKind = "Item";
                 _desc = "A more expensive winning condition.";
                 if (SceneManager.GetActiveScene().name == "Shogun_Seaport") { _price = 20; }    break;
-            default :                   _price = 999;   _mpCost = 1;    _spellKind = "Trap";
+
+            //* EMPTY SLOT / RAN OUT OF SPELLS / EMPTY GRIMOIRE
+            default :                   
+                _price = 999;   _mpCost = 1;    _spellKind = "Trap";
                 _desc = "No Spells :(";    break;
         }
 

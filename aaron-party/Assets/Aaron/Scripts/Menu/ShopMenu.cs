@@ -194,7 +194,7 @@ public class ShopMenu : MonoBehaviour
                 else if (currentSelected.name == "SpellBook")
                 {
                     player.boughtASpellBook = true;  
-                    player.spellsLeftToGain = 3;  
+                    player.spellsLeftToGain = 3 - player.spells.Count;  // GAIN UNTIL FULL
                     confirmObj.SetActive(false);
                     StartCoroutine( player.BOUGHT_A_SPELLBOOK() );
                     StartCoroutine( BuyMore() );
