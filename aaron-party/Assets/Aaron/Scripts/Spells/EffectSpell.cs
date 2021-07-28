@@ -48,7 +48,7 @@ public class EffectSpell : MonoBehaviour
             {
                 PathFollower p = other.GetComponent<HurtBoxPlayer>().player;
                 if (p == null) Debug.LogError("FAILURE TO DETECT PLAYER");
-                Debug.Log("found player");
+                // Debug.Log("found player");
                 nodeLocked = true;
                 targetedPlayer = p;
                 targetedPlayer.LOCKED_ON();

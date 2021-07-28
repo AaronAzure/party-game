@@ -142,6 +142,8 @@ public class Node : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (magicOrb != null)   magicOrb.SetActive(false);
+        
         // * IF MAGIC GATE
         if (magicGate != null) {
             gateAnim = magicGate.GetComponent<Animator>();

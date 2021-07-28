@@ -399,7 +399,7 @@ public class GameManager : MonoBehaviour
         {
             mainCam.gameObject.SetActive(false);
 
-            Debug.Log("|| player " + (controller.playerOrder[playerOrder]+1) + " 's TURN");
+            // Debug.Log("|| player " + (controller.playerOrder[playerOrder]+1) + " 's TURN");
             int gamer = controller.playerOrder[playerOrder];
 
             // switch (gamer)
@@ -423,14 +423,14 @@ public class GameManager : MonoBehaviour
             // }
             switch (gamer)
             {
-                case 0:     Debug.Log("Player 1 turn");   StartCoroutine( player1.YOUR_TURN() );  break;
-                case 1:     Debug.Log("Player 2 turn");   StartCoroutine( player2.YOUR_TURN() );  break;
-                case 2:     Debug.Log("Player 3 turn");   StartCoroutine( player3.YOUR_TURN() );  break;
-                case 3:     Debug.Log("Player 4 turn");   StartCoroutine( player4.YOUR_TURN() );  break;
-                case 4:     Debug.Log("Player 5 turn");   StartCoroutine( player5.YOUR_TURN() );  break;
-                case 5:     Debug.Log("Player 6 turn");   StartCoroutine( player6.YOUR_TURN() );  break;
-                case 6:     Debug.Log("Player 7 turn");   StartCoroutine( player7.YOUR_TURN() );  break;
-                case 7:     Debug.Log("Player 8 turn");   StartCoroutine( player8.YOUR_TURN() );  break;
+                case 0:     StartCoroutine( player1.YOUR_TURN() );  break;
+                case 1:     StartCoroutine( player2.YOUR_TURN() );  break;
+                case 2:     StartCoroutine( player3.YOUR_TURN() );  break;
+                case 3:     StartCoroutine( player4.YOUR_TURN() );  break;
+                case 4:     StartCoroutine( player5.YOUR_TURN() );  break;
+                case 5:     StartCoroutine( player6.YOUR_TURN() );  break;
+                case 6:     StartCoroutine( player7.YOUR_TURN() );  break;
+                case 7:     StartCoroutine( player8.YOUR_TURN() );  break;
             }
         }
         //* PLASMA PALACE, TURRET'S TURN

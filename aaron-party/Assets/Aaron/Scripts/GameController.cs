@@ -548,28 +548,36 @@ public class GameController : MonoBehaviour
 
             // BONUS ORB
             int[] richTemp = PlayerPrefsElite.GetIntArray("rich-orb");
-            for (int i=0 ; i<nPlayers ; i++)    richOrb[i] = richTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    richOrb[i] = richTemp[i]; }
+            else                    { for (int i=0 ; i<richTemp.Length ; i++)    richOrb[i] = richTemp[i]; }
 
             int[] questTemp = PlayerPrefsElite.GetIntArray("quest-orb");
-            for (int i=0 ; i<nPlayers ; i++)    questOrb[i] = questTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    questOrb[i] = questTemp[i]; }
+            else                    { for (int i=0 ; i<questTemp.Length ; i++)    questOrb[i] = questTemp[i]; }
 
             int[] trapTemp = PlayerPrefsElite.GetIntArray("trap-orb");
-            for (int i=0 ; i<nPlayers ; i++)    trapOrb[i] = trapTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    trapOrb[i] = trapTemp[i]; }
+            else                    { for (int i=0 ; i<trapTemp.Length ; i++)    trapOrb[i] = trapTemp[i]; }
 
             int[] eventTemp = PlayerPrefsElite.GetIntArray("event-orb");
-            for (int i=0 ; i<nPlayers ; i++)    eventOrb[i] = eventTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    eventOrb[i] = eventTemp[i]; }
+            else                    { for (int i=0 ; i<eventTemp.Length ; i++)    eventOrb[i] = eventTemp[i]; }
 
             int[] blueTemp = PlayerPrefsElite.GetIntArray("blue-orb");
-            for (int i=0 ; i<nPlayers ; i++)    blueOrb[i] = blueTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    blueOrb[i] = blueTemp[i]; }
+            else                    { for (int i=0 ; i<blueTemp.Length ; i++)    blueOrb[i] = blueTemp[i]; }
 
             int[] redTemp = PlayerPrefsElite.GetIntArray("red-orb");
-            for (int i=0 ; i<nPlayers ; i++)    redOrb[i] = redTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    redOrb[i] = redTemp[i]; }
+            else                    { for (int i=0 ; i<redTemp.Length ; i++)    redOrb[i] = redTemp[i]; }
 
             int[] slowTemp = PlayerPrefsElite.GetIntArray("slow-orb");
-            for (int i=0 ; i<nPlayers ; i++)    slowOrb[i] = slowTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    slowOrb[i] = slowTemp[i]; }
+            else                    { for (int i=0 ; i<slowTemp.Length ; i++)    slowOrb[i] = slowTemp[i]; }
 
             int[] shopTemp = PlayerPrefsElite.GetIntArray("shop-orb");
-            for (int i=0 ; i<nPlayers ; i++)    shopOrb[i] = shopTemp[i];
+            if (prevNPlayers > nPlayers) { for (int i=0 ; i<nPlayers ; i++)    shopOrb[i] = shopTemp[i]; }
+            else                    { for (int i=0 ; i<shopTemp.Length ; i++)    shopOrb[i] = shopTemp[i]; }
 
 
             // REMEMBER MAGIC ORB RELATED

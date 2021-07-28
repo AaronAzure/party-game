@@ -83,10 +83,10 @@ public class Spell : MonoBehaviour
                 _price = 20;    _mpCost = 0;    _spellKind = "Key";
                 _desc = "Key embuded with mana, used to unlock sealed doors.";  break;
             case "Spell_Move_Titan":     
-                _price = 20;    _mpCost = 3;    _spellKind = "Move";
+                _price = 20;    _mpCost = 4;    _spellKind = "Move";
                 _desc = "Enlarge yourself, allowing you to move twice as far.";  break;
             case "Spell_Effect_Orb":     
-                _price = 20;    _mpCost = 5;    _spellKind = "Effect";
+                _price = 20;    _mpCost = 4;    _spellKind = "Effect";
                 _desc = "Steal a magic orb from a selected player within small range.";  break;
 
 

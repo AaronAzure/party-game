@@ -43,7 +43,7 @@ public class MinigameControls : MonoBehaviour
 
 
     [Header("Rewired")]
-    [SerializeField] private RewiredStandaloneInputModule rInput;
+    [SerializeField] private RewiredStandaloneInputModule[] rInputs;
 
 
     // *********************** ASSIGN FROM LevelManager *********************** //
@@ -577,10 +577,13 @@ public class MinigameControls : MonoBehaviour
 
 
         if (whoPaused != null) whoPaused.text = characterName + " Paused";
-        if (rInput.RewiredPlayerIds != null) {
-            rInput.RewiredPlayerIds[0] = playerID;
+        if (rInputs != null) {
+            foreach (RewiredStandaloneInputModule rIn in rInputs)
+            {
+                rIn.RewiredPlayerIds = new int[1]{playerID};
+                rIn.RewiredInputManager = GameObject.Find("Rewired_Input_Manager").GetComponent<InputManager>();
+            }
         }
-        rInput.RewiredInputManager = GameObject.Find("Rewired_Input_Manager").GetComponent<InputManager>();
         if (!controller.minigameMode) { 
             foreach (GameObject button in freePlayButtons) { button.SetActive(false); }
         }

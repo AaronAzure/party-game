@@ -8,6 +8,7 @@ using TMPro;
 // Imported assets
 using Rewired;
 using Rewired.Integration.UnityUI;
+using Rewired.Data.Mapping;
 using BeautifulTransitions.Scripts.Transitions.Components.Camera.AbstractClasses;
 using BeautifulTransitions.Scripts.Transitions.TransitionSteps;
 using BeautifulTransitions.Scripts.Transitions.Components.Camera;
@@ -367,8 +368,8 @@ public class PathFollower : MonoBehaviour
         {
             foreach (RewiredStandaloneInputModule rInput in rInputs)
             {
+                rInput.RewiredPlayerIds = new int[1]{playerID};
                 rInput.RewiredInputManager = GameObject.Find("Rewired_Input_Manager").GetComponent<InputManager>();
-                if (rInput.RewiredPlayerIds != null) rInput.RewiredPlayerIds[0] = playerID;
             }
         }
 
@@ -1689,6 +1690,7 @@ public class PathFollower : MonoBehaviour
     // CAMERA FOCUSES ON PLAYER, WAIT BEFORE STARTING TURN
     public IEnumerator YOUR_TURN()
     {
+        Debug.Log("  Player " + (playerID+1) + "'s TURN", gameObject);
         // CAMERA FOCUSES ON PLAYER
         _cam.gameObject.SetActive(true);
 
@@ -3042,6 +3044,7 @@ public class PathFollower : MonoBehaviour
             trapSpellActive = true;
             spellTrapTarget.gameObject.SetActive(true); 
             spellTrapTarget.spellName = spells[index].spellName;
+            areaOfEffect.SetActive(true);
         }
         //* EFFECT (SINGLE PLAYER) RELATED SPELLS
         else if (spells[index].spellKind == "Effect" && spells[index].spellName == "Spell_Effect_Swap")  {
