@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5143229952745077833
 Transform:
   m_ObjectHideFlags: 0
@@ -25,11 +25,11 @@ Transform:
   m_GameObject: {fileID: 405553350848496210}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7027936, y: 0.7, z: 1}
   m_Children:
   - {fileID: 6449301595784463337}
-  m_Father: {fileID: 6945034686109693342}
-  m_RootOrder: 4
+  m_Father: {fileID: 6609775341190304111}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1100116090590387331
 GameObject:
@@ -24098,6 +24098,49 @@ SortingGroup:
   m_SortingLayerID: 1798455321
   m_SortingLayer: 2
   m_SortingOrder: 0
+--- !u!1 &5548089093288113412
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6609775341190304111}
+  - component: {fileID: 1939255770713910362}
+  m_Layer: 0
+  m_Name: ORB
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6609775341190304111
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5548089093288113412}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.4228928, y: 1.4285713, z: 1}
+  m_Children:
+  - {fileID: 5143229952745077833}
+  m_Father: {fileID: 6945034686109693342}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!210 &1939255770713910362
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5548089093288113412}
+  m_Enabled: 1
+  m_SortingLayerID: 1798455321
+  m_SortingLayer: 2
+  m_SortingOrder: 0
 --- !u!1 &5907041096021085216
 GameObject:
   m_ObjectHideFlags: 0
@@ -24255,7 +24298,7 @@ Transform:
   - {fileID: 4110936415224220570}
   - {fileID: 4270266177708050975}
   - {fileID: 4017117473157029291}
-  - {fileID: 5143229952745077833}
+  - {fileID: 6609775341190304111}
   - {fileID: 2292161238891189453}
   - {fileID: 5124061878301416542}
   - {fileID: 9091515530110804791}

@@ -230,11 +230,11 @@ public class IntroManager : MonoBehaviour
         {
             switch (nPrompt)
             {
-                case 0 :  { aaronText.text = "That's the ball game."; break; }
+                case 0 :  { aaronText.text = "That's all folks."; break; }
                 case 1 :  { aaronText.text = "I have seen quite enough."; break; }
                 case 2 :  { aaronText.text = "You all have fought so splendidly."; break; }
                 case 3 :  { aaronText.text = "But one of you clearly outranks everyone else."; break; }
-                case 4 :  { aaronText.text = "Such that it would be cruel to let this competition continue."; break; }
+                case 4 :  { aaronText.text = "Such that it would be too cruel to continue this competition."; break; }
                 case 5 :  { aaronText.text = "And that person is..."; break; }
                 case 6 :  {
                     StartCoroutine( REVEAL_THE_WINNER() );  

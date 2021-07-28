@@ -548,21 +548,29 @@ public class GameController : MonoBehaviour
 
             // BONUS ORB
             int[] richTemp = PlayerPrefsElite.GetIntArray("rich-orb");
-            for (int i=0 ; i<richTemp.Length ; i++)    richOrb[i] = richTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    richOrb[i] = richTemp[i];
+
             int[] questTemp = PlayerPrefsElite.GetIntArray("quest-orb");
-            for (int i=0 ; i<questTemp.Length ; i++)    questOrb[i] = questTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    questOrb[i] = questTemp[i];
+
             int[] trapTemp = PlayerPrefsElite.GetIntArray("trap-orb");
-            for (int i=0 ; i<trapTemp.Length ; i++)    trapOrb[i] = trapTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    trapOrb[i] = trapTemp[i];
+
             int[] eventTemp = PlayerPrefsElite.GetIntArray("event-orb");
-            for (int i=0 ; i<eventTemp.Length ; i++)    eventOrb[i] = eventTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    eventOrb[i] = eventTemp[i];
+
             int[] blueTemp = PlayerPrefsElite.GetIntArray("blue-orb");
-            for (int i=0 ; i<blueTemp.Length ; i++)    blueOrb[i] = blueTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    blueOrb[i] = blueTemp[i];
+
             int[] redTemp = PlayerPrefsElite.GetIntArray("red-orb");
-            for (int i=0 ; i<redTemp.Length ; i++)    redOrb[i] = redTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    redOrb[i] = redTemp[i];
+
             int[] slowTemp = PlayerPrefsElite.GetIntArray("slow-orb");
-            for (int i=0 ; i<slowTemp.Length ; i++)    slowOrb[i] = slowTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    slowOrb[i] = slowTemp[i];
+
             int[] shopTemp = PlayerPrefsElite.GetIntArray("shop-orb");
-            for (int i=0 ; i<shopTemp.Length ; i++)    shopOrb[i] = shopTemp[i];
+            for (int i=0 ; i<nPlayers ; i++)    shopOrb[i] = shopTemp[i];
+
 
             // REMEMBER MAGIC ORB RELATED
             int prevNofOrbSpaces = PlayerPrefsElite.GetInt("board-n-magic-orb");

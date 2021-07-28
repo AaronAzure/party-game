@@ -85,6 +85,9 @@ public class Spell : MonoBehaviour
             case "Spell_Move_Titan":     
                 _price = 20;    _mpCost = 3;    _spellKind = "Move";
                 _desc = "Enlarge yourself, allowing you to move twice as far.";  break;
+            case "Spell_Effect_Orb":     
+                _price = 20;    _mpCost = 5;    _spellKind = "Effect";
+                _desc = "Steal a magic orb from a selected player within small range.";  break;
 
 
             case "move-potion":   

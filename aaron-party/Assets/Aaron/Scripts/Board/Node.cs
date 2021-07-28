@@ -774,7 +774,7 @@ public class Node : MonoBehaviour
     public void TURN_INTO_ORB_SPACE()
     {
         magicOrb.SetActive(true);
-        magicOrb.transform.parent = null;
+        // magicOrb.transform.parent = null;
         _spaceType.color = new Color(1,1,1,1);
         StartCoroutine( AARON_APPEARS() );
         this._anim.SetBool("isOrb", true);

@@ -192,7 +192,9 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private EffectSpell  spellEffectTarget;
     [SerializeField] private EffectSpell  spellSpecialEffectTarget; // EFFECT SINGLE PLAYER
     [SerializeField] private GameObject   lockedOn;
+    [SerializeField] private GameObject aoeHolder;
     [SerializeField] private GameObject areaOfEffect;
+    [SerializeField] private GameObject areaOfEffectSmall;
     [SerializeField] private GameObject blueSpellCirclePrefab;
     [SerializeField] private GameObject blueBuffPrefab;
     [SerializeField] private GameObject greenSpellCirclePrefab;
@@ -289,6 +291,7 @@ public class PathFollower : MonoBehaviour
     public Sprite spellMoveSteal;
     public Sprite spellMoveOrb;
     public Sprite spellMoveTitan;
+    public Sprite spellEffectOrb;
     public Sprite keySprite;
     private bool slowDice;
 
@@ -388,6 +391,7 @@ public class PathFollower : MonoBehaviour
 
         grimoireUI.gameObject.SetActive(false);
         areaOfEffect.SetActive(false);
+        areaOfEffectSmall.SetActive(false);
         powerup.SetActive(false);
 
 
@@ -448,7 +452,7 @@ public class PathFollower : MonoBehaviour
             }
             if (playerExtraBuy) maxNPurchases = 3;
             else                maxNPurchases = 1;
-            if (playerRange2)   areaOfEffect.transform.localScale *= 2;
+            if (playerRange2)   aoeHolder.transform.localScale *= 2;
         }
         // TURN 1 ONLY
         else
@@ -800,6 +804,7 @@ public class PathFollower : MonoBehaviour
                 isCastingSpell = false;
                 spellTrapTarget.gameObject.SetActive(false);
                 areaOfEffect.SetActive(false);
+                areaOfEffectSmall.SetActive(false);
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = 
@@ -846,6 +851,7 @@ public class PathFollower : MonoBehaviour
                 isCastingSpell = false;
                 spellEffectTarget.gameObject.SetActive(false);
                 areaOfEffect.SetActive(false);
+                areaOfEffectSmall.SetActive(false);
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -30f);
@@ -890,6 +896,7 @@ public class PathFollower : MonoBehaviour
                 isCastingSpell = false;
                 spellSpecialEffectTarget.gameObject.SetActive(false);
                 areaOfEffect.SetActive(false);
+                areaOfEffectSmall.SetActive(false);
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -30f);
@@ -1471,10 +1478,6 @@ public class PathFollower : MonoBehaviour
             manaUsed.Play();
             yield return new WaitForSeconds(0.25f);
         }
-        // WAIT EXTRA TIME 
-        // if (cost < 4) {
-        //     yield return new WaitForSeconds(0.25f * (4 - cost));
-        // }
 
         yield return new WaitForSeconds(1);
         _animator.SetBool("IsWalking", true);
@@ -2221,6 +2224,7 @@ public class PathFollower : MonoBehaviour
     public IEnumerator ORB_GAINED(int n)
     {
         var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+        Debug.Log("    Stealing " + n);
             
         go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
         Color top = new Color(0, 0.8f, 1);
@@ -2232,8 +2236,10 @@ public class PathFollower : MonoBehaviour
             if (n<11) { yield return new WaitForSeconds(0.1f); }
             else { yield return new WaitForSeconds(0.02f); }
             orbPickup.Play();    
+            Debug.Log("    Orb GAINED");
             orbs++;
         }
+
         UPDATE_INFORMATION(false);
         manager.IS_MERCY_RULE_WINNER(playerID);
 
@@ -2244,6 +2250,36 @@ public class PathFollower : MonoBehaviour
         }
     }
     
+    public IEnumerator LOSE_ORBS(int n)
+    {
+        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+
+        n = Mathf.Abs(n);
+        // NOT ENOUGH ORBS TO LOSE
+        if (orbs < Mathf.Abs(n) ) {
+            go.GetComponent<TextMeshPro>().text    = "-" + orbs.ToString();
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        else {
+            go.GetComponent<TextMeshPro>().text    = "-" + n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        // LOSE ORB(S)
+        for (int i = 0; i < n; i++)
+        {
+            if (n<11) { yield return new WaitForSeconds(0.1f); }
+            else { yield return new WaitForSeconds(0.02f); }
+            orbLoss.Play();    
+            orbs--;
+        }
+        UPDATE_INFORMATION(false);
+        // manager.CHECK_RANKINGS();
+    }
+
     private IEnumerator ORB_LOST_FROM_BOAT(int n)
     {
         if (orbStolen.isPlaying) orbStolen.Stop();
@@ -2358,7 +2394,7 @@ public class PathFollower : MonoBehaviour
     {
         if (playerExtraBuy) maxNPurchases = 3;
         else                maxNPurchases = 1;
-        if (playerRange2)   areaOfEffect.transform.localScale *= 2;
+        if (playerRange2)   aoeHolder.transform.localScale *= 2;
     }
 
     public void PURCHASES_LEFT()
@@ -2433,6 +2469,7 @@ public class PathFollower : MonoBehaviour
                 orbPickup.Play();
                 orbs++;
             }
+            yield return new WaitForEndOfFrame();
             UPDATE_INFORMATION(false);
             manager.IS_MERCY_RULE_WINNER(playerID);
         }
@@ -2760,6 +2797,7 @@ public class PathFollower : MonoBehaviour
             case "Spell_Move_Barrier" :     return spellMoveBarrier;
             case "Spell_Move_Orb" :         return spellMoveOrb;
             case "Spell_Move_Titan" :       return spellMoveTitan;
+            case "Spell_Effect_Orb" :       return spellEffectOrb;
             case "Key" :                    return keySprite;
             default :      
                 if (canReturnNull) {
@@ -2907,7 +2945,6 @@ public class PathFollower : MonoBehaviour
 
         spellTrapTarget.gameObject.SetActive(false);
         spellEffectTarget.gameObject.SetActive(false);
-        // areaOfEffect.SetActive(false);
     }
 
     public void UPDATE_SPELLS_UI()
@@ -3006,22 +3043,31 @@ public class PathFollower : MonoBehaviour
             spellTrapTarget.gameObject.SetActive(true); 
             spellTrapTarget.spellName = spells[index].spellName;
         }
-        //* EFFECT RELATED SPELLS
-        else if (spells[index].spellKind == "Effect" && spells[index].spellName != "Spell_Effect_Swap")  { 
-            effectSpellActive = true;
-            spellEffectTarget.gameObject.SetActive(true); 
-            spellEffectTarget.specialEffect = false;
-            spellEffectTarget.spellName = spells[index].spellName;
-        }
-        //* EFFECT NODE RELATED SPELLS
+        //* EFFECT (SINGLE PLAYER) RELATED SPELLS
         else if (spells[index].spellKind == "Effect" && spells[index].spellName == "Spell_Effect_Swap")  {
             specialSpellActive = true;
             spellSpecialEffectTarget.gameObject.SetActive(true); 
             spellSpecialEffectTarget.specialEffect = true; 
             spellSpecialEffectTarget.spellName = spells[index].spellName;
+            areaOfEffect.SetActive(true);
+        }
+        //* EFFECT (SINGLE PLAYER) RELATED SPELLS
+        else if (spells[index].spellKind == "Effect" && spells[index].spellName == "Spell_Effect_Orb")  {
+            specialSpellActive = true;
+            spellSpecialEffectTarget.gameObject.SetActive(true); 
+            spellSpecialEffectTarget.specialEffect = true; 
+            spellSpecialEffectTarget.spellName = spells[index].spellName;
+            areaOfEffectSmall.SetActive(true);
+        }
+        //* EFFECT RELATED SPELLS
+        else if (spells[index].spellKind == "Effect")  { 
+            effectSpellActive = true;
+            spellEffectTarget.gameObject.SetActive(true); 
+            spellEffectTarget.specialEffect = false;
+            spellEffectTarget.spellName = spells[index].spellName;
+            areaOfEffect.SetActive(true);
         }
 
-        areaOfEffect.SetActive(true);
         _cam.orthographicSize = camSizeLarge;
     }
 
@@ -3137,6 +3183,7 @@ public class PathFollower : MonoBehaviour
         slowed.transform.parent = character.transform; 
     }
 
+    // TITANIZE
     IEnumerator TITANIZE(bool enlarge=true)
     {
         if (enlarge)
@@ -3165,6 +3212,15 @@ public class PathFollower : MonoBehaviour
         currentNode = GameObject.Find(newPath).GetComponent<Node>();
     }
 
+
+    public void STEALING_ORB_EFFECT(PathFollower victim)
+    {
+        StartCoroutine( victim.LOSE_ORBS(1) );
+
+        // yield return new WaitForSeconds(0.5f);
+        StartCoroutine( ORB_GAINED(1) );
+
+    }
     public void RESET_TARGET_SPELL_CAM()
     {
         spellSpecialEffectTarget.transform.position = new Vector3(this.transform.position.x,
@@ -3173,6 +3229,12 @@ public class PathFollower : MonoBehaviour
         var obj = Instantiate(greenTeleportEffect, transform.position, greenTeleportEffect.transform.rotation);
         Destroy(obj, 1.5f);
     }
+
+
+
+
+
+
 
     public void DISPLAY_PLAYER_RANKINGS(int xth)
     {
