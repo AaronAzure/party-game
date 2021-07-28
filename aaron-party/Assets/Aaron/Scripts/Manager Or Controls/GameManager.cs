@@ -348,9 +348,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void IS_MERCY_RULE_WINNER(int playerID)
+    public bool IS_MERCY_RULE_WINNER()
     {
-        if (!controller.mercyRule || nPlayers <= 1) return;
+        if (!controller.mercyRule || nPlayers <= 1) return false;
 
         int[] score = new int[nPlayers];
         int[] pID   = new int[nPlayers];    // playerID
@@ -383,13 +383,7 @@ public class GameManager : MonoBehaviour
 
         // FIRST PLACE HAS MORE THAN THREE ORBS THAN THE PLAYER IN SECOND, IMMEDIATE VICTORY
         Debug.Log(controller.playerData[ pID[0] ].orbs + "  :  " + (controller.playerData[ pID[1] ].orbs + 3));
-        if (pID.Length > 1 && pID[0] == playerID && 
-            controller.playerData[ pID[0] ].orbs >= (controller.playerData[ pID[1] ].orbs + 3) )
-            {
-                UPDATE_ALL_INFO();
-                controller.mercyWinner = true;
-                StartCoroutine( WE_HAVE_A_WINNER() );
-            }
+        return (pID.Length > 1 && controller.playerData[ pID[0] ].orbs >= (controller.playerData[ pID[1] ].orbs + 3) );
     }
 
     // todo ------------------------------------------------------------------------
@@ -456,13 +450,30 @@ public class GameManager : MonoBehaviour
         // ALL PLAYERS HAD THEIR TURN
         else
         {
-            if (controller.skipSideQuest) {
-                StartCoroutine( SKIP_SIDE_QUEST() );
+            // DOES A PLAYER HAVE MORE THAN 3 ORBS THAN ALL OTHER PLAYERS
+            UPDATE_ALL_INFO();
+            if (controller.mercyRule) {
+                if (IS_MERCY_RULE_WINNER()) {
+                    controller.mercyWinner = true;
+                    StartCoroutine( WE_HAVE_A_WINNER() );
+                }
+                else {
+                    if (controller.skipSideQuest) {
+                        StartCoroutine( SKIP_SIDE_QUEST() );
+                    }
+                    else {
+                        StartCoroutine( SIDE_QUEST_TIME() );
+                    }
+                }
             }
             else {
-                StartCoroutine( SIDE_QUEST_TIME() );
+                if (controller.skipSideQuest) {
+                    StartCoroutine( SKIP_SIDE_QUEST() );
+                }
+                else {
+                    StartCoroutine( SIDE_QUEST_TIME() );
+                }
             }
-            // UPDATE_ALL_INFO();
 
             // // MINIGAME TIME!
             // controller.GAME_START();
@@ -553,7 +564,6 @@ public class GameManager : MonoBehaviour
     public IEnumerator SIDE_QUEST_TIME() 
     {
         // HIDE UI STUFF
-        UPDATE_ALL_INFO();
         HIDE_UI();
         for (int i=0 ; i<gamers.Length ; i++) { gamers[ i ].HIDE_DATA_CANVAS(); }
 
@@ -598,7 +608,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator SKIP_SIDE_QUEST() 
     {
         // HIDE UI STUFF
-        UPDATE_ALL_INFO();
         HIDE_UI();
         for (int i=0 ; i<gamers.Length ; i++) { gamers[ i ].HIDE_DATA_CANVAS(); }
 
@@ -664,6 +673,11 @@ public class GameManager : MonoBehaviour
     IEnumerator WE_HAVE_A_WINNER()
     {
         SCREEN_TRANSITION("Oval_Transition", 0);
+        if (GameObject.Find("BACKGROUND_MUSIC") != null) {
+            AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+            bgMusic.volume = 0;
+        }
+
         yield return new WaitForSeconds(1);
         controller.LOAD_CUTAWAY();
     }

@@ -2148,8 +2148,6 @@ public class PathFollower : MonoBehaviour
                 orbPickup.Play();
                 orbs++;
             }
-            UPDATE_INFORMATION(false);
-            manager.IS_MERCY_RULE_WINNER(playerID);
         }
         else
         {
@@ -2241,9 +2239,6 @@ public class PathFollower : MonoBehaviour
             Debug.Log("    Orb GAINED");
             orbs++;
         }
-
-        UPDATE_INFORMATION(false);
-        manager.IS_MERCY_RULE_WINNER(playerID);
 
         if (beingPayed) { 
             yield return new WaitForSeconds(1);
@@ -2471,9 +2466,6 @@ public class PathFollower : MonoBehaviour
                 orbPickup.Play();
                 orbs++;
             }
-            yield return new WaitForEndOfFrame();
-            UPDATE_INFORMATION(false);
-            manager.IS_MERCY_RULE_WINNER(playerID);
         }
         manager.CHECK_RANKINGS();
 
