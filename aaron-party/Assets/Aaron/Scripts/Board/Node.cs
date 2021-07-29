@@ -833,10 +833,15 @@ public class Node : MonoBehaviour
 
     public void MAGIC_ORB_BOUGHT()
     {
-        StartCoroutine( AARON_DISSAPPEARS() );
-        magicOrb.SetActive(false);
-        _spaceType.color = new Color(0.5f, 0.5f, 0.5f, 0.6f);
-        this._anim.SetBool("isOrb", false);
+        if (GameObject.Find("Game_Controller") != null) {
+            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+        }
+        if (controller.GET_N_MAGIC_ORB_SPACES() > 1) {
+            StartCoroutine( AARON_DISSAPPEARS() );
+            magicOrb.SetActive(false);
+            _spaceType.color = new Color(0.5f, 0.5f, 0.5f, 0.6f);
+            this._anim.SetBool("isOrb", false);
+        }
     }
 
 

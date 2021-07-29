@@ -423,6 +423,10 @@ public class GameController : MonoBehaviour
             boardSceneName = "Plasma_Palace";
             introSceneName = "Plasma_Palace Intro";
         }
+        else if (boardName == "Volcanic_Villa" || boardName == "Volcanic_Villa Intro" ) {
+            boardSceneName = "Volcanic_Villa";
+            introSceneName = "Volcanic_Villa Intro";
+        }
         else Debug.LogError("HAVEN'T ADDED MAP TO - GameController.LOAD_BOARD() ");
         SceneManager.LoadScene(boardName); 
     }
@@ -1014,6 +1018,12 @@ public class GameController : MonoBehaviour
         node.TURN_INTO_ORB_SPACE();
     }
 
+    public int GET_N_MAGIC_ORB_SPACES()
+    {
+        if (magicOrbSpace == null) return 0;
+        return magicOrbSpace.Count;
+    }
+
 
     // CHOOSE NEW NODE FOR MAGIC ORB SPACE
     public void CHOOSE_MAGIC_ORB_SPACE(string key)
@@ -1021,8 +1031,10 @@ public class GameController : MonoBehaviour
         int r = Random.Range(0, magicOrbSpace.Count);
 
         // DO NOT PICK THE SAME MAGIC ORB SPACE AFTER PURCHASE
-        while (currentMagicOrbIndex == r) {
-            r = Random.Range(0, magicOrbSpace.Count);
+        if (magicOrbSpace.Count > 1) {
+            while (currentMagicOrbIndex == r) {
+                r = Random.Range(0, magicOrbSpace.Count);
+            }
         }
         if (!firstMagicOrbShown) { 
             r = 0; 
@@ -1037,7 +1049,7 @@ public class GameController : MonoBehaviour
             }
         }
         currentMagicOrbIndex = r;
-
+        
         Node node = GameObject.Find(magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         camNode = node;
         node.TURN_INTO_ORB_SPACE();
@@ -1047,7 +1059,7 @@ public class GameController : MonoBehaviour
         {
             StartCoroutine( NEXT_ORB_SPACE(key) );
         }
-        // 
+        // FIRST ORB 
         else 
         {
             orbCam.gameObject.SetActive(true);

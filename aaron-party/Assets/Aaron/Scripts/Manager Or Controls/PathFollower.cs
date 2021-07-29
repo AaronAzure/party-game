@@ -2198,7 +2198,8 @@ public class PathFollower : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
         bgMusic.volume = bgMusicVol;
-        controller.CHOOSE_MAGIC_ORB_SPACE(name);
+        if (controller.GET_N_MAGIC_ORB_SPACES() > 1) controller.CHOOSE_MAGIC_ORB_SPACE(name);
+        else RESUME_PLAYER_TURN();
             
         if (isAtMagicOrb) { nMovesLeft.gameObject.SetActive(true); }
         manager.UNHIDE_UI();
@@ -3185,15 +3186,24 @@ public class PathFollower : MonoBehaviour
         yield return new WaitForSeconds(0.6f);
         Destroy(buff.gameObject);
         isPlayerTurn = false;
-        if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
+        switch (SceneManager.GetActiveScene().name)
         {
-            controller.MagicOrbBoughtController();
-            controller.CHOOSE_MAGIC_ORB_SPACE(name);
-        }
-        else 
-        {
-            PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
+            case "Crystal_Caverns" :
+                controller.MagicOrbBoughtController();
+                controller.CHOOSE_MAGIC_ORB_SPACE(name);
+                break;
+            case "Volcanic_Villa" :
+                // TODO : MAGMABEAST
+                RESUME_PLAYER_TURN();
+                break;
+            case "Plasma_Palace" :
+                controller.MagicOrbBoughtController();
+                controller.CHOOSE_MAGIC_ORB_SPACE(name);
+                break;
+            case "Shogun_Seaport" :
+                PLAYER_CAM_OFF(0);
+                StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
+                break;
         }
     }
 

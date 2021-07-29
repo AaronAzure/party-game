@@ -223,6 +223,13 @@ public class GameManager : MonoBehaviour
                 StartCoroutine( DelayChoosingMagicOrbSpace(0) );
                 SCREEN_TRANSITION("Oval_Transition", 0.5f);
             }
+            else if (sceneName == "Volcanic_Villa")
+            {
+                if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
+                controller.orbCam.gameObject.SetActive(true);
+                StartCoroutine( DelayChoosingMagicOrbSpace(0) );
+                SCREEN_TRANSITION("Oval_Transition", 0.5f);
+            }
             //* SHOGUN_SEAPORT (HOPEFULLY)
             else 
             {

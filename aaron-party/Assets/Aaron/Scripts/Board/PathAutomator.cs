@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class PathAutomator : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class PathAutomator : MonoBehaviour
                 for (int j=0 ; j<nodes[i].nexts.Length ; j++) 
                 {
                     if (nodes[i].nexts.Length <= 0 || nodes[i].nexts[j].dontCreateArrow || nodes[i].nexts[0].node == null) continue;
+
                     // POINT TO NEXT NODE
                     //* CALCULATE MIDPOINT
                     Vector2 midPos = nodes[i].transform.position + 
@@ -59,4 +61,26 @@ public class PathAutomator : MonoBehaviour
             }
         }
     }
+
+    public void HOW_MANY_NODES()
+    {
+        Debug.Log(transform.childCount);
+    }
 }
+
+[CustomEditor(typeof(PathAutomator))]
+public class PathAutomatorEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        PathAutomator myScript = (PathAutomator)target;
+        if(GUILayout.Button("Log Path Length"))
+        {
+            myScript.HOW_MANY_NODES();
+        }
+    }
+}
+
+
