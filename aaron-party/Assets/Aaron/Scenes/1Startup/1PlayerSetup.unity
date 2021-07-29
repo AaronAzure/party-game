@@ -3097,7 +3097,8 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2864894283453538977, guid: 37f7365ca06944316904bcd1984512d9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 37f7365ca06944316904bcd1984512d9, type: 3}
 --- !u!1001 &1527605320
 PrefabInstance:
@@ -3906,7 +3907,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1814504389}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1814504391
 Camera:
   m_ObjectHideFlags: 0
@@ -4065,6 +4066,14 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1498495539}
   m_PrefabAsset: {fileID: 0}
+--- !u!81 &1913313172
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1913313171}
+  m_Enabled: 1
 --- !u!114 &1913313174
 MonoBehaviour:
   m_ObjectHideFlags: 0
