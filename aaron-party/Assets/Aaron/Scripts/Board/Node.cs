@@ -61,6 +61,7 @@ public class Node : MonoBehaviour
     
     //* map-exclusive spaces
     [Header("Event Spaces")]
+    [SerializeField] private Sprite poisonSpace;   // cause cave in
     [SerializeField] private Sprite boulderSpace;   // cause cave in
     [SerializeField] private Sprite boatSpace;    //  BOAT
     [SerializeField] private Sprite rotateSpace;   // laser rotate 90˚ anti-clockwise
@@ -135,6 +136,8 @@ public class Node : MonoBehaviour
     [SerializeField] private GameObject effectSlow1Prefab;
     [SerializeField] private GameObject moveStealPrefab;
 
+    [Space] [SerializeField] private GameObject poisonMistPrefab;
+
 
 
     // ---------------------------------------------------------------------
@@ -163,8 +166,9 @@ public class Node : MonoBehaviour
         noCostSpace.Add(boulders);
 
         // SET THAT COUNTS TOWARDS HAPPENING BONUS (COLLECTION)
-        greenSpaces.Add(boatSpace);
+        greenSpaces.Add(poisonSpace);
         greenSpaces.Add(boulderSpace);
+        greenSpaces.Add(boatSpace);
         greenSpaces.Add(rotateSpace);
         greenSpaces.Add(speedUpSpace);
 
@@ -264,7 +268,10 @@ public class Node : MonoBehaviour
     public bool IS_GREEN() { 
         if (magicGate != null) return false;    //! MAGIC GATE
 
-        if (greenSpaces.Contains(_spaceType.sprite)) {
+        if (_spaceType.sprite == poisonSpace) {
+            // Instantiate(poisonMistPrefab, transform.position, poisonMistPrefab.transform.rotation);
+        }
+        else if (greenSpaces.Contains(_spaceType.sprite)) {
             var eff = Instantiate(instanGreenEffect, transform.position, instanGreenEffect.transform.rotation);
             Destroy(eff, 4);
         }
@@ -281,13 +288,25 @@ public class Node : MonoBehaviour
             || _spaceType.sprite == mauriceOrb || _spaceType.sprite == mimiOrb || _spaceType.sprite == pinkinsOrb
             || _spaceType.sprite == sweeterellaOrb || _spaceType.sprite == thanatosOrb || _spaceType.sprite == charlotteOrb);
     }
-    public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
+    public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
 
     //* EVENT SPACES
-    public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
+    public bool IS_POISON() { 
+        Invoke("CREATE_POISON_MIST", 0.1f);
+        return (_spaceType.sprite == poisonSpace); 
+    }
+    public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
     public bool IS_BOAT() { return (_spaceType.sprite == boatSpace); }
     public bool IS_ROTATE() { return (_spaceType.sprite == rotateSpace); }
     public bool IS_SPEED_UP() { return (_spaceType.sprite == speedUpSpace); }
+
+
+    void CREATE_POISON_MIST()
+    {
+        if (poisonMistPrefab != null && _spaceType.sprite == poisonSpace) {
+            Instantiate(poisonMistPrefab, transform.position, poisonMistPrefab.transform.rotation);
+        }
+    }
 
 
 
@@ -352,6 +371,7 @@ public class Node : MonoBehaviour
         else if (_spaceType.sprite == redSpace)     { this._anim.SetTrigger("isRed"); }
         else if (_spaceType.sprite == goldSpace)    { this._anim.SetTrigger("isSpell"); }
         else if (_spaceType.sprite == eventSpace)   { this._anim.SetTrigger("isEvent"); }
+        // GREEN HAPPENING SPACE
         else if (greenSpaces.Contains(_spaceType.sprite))  { this._anim.SetTrigger("isHappen"); }
         //// else if (_spaceType.sprite == happenSpace)  { this._anim.SetTrigger("isHappen"); }
         else if (_spaceType.sprite == spellSpace)   { this._anim.SetTrigger("isSpell"); }

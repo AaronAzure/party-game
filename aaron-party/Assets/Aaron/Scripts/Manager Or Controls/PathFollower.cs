@@ -71,11 +71,14 @@ public class PathFollower : MonoBehaviour
     private bool moveDecremented;
 
     [Range(1,20)]
-    [SerializeField] private float _moveSpeed = 5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
+    [SerializeField] private float _moveSpeed = 6f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
     private float _timer;
 
     private GameManager manager;
     public Camera _cam;           // PLAYER TRACKING CAM
+    private float elapsed;
+    private float duration = 1;
+    private bool zoomOut;
     private float camSizeLarge = 17.5f;
     private float camSizeNormal = 7.5f;
     private float camSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
@@ -193,6 +196,7 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private EffectSpell  spellEffectTarget;
     [SerializeField] private EffectSpell  spellSpecialEffectTarget; // EFFECT SINGLE PLAYER
     [SerializeField] private GameObject   lockedOn;
+    [SerializeField] private GameObject   effectCastCircle;
     [SerializeField] private GameObject aoeHolder;
     [SerializeField] private GameObject areaOfEffect;
     [SerializeField] private GameObject areaOfEffectSmall;
@@ -200,6 +204,8 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private GameObject blueBuffPrefab;
     [SerializeField] private GameObject greenSpellCirclePrefab;
     [SerializeField] private GameObject greenBuffPrefab;
+    [SerializeField] private GameObject solarFlarePrefab;
+
 
     // ************************* SPELL STATES ************************* //
     private bool trapSpellActive;               //   CASTING TRAP SPELL
@@ -391,8 +397,7 @@ public class PathFollower : MonoBehaviour
         arrowDown.gameObject.SetActive(false);
 
         grimoireUI.gameObject.SetActive(false);
-        areaOfEffect.SetActive(false);
-        areaOfEffectSmall.SetActive(false);
+        DONE_CASTING();
         powerup.SetActive(false);
 
 
@@ -502,9 +507,18 @@ public class PathFollower : MonoBehaviour
             //     // TURNS OFF
             //     if (!setting.activeSelf) { controller.pSpeed = this.pSpeed.value; }
             // }
+            // ZOOMING OUT CAMERA
+            if (zoomOut) {
+                if (_cam.orthographicSize >= camSizeLarge) {
+                    zoomOut = false;
+                    elapsed = 0;
+                }
+                elapsed += Time.deltaTime / duration;
+                _cam.orthographicSize = Mathf.Lerp(_cam.orthographicSize, camSizeLarge, elapsed);
+            }
 
             // CHARACTER START
-            if (startUi.gameObject.activeSelf)
+            else if (startUi.gameObject.activeSelf)
             {
                 READY_TO_START();
             }
@@ -804,8 +818,7 @@ public class PathFollower : MonoBehaviour
                     this.transform.position.y, this.transform.position.z);
                 isCastingSpell = false;
                 spellTrapTarget.gameObject.SetActive(false);
-                areaOfEffect.SetActive(false);
-                areaOfEffectSmall.SetActive(false);
+                DONE_CASTING();
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = 
@@ -851,8 +864,7 @@ public class PathFollower : MonoBehaviour
                     this.transform.position.y, this.transform.position.z);
                 isCastingSpell = false;
                 spellEffectTarget.gameObject.SetActive(false);
-                areaOfEffect.SetActive(false);
-                areaOfEffectSmall.SetActive(false);
+                DONE_CASTING();
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -30f);
@@ -896,8 +908,7 @@ public class PathFollower : MonoBehaviour
                     this.transform.position.y, this.transform.position.z);
                 isCastingSpell = false;
                 spellSpecialEffectTarget.gameObject.SetActive(false);
-                areaOfEffect.SetActive(false);
-                areaOfEffectSmall.SetActive(false);
+                DONE_CASTING();
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -30f);
@@ -1228,6 +1239,12 @@ public class PathFollower : MonoBehaviour
         }
         
         // todo - EVENT RELATED
+        // LANDED ON EVENT (caving in)
+        else if (currentNode.IS_POISON()) {
+            // _cam.orthographicSize = camSizeLarge;
+            zoomOut = true;
+            StartCoroutine( UPDATE_PLAYER_COINS(0) );
+        }
         // LANDED ON EVENT (caving in)
         else if (currentNode.IS_BOULDER_EVENT()) {
             if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
@@ -1792,10 +1809,12 @@ public class PathFollower : MonoBehaviour
     {
         _cam.gameObject.SetActive(true);    // CAM TURNS ON
     }
+
     public IEnumerator PLAYER_CAM_OFF(float delayTime)
     {
         yield return new WaitForSeconds(delayTime);
         _cam.gameObject.SetActive(false);   // CAM TURNS OFF
+        _cam.orthographicSize = camSizeNormal;
     }
 
     // ENABLE COLLIDER = SOUND EFFECT FOR WALKING OVER NODE
@@ -2092,6 +2111,7 @@ public class PathFollower : MonoBehaviour
     {
         n = Mathf.Abs(n);
         
+        // LOSE A RANDOM SPELL
         if (ind == -1) {
             for ( int i=0 ; i<n ; i++ )
             {
@@ -2110,6 +2130,7 @@ public class PathFollower : MonoBehaviour
                 }
             } 
         }
+        // LOSE A SPECIFIED SPELL AT ind
         else {
             if (spells.Count > spellIndex) {
                 var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
@@ -2126,6 +2147,14 @@ public class PathFollower : MonoBehaviour
         }
 
         UPDATE_SPELLS_UI();
+    }
+    public void LOSE_ALL_SPELLs()
+    {
+        if (spells.Count > 0) 
+        {
+            spells.Clear();
+            UPDATE_SPELLS_UI();
+        }
     }
 
     public IEnumerator BOUGHT_AN_ORB(int n)
@@ -2221,8 +2250,10 @@ public class PathFollower : MonoBehaviour
         manager.CHECK_RANKINGS();
     }
     
-    public IEnumerator ORB_GAINED(int n)
+    public IEnumerator ORB_GAINED(int n, float delay=0f)
     {
+        yield return new WaitForSeconds(delay);     //* DELAY
+
         var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
         Debug.Log("    Stealing " + n);
             
@@ -2247,8 +2278,10 @@ public class PathFollower : MonoBehaviour
         }
     }
     
-    public IEnumerator LOSE_ORBS(int n)
+    public IEnumerator LOSE_ORBS(int n, float delay=0f)
     {
+        yield return new WaitForSeconds(delay);     //* DELAY
+
         var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
 
         n = Mathf.Abs(n);
@@ -2497,13 +2530,6 @@ public class PathFollower : MonoBehaviour
         }
     }
 
-    // void DOMINATING_VICTORY()
-    // {
-    //     if (manager.MERCY_RULE(playerID)) {
-
-    //     }
-    // }
-
 
     /* ---------------------------------------------------------------- */
     /* ------------------------ SPELLS RELATED ------------------------ */
@@ -2514,7 +2540,7 @@ public class PathFollower : MonoBehaviour
         coins -= cost;
         nPurchaseLeft--;
         PURCHASES_LEFT();
-        // UPDATE_SPELLS_UI();
+        LOSE_ALL_SPELLs();
 
         // LOSE COINS
         for (int i = 0; i < cost; i++)
@@ -3036,7 +3062,7 @@ public class PathFollower : MonoBehaviour
             trapSpellActive = true;
             spellTrapTarget.gameObject.SetActive(true); 
             spellTrapTarget.spellName = spells[index].spellName;
-            areaOfEffect.SetActive(true);
+            CASTING_EFFECT_SPELL();
         }
         //* EFFECT (SINGLE PLAYER) RELATED SPELLS
         else if (spells[index].spellKind == "Effect" && spells[index].spellName == "Spell_Effect_Swap")  {
@@ -3044,7 +3070,7 @@ public class PathFollower : MonoBehaviour
             spellSpecialEffectTarget.gameObject.SetActive(true); 
             spellSpecialEffectTarget.specialEffect = true; 
             spellSpecialEffectTarget.spellName = spells[index].spellName;
-            areaOfEffect.SetActive(true);
+            CASTING_EFFECT_SPELL();
         }
         //* EFFECT (SINGLE PLAYER) RELATED SPELLS
         else if (spells[index].spellKind == "Effect" && spells[index].spellName == "Spell_Effect_Orb")  {
@@ -3052,7 +3078,7 @@ public class PathFollower : MonoBehaviour
             spellSpecialEffectTarget.gameObject.SetActive(true); 
             spellSpecialEffectTarget.specialEffect = true; 
             spellSpecialEffectTarget.spellName = spells[index].spellName;
-            areaOfEffectSmall.SetActive(true);
+            CASTING_EFFECT_SPELL(true);
         }
         //* EFFECT RELATED SPELLS
         else if (spells[index].spellKind == "Effect")  { 
@@ -3060,10 +3086,26 @@ public class PathFollower : MonoBehaviour
             spellEffectTarget.gameObject.SetActive(true); 
             spellEffectTarget.specialEffect = false;
             spellEffectTarget.spellName = spells[index].spellName;
-            areaOfEffect.SetActive(true);
+            CASTING_EFFECT_SPELL();
         }
 
         _cam.orthographicSize = camSizeLarge;
+    }
+
+    void CASTING_EFFECT_SPELL(bool smallAoe=false)
+    {
+        if (smallAoe)   areaOfEffectSmall.SetActive(true);
+        else            areaOfEffect.SetActive(true);
+        
+        effectCastCircle.SetActive(true);
+    }
+
+    void DONE_CASTING()
+    {
+        areaOfEffectSmall.SetActive(false);
+        areaOfEffect.SetActive(false);
+        
+        effectCastCircle.SetActive(false);
     }
 
     public void LOCKED_ON() { lockedOn.SetActive(true); }
@@ -3210,10 +3252,13 @@ public class PathFollower : MonoBehaviour
 
     public void STEALING_ORB_EFFECT(PathFollower victim)
     {
-        StartCoroutine( victim.LOSE_ORBS(1) );
+        StartCoroutine( victim.LOSE_ORBS(1, 0.5f) );
+        if (solarFlarePrefab != null) {
+            Instantiate(solarFlarePrefab, victim.transform.position, solarFlarePrefab.transform.rotation);
+        }
 
         // yield return new WaitForSeconds(0.5f);
-        StartCoroutine( ORB_GAINED(1) );
+        StartCoroutine( ORB_GAINED(1, 2) );
 
     }
     public void RESET_TARGET_SPELL_CAM()

@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5143229952745077833
 Transform:
   m_ObjectHideFlags: 0
@@ -24209,6 +24209,7 @@ MonoBehaviour:
   shopSpace: {fileID: 21300000, guid: b8856b46e499642959918630da9b97c2, type: 3}
   potionSpace: {fileID: 21300000, guid: f36f6f44274c049d2bb630feeefa502b, type: 3}
   specialSpace: {fileID: 21300000, guid: b8d92939491e64732a453dc3d53f81cb, type: 3}
+  poisonSpace: {fileID: 21300000, guid: e7cb875a7588b4e5ab136b7cd416f783, type: 3}
   boulderSpace: {fileID: 21300000, guid: 413b2ea64105844d6b792ddf065f4a9b, type: 3}
   boatSpace: {fileID: 21300000, guid: ac8dfd7c522184a8fb9f3345aaf883e7, type: 3}
   rotateSpace: {fileID: 21300000, guid: 36a8d0a44d46b42e0a662db32ab72c80, type: 3}
@@ -24262,6 +24263,8 @@ MonoBehaviour:
   effectSlow1Prefab: {fileID: 1077009852118748725, guid: b77b9671f4968444082232ebc13400d0,
     type: 3}
   moveStealPrefab: {fileID: 1077009852118748725, guid: f31de30aa30b040d387b1840c5495e9b,
+    type: 3}
+  poisonMistPrefab: {fileID: 8001364445927459806, guid: 0aeb07e63be5847bdbadd8879ec99702,
     type: 3}
 --- !u!1 &6945034686109693343
 GameObject:

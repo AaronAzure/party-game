@@ -16,6 +16,7 @@ public class EffectSpell : MonoBehaviour
     public PathFollower targetedPlayer;
     public string spellName;
 
+
     private void Start() {
         itself = gameObject.GetComponent<SpriteRenderer>();
     }
@@ -99,6 +100,7 @@ public class EffectSpell : MonoBehaviour
     
     public void PLAYER_CAST_SPECIAL()
     {
+        // SWAP SPACES
         if (spellName == "Spell_Effect_Swap")
         {
             if (nodeLocked && spellCasterPlayer.mpBar.value >= spellCasterPlayer.spellMpCost)
@@ -128,6 +130,7 @@ public class EffectSpell : MonoBehaviour
                 spellCasterPlayer.USE_MP(spellCasterPlayer.spellMpCost);
             }
         }
+        // STEAL ORB
         else if (spellName == "Spell_Effect_Orb") 
         {
             if (nodeLocked && spellCasterPlayer.mpBar.value >= spellCasterPlayer.spellMpCost)

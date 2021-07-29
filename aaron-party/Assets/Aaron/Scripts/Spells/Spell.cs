@@ -78,7 +78,7 @@ public class Spell : MonoBehaviour
 
             case "SpellBook":     
                 _price = 30;    _mpCost = 0;    _spellKind = "Item";
-                _desc = "Contains up to three random spells.";  break;
+                _desc = "Lose all current spells and gain three new spells.";  break;
             case "Key":     
                 _price = 20;    _mpCost = 0;    _spellKind = "Key";
                 _desc = "Key embuded with mana, used to unlock sealed doors.";  break;
@@ -117,30 +117,5 @@ public class Spell : MonoBehaviour
 
         _interactable = this.gameObject.GetComponent<Button>();
         _color        = this.gameObject.GetComponent<Image>();
-    }
-
-    public string SpellDescription(string spellname)
-    {
-        switch (spellname)
-        {
-            case "Spell_Trap_10" :      return "Create a trap, steal 10 gold from any opponent that lands on the trap.";  
-            case "Spell_Trap_20" :      return "Create a trap, steal 20 gold from any opponent that lands on the trap.";  
-            case "Spell_Trap_Orb" :     return "Create a trap, steal an orb from any opponent that lands on the trap.";  
-
-            case "Spell_Effect_10" :    return "Destroy 15 gold to all opponents on a targeted space (within range).";
-            case "Spell_Effect_Mana_3": return "Destroy 3 mana to all opponents on a targeted space (within range).";  
-            case "Spell_Effect_Spell_1":return "Destroy a random spell to all opponents on a targeted space (within range).";  
-            case "Spell_Effect_Slow_1": return "Reduce max movement to 5 for all opponents on a targeted space (within range).";  
-            case "Spell_Effect_Swap":   return "Swap places with a targeted opponent (within range).";  
-
-            case "Spell_Move_Dash_5":   return "Immediately advance 4 spaces.";
-            case "Spell_Move_Dash_8":   return "Immediately advance 8 spaces.";  
-            case "Spell_Move_Slowgo":   return "Reduce max movement to 5, but with slower movement multiplier.";  
-            case "Spell_Move_Slow":     return "Slower movement multiplier.";  
-            case "Spell_Move_Steal":    return "Steal 10 coins from all opponents you pass.";  
-            case "Spell_Move_Barrier":  return "Nullify all effects of opponent's spells or traps until the start of next turn";  
-            case "Spell_Move_Orb":      return "Change the location of the Magic Orb space.";  
-            default :                   return "";
-        }
     }
 }
