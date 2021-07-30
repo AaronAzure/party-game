@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
     public bool slowerDice;  //* DEBUGGING ONLY, INSPECTOR
     public bool infiniteMovement;  //* DEBUGGING ONLY, INSPECTOR
     public bool playLatestQuest;  //* DEBUGGING ONLY, INSPECTOR
+    public bool dontSaveState;  //* DEBUGGING ONLY, INSPECTOR
 
 
     [Header("Board Settings")]
@@ -97,7 +98,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject aaronOrb;   // THE NEXT MAGIC ORB LOCATION
     private float camSpeed;
     private bool showingNewMagicOrb;
-    private Node camNode;
+    [SerializeField] private Node camNode;
+    [SerializeField] private Vector3 firstOrbPos;
     private string playerToResume;
     private bool firstMagicOrbShown;
     public bool starting;
@@ -426,6 +428,7 @@ public class GameController : MonoBehaviour
         else if (boardName == "Volcanic_Villa" || boardName == "Volcanic_Villa Intro" ) {
             boardSceneName = "Volcanic_Villa";
             introSceneName = "Volcanic_Villa Intro";
+            orbCam.backgroundColor = new Color(0.1686275f, 0.6196079f, 0.9372549f);
         }
         else Debug.LogError("HAVEN'T ADDED MAP TO - GameController.LOAD_BOARD() ");
         SceneManager.LoadScene(boardName); 
@@ -903,8 +906,7 @@ public class GameController : MonoBehaviour
         if (!firstMagicOrbShown && starting)
         {
             // AFTER MOVING TO NEXT MAGIC ORB SPACE, SHRINK CAM (2)
-            if (orbCam.transform.position.x - camNode.transform.position.x <= 0.01f &&
-                orbCam.transform.position.x - camNode.transform.position.x >= -0.01f)
+            if (Vector2.Distance(orbCam.transform.position, camNode.transform.position) <= 0.01f)
             {
                 orbCam.orthographicSize -= 0.05f;
 
@@ -929,8 +931,7 @@ public class GameController : MonoBehaviour
         if (showingNewMagicOrb)
         {
             
-            if (orbCam.transform.position.x - camNode.transform.position.x <= 0.01f &&
-                orbCam.transform.position.x - camNode.transform.position.x >= -0.01f)
+            if (Vector2.Distance(orbCam.transform.position, camNode.transform.position) <= 0.01f)
             {
                 orbCam.orthographicSize -= 0.05f;
 
@@ -1049,7 +1050,7 @@ public class GameController : MonoBehaviour
             }
         }
         currentMagicOrbIndex = r;
-        
+
         Node node = GameObject.Find(magicOrbSpace[r].parentPath + "/" + magicOrbSpace[r].childNode).GetComponent<Node>();
         camNode = node;
         node.TURN_INTO_ORB_SPACE();

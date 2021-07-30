@@ -10,7 +10,7 @@ public class Node : MonoBehaviour
     
 
     [Header("Spell Keeper / Potion Master")]
-    [Tooltip("The shop keeper number")] public int whoIsTheSeller;  // ** INSPECTOR
+    [Tooltip("The shop keeper number {0, 1, 2, 3}")] public int whoIsTheSeller;  // ** INSPECTOR
 
 
     [Header("Spell Related")]
@@ -27,7 +27,7 @@ public class Node : MonoBehaviour
 
 
     // TODO : which node each node connects to
-    public enum Directions { none, left, right, up, down, blocked }
+    public enum Directions { none, left, right, up, down }
     [System.Serializable] public class Nexts {
         public GameObject node;
         public Directions direction;
@@ -707,7 +707,7 @@ public class Node : MonoBehaviour
         {
             case "Spell_Effect_10" : 
                 Instantiate(effect10Prefab, transform.position, Quaternion.identity); 
-                if (_spaceType.sprite == boulders) UNBLOCK();
+                if (_spaceType.sprite == boulders) Invoke("UNBLOCK", 0.5f); // UNBLOCK();
                 break;
                 
             case "Spell_Effect_Mana_3" : Instantiate(effectMp3Prefab, transform.position, Quaternion.identity); break;

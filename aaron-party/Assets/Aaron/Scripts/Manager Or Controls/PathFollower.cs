@@ -8,7 +8,6 @@ using TMPro;
 // Imported assets
 using Rewired;
 using Rewired.Integration.UnityUI;
-using Rewired.Data.Mapping;
 using BeautifulTransitions.Scripts.Transitions.Components.Camera.AbstractClasses;
 using BeautifulTransitions.Scripts.Transitions.TransitionSteps;
 using BeautifulTransitions.Scripts.Transitions.Components.Camera;
@@ -145,6 +144,8 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private GameObject floatingManaTextPrefab;
     [SerializeField] private GameObject floatingSpellTextPrefab;
     [SerializeField] private GameObject confettiPrefab;
+    [SerializeField] private GameObject smoke;
+    [SerializeField] private GameObject fireExplosion;
     [SerializeField] private Text[] textBox;
     private GameController controller;
 
@@ -205,6 +206,7 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private GameObject greenSpellCirclePrefab;
     [SerializeField] private GameObject greenBuffPrefab;
     [SerializeField] private GameObject solarFlarePrefab;
+    [SerializeField] private GameObject movementCircle;
 
 
     // ************************* SPELL STATES ************************* //
@@ -386,8 +388,8 @@ public class PathFollower : MonoBehaviour
         buttonMove.gameObject.SetActive(false);
         buttonSpells.gameObject.SetActive(false);
         buttonMap.gameObject.SetActive(false);
-        // moveBar.gameObject.SetActive(false);
         radialBar.gameObject.SetActive(false);
+        movementCircle.SetActive(false);
         radialCircle = radialBar.GetComponent<Image>();
 
         // VISUAL BUTTON INDICATORS AT FORK
@@ -617,6 +619,7 @@ public class PathFollower : MonoBehaviour
                     buttonMap.gameObject.SetActive(false);
 
                     radialBar.gameObject.SetActive(true);
+                    movementCircle.SetActive(true);
                     radialBar.maxValue = 360;
                     radialBar.value = Random.Range(radialBar.minValue, radialBar.maxValue);
                     if      (playerSlowed) { 
@@ -701,6 +704,7 @@ public class PathFollower : MonoBehaviour
                 buttonSpells.gameObject.SetActive(true);
                 buttonMap.gameObject.SetActive(true);
                 radialBar.gameObject.SetActive(false);
+                movementCircle.SetActive(false);
                 isRollingDice = false;
             }
         }
@@ -1851,8 +1855,8 @@ public class PathFollower : MonoBehaviour
         grimoireUI.gameObject.SetActive(false);
 
         if (!pseudoMove) yield return new WaitForSeconds(1.6f);
-        // moveBar.gameObject.SetActive(false);
         radialBar.gameObject.SetActive(false);
+        movementCircle.SetActive(false);
 
         yield return new WaitForSeconds(0.1f);
         _animator.SetBool("IsWalking", true);
@@ -3285,7 +3289,6 @@ public class PathFollower : MonoBehaviour
 
 
 
-
     public void DISPLAY_PLAYER_RANKINGS(int xth)
     {
         switch (xth)
@@ -3301,7 +3304,20 @@ public class PathFollower : MonoBehaviour
         }
     }
 
-    
+    private void OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("Enemy")) {
+            var obj = Instantiate(smoke, transform.position, smoke.transform.rotation);
+            Destroy(obj, 3);
+            var explosion = Instantiate(fireExplosion, transform.position, Quaternion.identity);
+            Destroy(explosion, 3);
+
+            currentNode = GameObject.Find("New-Node").GetComponent<Node>();
+            transform.position = currentNode.transform.position;
+            UPDATE_INFORMATION(false);
+        }
+    }
+
+
 
 
     // todo : HAPPENING \ EVENT SPACES

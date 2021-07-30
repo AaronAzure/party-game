@@ -8,10 +8,6 @@ using BeautifulTransitions.Scripts.Transitions.Components.Camera;
 public class GameManager : MonoBehaviour
 {
     // GLOBAL VARIABLES
-    [System.Serializable]
-    public class MyEventType : UnityEvent { }
- 
-    public MyEventType OnEvent;
 
     [SerializeField] private int nPlayers;
     private string sceneName;
@@ -59,6 +55,11 @@ public class GameManager : MonoBehaviour
     private bool turretOnCoolDown;
 
     private float mainCamOrigSize;
+
+
+    [Header("Volcanic Villa")]
+    [SerializeField] private MagmabeastBoard[] magmabeasts;
+    private bool magmabeastsCalled;
 
 
     // -------------------------------------------------------------------------------
@@ -184,7 +185,7 @@ public class GameManager : MonoBehaviour
             controller.ResetAllTraps();
             if (sceneName != "Shogun_Seaport") StartCoroutine( DelayChoosingMagicOrbSpace(1) );
             gamers[ controller.playerOrder[playerOrder] ].BEGIN(); 
-            StartCoroutine( TELL_CONTROLLER_TO_SAVE_GAME() );
+            if (!controller.dontSaveState) StartCoroutine( TELL_CONTROLLER_TO_SAVE_GAME() );
             StartCoroutine( CAMERA_TRANSITION(0.5f, 1f, false));
             // StartCoroutine(CAMERA_TRANSITION());
             // SCREEN_TRANSITION("Oval_Transition", 0.5f);
@@ -276,8 +277,10 @@ public class GameManager : MonoBehaviour
     public void p1Start() { StartCoroutine( CAMERA_TRANSITION(0,1,false) ); }
 
     // -------------------------------------------------------------------------------
-    public IEnumerator INCREMENT_TURN()
+    public IEnumerator INCREMENT_TURN(float delay=0)
     {
+        yield return new WaitForSeconds(delay);
+
         SCREEN_TRANSITION("Oval_Transition", 0);
         yield return new WaitForSeconds(transitionTime);
 
@@ -394,6 +397,23 @@ public class GameManager : MonoBehaviour
     }
 
     // todo ------------------------------------------------------------------------
+    private int nMagmaBeast = 0;
+    public void NEXT_MAGMABEAST_TURN(int n=0)
+    {
+        if (n >= magmabeasts.Length) {
+            mainCam.gameObject.SetActive(true);
+            magmabeastsCalled = true;
+            NEXT_PLAYER_TURN();
+        }
+        else {
+            if (magmabeasts.Length > 0) {
+                magmabeasts[n].endOfTurn = true;
+                StartCoroutine( magmabeasts[n].PICK_A_DEST() );
+            }
+            mainCam.gameObject.SetActive(true);
+        }
+    }
+
     public void NEXT_PLAYER_TURN()
     {
         if (playerOrder < nPlayers)
@@ -435,7 +455,8 @@ public class GameManager : MonoBehaviour
             }
         }
         //* PLASMA PALACE, TURRET'S TURN
-        else if (sceneName == "Plasma_Palace" && !turretOnCoolDown && playerOrder >= nPlayers) {
+        else if (sceneName == "Plasma_Palace" && !turretOnCoolDown && playerOrder >= nPlayers) 
+        {
             turretCount = PlayerPrefs.GetInt("TurretCount") - 1;
             PlayerPrefs.SetInt("TurretCount", turretCount);
             turretOnCoolDown = true;
@@ -453,6 +474,18 @@ public class GameManager : MonoBehaviour
             else {
                 mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
             }
+        }
+        //* VOLCANIC VILLA, TURRET'S TURN
+        else if (sceneName == "Volcanic_Villa" && !magmabeastsCalled && playerOrder >= nPlayers) 
+        {
+            NEXT_MAGMABEAST_TURN(nMagmaBeast);
+            nMagmaBeast++;
+            // if (magmabeasts.Length > 0) {
+            //     magmabeasts[0].endOfTurn = true;
+            //     StartCoroutine( magmabeasts[0].PICK_A_DEST() );
+            // }
+            // mainCam.gameObject.SetActive(true);
+            // magmabeastsCalled = true;
         }
         // ALL PLAYERS HAD THEIR TURN
         else
