@@ -394,10 +394,14 @@ public class MinigameManager : MonoBehaviour
     }
 
     // IF x == 1, THEN LAST MAN STANDING; ELSE x == 0, THEN UNTIL ALL PLAYERS ARE ELIMINATED;
-    public void CheckIfEveyoneIsOut(int x)
+    public void CheckIfEveyoneIsOut(int x=0)
     {
         // SOMETHING HAPPENS BEFPORE FINISH SCREEN
         if (sceneName == "Stop_Watchers" && nPlayersOut >= controller.nPlayers - x)
+        {
+            StartCoroutine( EventGameOver() );
+        }
+        else if (sceneName == "County-Bounty" && nPlayersOut >= controller.nPlayers - x)
         {
             StartCoroutine( EventGameOver() );
         }

@@ -423,11 +423,12 @@ public class PreviewManager : MonoBehaviour
     }
 
 
-    public void CheckIfEveyoneIsOut(int x)
+    public void CheckIfEveyoneIsOut(int x=0)
     {
         if (nPlayersOut >= controller.nPlayers - x)     
         { 
             if (sceneName == "Stop Watchers") { StartCoroutine( EventGameOver() ); }
+            else if (sceneName == "County Bounty") { StartCoroutine( EventGameOver() ); }
             else    { StartCoroutine( RELOAD() ); }
         }
     }

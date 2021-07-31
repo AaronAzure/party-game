@@ -52,8 +52,15 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private GameObject characterHolder;
     [SerializeField] private GameObject[] characters;   // ** inspector
     [SerializeField] private GameObject[] heads;        // ** inspector
+
+
+    [Header("Comment")]
+    [SerializeField] private Animator commentAnim;
+    [SerializeField] private GameObject commentBox;
+    [SerializeField] private TextMeshProUGUI comment;
     
 
+    [Header("Path")]
     // CUSTOM PATHS 
     [SerializeField] public Node currentNode;
     [SerializeField] public Node nextNode;
@@ -581,6 +588,36 @@ public class PathFollower : MonoBehaviour
             else if (readyToMovedAside && isReadyToMove && !isAside && !pseudoMove)
             {
                 MOVE_ASIDE();
+            }
+        }
+        else
+        {
+            if (!commentBox.activeSelf)
+            {
+                if      (player.GetButtonDown("A"))
+                {
+                    comment.text = "Good Job!";
+                    commentAnim.Play("Comment_Anim", -1, 0);
+                    // commentAnim.SetTrigger("Comment");
+                }
+                else if (player.GetButtonDown("B"))
+                {
+                    comment.text = "Hurry Up!";
+                    commentAnim.Play("Comment_Anim", -1, 0);
+                    // commentAnim.SetTrigger("Comment");
+                }
+                else if (player.GetButtonDown("X"))
+                {
+                    comment.text = "What?!";
+                    commentAnim.Play("Comment_Anim", -1, 0);
+                    // commentAnim.SetTrigger("Comment");
+                }
+                else if (player.GetButtonDown("Y"))
+                {
+                    comment.text = "I'm Winning!";
+                    commentAnim.Play("Comment_Anim", -1, 0);
+                    // commentAnim.SetTrigger("Comment");
+                }
             }
         }
 

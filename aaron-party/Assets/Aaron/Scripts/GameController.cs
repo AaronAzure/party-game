@@ -900,7 +900,7 @@ public class GameController : MonoBehaviour
     }
 
     // MOVE CAMERA TO SHOW WHERE THE MAGIC ORB SPACE IS
-    void Update() 
+    void FixedUpdate() 
     {
         // SHOW THE FIRST MAGIC ORB
         if (!firstMagicOrbShown && starting)

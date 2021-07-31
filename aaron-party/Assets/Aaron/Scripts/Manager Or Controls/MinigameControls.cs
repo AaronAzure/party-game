@@ -15,6 +15,7 @@ public class MinigameControls : MonoBehaviour
     [SerializeField] public  int playerID;  // ASSIGN FROM MingameManager
     [SerializeField] private Player player;
     [SerializeField] private GameObject  placeBubble;
+    [SerializeField] private GameObject  doneBubble;
     [SerializeField] private TextMeshPro placetext;
     private float moveSpeed;
     private float jumpSpeed;
@@ -123,6 +124,7 @@ public class MinigameControls : MonoBehaviour
     private bool isGrounded;
     private bool inAir;
     public  bool isOut;
+    public  bool isDone = false;
     private bool isFinished;
 
 
@@ -1262,11 +1264,13 @@ public class MinigameControls : MonoBehaviour
 
         else if (sceneName == "County-Bounty" && manager.canPlay && !manager.timeUp && !isOut) 
         {
-            COUNT();
+            if (!isDone) COUNT();
+            DONE();
         }
         else if (sceneName == "County Bounty" && pw.canPlay && !isOut) 
         {
-            COUNT();
+            if (!isDone) COUNT();
+            DONE();
         }
 
         else if (sceneName == "Slay-The-Shades" && manager.canPlay && !manager.timeUp && !isOut ) 
@@ -2493,6 +2497,7 @@ public class MinigameControls : MonoBehaviour
     {
         // DISPLAY ANSWER
         thoughtBubble.SetActive(true);
+        if (doneBubble != null) doneBubble.SetActive(false);
         isOut = true;
         RESET_PLAYER_UI();
 
@@ -2504,11 +2509,34 @@ public class MinigameControls : MonoBehaviour
         score.text = points.ToString();
     }
 
-    void DONE_COUNTING() 
+    void DONE() 
     {
-        if (!isOut && player.GetButtonDown("Y")) {
-            isOut = true;
-            manager.CheckIfEveyoneIsOut(0);
+        // FINISHED
+        if (player.GetButtonDown("Y")) 
+        {
+            isDone = !isDone;  //  TRUE INITIALLY
+            doneBubble.SetActive(isDone);
+            if (sceneName.Contains("County") && sceneName.Contains("Bounty")) thoughtBubble.SetActive(false);
+            if (isDone) {
+                if (manager != null) {
+                    manager.nPlayersOut++;
+                    manager.CheckIfEveyoneIsOut(0);
+                }
+                else if (pw != null) {
+                    pw.nPlayersOut++;
+                    pw.CheckIfEveyoneIsOut(0);
+                }
+            }
+            else {
+                if (manager != null) {
+                    manager.nPlayersOut--;
+                    manager.CheckIfEveyoneIsOut(0);
+                }
+                else if (pw != null) {
+                    pw.nPlayersOut--;
+                    pw.CheckIfEveyoneIsOut(0);
+                }
+            }
         }
     }
 
@@ -2549,6 +2577,11 @@ public class MinigameControls : MonoBehaviour
         }
         UPDATE_POINTS();
     }
+
+
+    
+
+
 
 
     // ***************************************************************************** //
