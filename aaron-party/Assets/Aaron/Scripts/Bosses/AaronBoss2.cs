@@ -36,7 +36,7 @@ public class AaronBoss2 : MonoBehaviour
     [SerializeField] private Slider slider;
     IEnumerator co;
 
-    private int easyHp = 100;
+    private int easyHp = 125;
     private int normHp = 150;
     private int hardHp = 200;
 

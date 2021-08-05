@@ -590,34 +590,37 @@ public class PathFollower : MonoBehaviour
                 MOVE_ASIDE();
             }
         }
-        else
+        else if (!commentBox.activeSelf)
         {
-            if (!commentBox.activeSelf)
+            if      (player.GetButtonDown("A"))
             {
-                if      (player.GetButtonDown("A"))
-                {
-                    comment.text = "Good Job!";
-                    commentAnim.Play("Comment_Anim", -1, 0);
-                    // commentAnim.SetTrigger("Comment");
-                }
-                else if (player.GetButtonDown("B"))
-                {
-                    comment.text = "Hurry Up!";
-                    commentAnim.Play("Comment_Anim", -1, 0);
-                    // commentAnim.SetTrigger("Comment");
-                }
-                else if (player.GetButtonDown("X"))
-                {
-                    comment.text = "What?!";
-                    commentAnim.Play("Comment_Anim", -1, 0);
-                    // commentAnim.SetTrigger("Comment");
-                }
-                else if (player.GetButtonDown("Y"))
-                {
-                    comment.text = "I'm Winning!";
-                    commentAnim.Play("Comment_Anim", -1, 0);
-                    // commentAnim.SetTrigger("Comment");
-                }
+                comment.text = "Good Job!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("B"))
+            {
+                comment.text = "Nooo!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("X"))
+            {
+                comment.text = "What?!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("Y"))
+            {
+                comment.text = "You can do it!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("L"))
+            {
+                comment.text = ":(";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("R"))
+            {
+                comment.text = "Come Again?";
+                commentAnim.Play("Comment_Anim", -1, 0);
             }
         }
 
@@ -1870,8 +1873,8 @@ public class PathFollower : MonoBehaviour
     public void UNHIDE_DATA_CANVAS()  { layout.SetActive(true); }
 
 
-    /* --------------------------------------------------------- */
-    /* ------------ DURING THE START OF PLAYER TURN ------------ */
+    //* --------------------------------------------------------- */
+    //* ------------ DURING THE START OF PLAYER TURN ------------ */
 
 
     // AFTER ROLLING DICE, DELAY THEN MOVE PLAYER
@@ -2393,7 +2396,7 @@ public class PathFollower : MonoBehaviour
     // DOUBLE PURCHASES IN LAST 5 TURNS
     public void RESET_PURCHASES() 
     { 
-        if (shop4)  { nPurchaseLeft = controller.turnMultiplier; }
+        if (shop4)  { nPurchaseLeft = 1; }
         else        { nPurchaseLeft = maxNPurchases * controller.turnMultiplier;  }
         purchaseLeftText.color = new Color(1,1,1);
         purchaseLeftText2.color = new Color(1,1,1);
@@ -2615,7 +2618,6 @@ public class PathFollower : MonoBehaviour
             UPDATE_SPELLS_UI();
 
             yield return new WaitForSeconds(0.5f);
-            // isAtFree = false;
             UPDATE_INFORMATION(true);
             
             yield return new WaitForSeconds(0.5f);

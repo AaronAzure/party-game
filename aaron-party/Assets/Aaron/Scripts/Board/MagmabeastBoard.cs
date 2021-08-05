@@ -16,6 +16,7 @@ public class MagmabeastBoard : MonoBehaviour
     [SerializeField] private GameObject lavaTrail;
     [SerializeField] private Image startUi;
     [SerializeField] private Animator startUiAnim;
+    [SerializeField] private CapsuleCollider2D _collider;
     public bool endOfTurn; 
 
     [SerializeField] private GameManager manager;
@@ -35,6 +36,8 @@ public class MagmabeastBoard : MonoBehaviour
             ind = PlayerPrefs.GetInt("magmabeast-" + x);
             if (ind < posToMove.Length) transform.position = posToMove[ind].position;
         }
+        if (_collider == null) _collider = this.GetComponent<CapsuleCollider2D>();
+        _collider.enabled = false;
     }
 
 
@@ -55,6 +58,7 @@ public class MagmabeastBoard : MonoBehaviour
     public IEnumerator PICK_A_DEST()
     {
         cam.gameObject.SetActive(true);
+        _collider.enabled = true;
 
         StartCoroutine( START() );
         if (posToMove.Length <= 1) { 
@@ -109,6 +113,7 @@ public class MagmabeastBoard : MonoBehaviour
             if (Vector3.Distance(transform.position, posToMove[ind].position) < 0.001f)
             {
                 canMove = false;
+                _collider.enabled = false;
                 burningStand.SetActive(true);
                 StartCoroutine( DELAY_SET_CAM_ACTIVE(false, 2) );
 
@@ -132,11 +137,11 @@ public class MagmabeastBoard : MonoBehaviour
     IEnumerator LavaTrail()
     {
         if (lavaTrail == null || !canMove) yield break;
-        yield return new WaitForSeconds(0.2f);
         if (burningStand.activeSelf) burningStand.SetActive(false);
         var trail = Instantiate(lavaTrail, transform.position, lavaTrail.transform.rotation); 
-
         Destroy(trail, 1.5f);
+
+        yield return new WaitForSeconds(0.2f);
         StartCoroutine( LavaTrail() );
     }
 

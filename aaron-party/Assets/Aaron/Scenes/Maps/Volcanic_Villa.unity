@@ -1347,6 +1347,7 @@ MonoBehaviour:
     type: 3}
   startUi: {fileID: 492577892}
   startUiAnim: {fileID: 492577890}
+  _collider: {fileID: 0}
   endOfTurn: 0
   manager: {fileID: 1632724030}
   ctr: {fileID: 0}
@@ -4117,7 +4118,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381897749}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 43.9, y: 10.7, z: 0}
+  m_LocalPosition: {x: 46.1, y: 16.3, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_Children: []
   m_Father: {fileID: 473169641}
@@ -9159,7 +9160,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1036124393}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 46.8, y: -16.7, z: 0}
+  m_LocalPosition: {x: 45.2, y: -21, z: 0}
   m_LocalScale: {x: 2, y: 2.4, z: 1}
   m_Children: []
   m_Father: {fileID: 473169641}
@@ -12339,6 +12340,7 @@ MonoBehaviour:
     type: 3}
   startUi: {fileID: 458468703}
   startUiAnim: {fileID: 458468702}
+  _collider: {fileID: 0}
   endOfTurn: 0
   manager: {fileID: 1632724030}
   ctr: {fileID: 0}
@@ -13712,6 +13714,7 @@ MonoBehaviour:
     type: 3}
   startUi: {fileID: 145490332}
   startUiAnim: {fileID: 145490331}
+  _collider: {fileID: 0}
   endOfTurn: 0
   manager: {fileID: 1632724030}
   ctr: {fileID: 0}
@@ -13892,7 +13895,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1619223561}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 37.6, y: -2.7, z: 0}
+  m_LocalPosition: {x: -23, y: 14.7, z: 0}
   m_LocalScale: {x: 1.6, y: 2, z: 1}
   m_Children: []
   m_Father: {fileID: 473169641}

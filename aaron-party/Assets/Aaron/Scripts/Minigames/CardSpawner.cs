@@ -21,7 +21,7 @@ public class CardSpawner : MonoBehaviour
     private IEnumerator SPAWN_CARD(float nextSpawn)
     {
         yield return new WaitForSeconds(nextSpawn);
-        var obj = Instantiate(cardPrefab, transform.position, Quaternion.identity);
+        var obj = Instantiate(cardPrefab, transform.position, Quaternion.identity, this.transform);
         CardPoints card = obj.GetComponent<CardPoints>();
 
         int rng = worth[Random.Range(0, worth.Length)];

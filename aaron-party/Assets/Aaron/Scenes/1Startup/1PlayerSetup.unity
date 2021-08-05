@@ -3015,17 +3015,17 @@ PrefabInstance:
     - target: {fileID: 2864894284712624756, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}
       propertyPath: slowerDice
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2864894284712624756, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}
       propertyPath: dontSaveState
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2864894284712624756, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}
       propertyPath: skipSideQuest
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2864894284712624756, guid: 37f7365ca06944316904bcd1984512d9,
         type: 3}

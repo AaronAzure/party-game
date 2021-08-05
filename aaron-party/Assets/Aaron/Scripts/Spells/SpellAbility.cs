@@ -34,9 +34,9 @@ public class SpellAbility : MonoBehaviour
                 default : Debug.LogError("HAVE NOT ADDED EFFECT SPELL > " + effectName); break;
             }
             //* PLASMA PALACE, TURRET CANNON
-            // if (name.Contains("TurretLaserPurple")) {
-            //     StartCoroutine( player.LOSE_ALL_COINS() );
-            // }
+            if (name.Contains("TurretLaserPurple")) {
+                StartCoroutine( player.LOSE_ALL_COINS() );
+            }
             // if (player == null) { Debug.LogError("-- couldn't find player"); }
             // else { StartCoroutine( player.LOSE_COINS(-10) ); }
         }

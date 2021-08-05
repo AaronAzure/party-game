@@ -31,7 +31,7 @@ public class GameController : MonoBehaviour
     public bool easy;
     public bool norm = true;
     public bool hard;
-    public bool isSetOrder = true;    // ** SET BY PLAYER 1 (LobbyControls) {true = set player order | false = flex player order}
+    public bool isSetOrder = false;    // ** SET BY PLAYER 1 (LobbyControls) {true = set player order | false = flex player order}
     public bool mercyRule = true;   // ** {true = If player in first has more than 3 orbs than second place, They WIN }
     public bool mercyWinner;
 
@@ -79,7 +79,7 @@ public class GameController : MonoBehaviour
     public bool hasStarted = false;
     private List<NodeSpace> changedSpaces;
     private int currentMagicOrbIndex = -1;
-    private List<NodeSpace> magicOrbSpace;
+    [SerializeField] private List<NodeSpace> magicOrbSpace;
 
     [SerializeField] private Sprite[] trapSprites;
     private bool justResumed;
@@ -184,12 +184,15 @@ public class GameController : MonoBehaviour
         FILL_RANDOM_SPELLS();
     }
 
+    // SPELLS AT FREE SPELL SPACE
     private void FILL_RANDOM_SPELLS()
     {
-        randomSpells.Add( new SpellType("Spell_Trap_10", 1, "Trap") );
+        // randomSpells.Add( new SpellType("Spell_Trap_10", 1, "Trap") );
+        randomSpells.Add( new SpellType("Spell_Trap_20", 2, "Trap") );
 
         randomSpells.Add( new SpellType("Spell_Effect_10", 2, "Effect") );
         randomSpells.Add( new SpellType("Spell_Effect_Spell_1", 2, "Effect") );
+        randomSpells.Add( new SpellType("Spell_Effect_Mana_3", 2, "Effect") );
         randomSpells.Add( new SpellType("Spell_Effect_Slow_1", 2, "Effect") );
 
         randomSpells.Add( new SpellType("Spell_Move_Slowgo", 2, "Move") );
@@ -304,15 +307,6 @@ public class GameController : MonoBehaviour
             for (int i=0 ; i<nPlayers ; i++) {
                 playerSpells.Add( new List<SpellType>() ); 
             }
-            //! DELETE
-            // p1.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            // p2.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            // p3.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            // p4.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            // p5.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            // p6.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            // p7.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
-            // p8.Add(new PlayerPrevData("path-0", 0, new Vector3(0,0), new Vector3(0,0), 10, 0, 5, 0, false));
             SceneManager.LoadScene("2Lobby");
         }
     }
@@ -832,7 +826,7 @@ public class GameController : MonoBehaviour
 
 
     /* -------------------------- */
-    /* ------- TURN STUFF ------- */
+    /* ------- BOARD STUFF ------- */
 
     public IEnumerator NEXT_ORB_SPACE(string player)
     {
@@ -843,7 +837,6 @@ public class GameController : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        // camNode = GameObject.Find("/" + magicOrbSpace[currentMagicOrbIndex].parentPath + "/" + magicOrbSpace[currentMagicOrbIndex].childNode).GetComponent<Node>();
         showingNewMagicOrb = true;
 
     }
@@ -1030,6 +1023,10 @@ public class GameController : MonoBehaviour
     public void CHOOSE_MAGIC_ORB_SPACE(string key)
     {
         int r = Random.Range(0, magicOrbSpace.Count);
+
+        foreach (NodeSpace orbSpace in magicOrbSpace) {
+            Debug.Log(orbSpace.parentPath + "/" + orbSpace.childNode);
+        }
 
         // DO NOT PICK THE SAME MAGIC ORB SPACE AFTER PURCHASE
         if (magicOrbSpace.Count > 1) {
@@ -1362,47 +1359,6 @@ public class GameController : MonoBehaviour
             arr[i] += playerData[i].coins + (playerData[i].orbs * 1000);
             names[i] = characterNames[i];
         }
-        //! DELETE
-        // if (p1.Count > 0 && nPlayers > 0) {
-        //     arr[0] += p1[0].coins;
-        //     arr[0] += (p1[0].orbs * 1000);
-        //     names[0] = characterName1;
-        // }
-        // if (p2.Count > 0 && nPlayers > 1) {
-        //     arr[1] += p2[0].coins;
-        //     arr[1] += (p2[0].orbs * 1000);
-        //     names[1] = characterName2;
-        // }
-        // if (p3.Count > 0 && nPlayers > 2) {
-        //     arr[2] += p3[0].coins;
-        //     arr[2] += (p3[0].orbs * 1000);
-        //     names[2] = characterName3;
-        // }
-        // if (p4.Count > 0 && nPlayers > 3) {
-        //     arr[3] += p4[0].coins;
-        //     arr[3] += (p4[0].orbs * 1000);
-        //     names[3] = characterName4;
-        // }
-        // if (p5.Count > 0 && nPlayers > 4) {
-        //     arr[4] += p5[0].coins;
-        //     arr[4] += (p5[0].orbs * 1000);
-        //     names[4] = characterName5;
-        // }
-        // if (p6.Count > 0 && nPlayers > 5) {
-        //     arr[5] += p6[0].coins;
-        //     arr[5] += (p6[0].orbs * 1000);
-        //     names[5] = characterName6;
-        // }
-        // if (p7.Count > 0 && nPlayers > 6) {
-        //     arr[6] += p7[0].coins;
-        //     arr[6] += (p7[0].orbs * 1000);
-        //     names[6] = characterName7;
-        // }
-        // if (p8.Count > 0 && nPlayers > 7) {
-        //     arr[7] += p8[0].coins;
-        //     arr[7] += (p8[0].orbs * 1000);
-        //     names[7] = characterName8;
-        // }
 
         // SORT THE HIGHEST POINT VALUES (ASCENDING ORDER)
         for ( int i=0 ; i<arr.Length ; i++ )
@@ -1430,49 +1386,8 @@ public class GameController : MonoBehaviour
 
         for (int i=0 ; i<nPlayers ; i++) {
             arr[i] += playerData[i].coins + (playerData[i].orbs * 1000);
-            pid[i] = 0;
+            pid[i] = i;
         }
-        //! DELETE
-        // if (p1.Count > 0 && nPlayers > 0) {
-        //     arr[0] += p1[0].coins;
-        //     arr[0] += (p1[0].orbs * 1000);
-        //     pid[0] = 0;
-        // }
-        // if (p2.Count > 0 && nPlayers > 1) {
-        //     arr[1] += p2[0].coins;
-        //     arr[1] += (p2[0].orbs * 1000);
-        //     pid[1] = 1;
-        // }
-        // if (p3.Count > 0 && nPlayers > 2) {
-        //     arr[2] += p3[0].coins;
-        //     arr[2] += (p3[0].orbs * 1000);
-        //     pid[2] = 2;
-        // }
-        // if (p4.Count > 0 && nPlayers > 3) {
-        //     arr[3] += p4[0].coins;
-        //     arr[3] += (p4[0].orbs * 1000);
-        //     pid[3] = 3;
-        // }
-        // if (p5.Count > 0 && nPlayers > 4) {
-        //     arr[4] += p5[0].coins;
-        //     arr[4] += (p5[0].orbs * 1000);
-        //     pid[4] = 4;
-        // }
-        // if (p6.Count > 0 && nPlayers > 5) {
-        //     arr[5] += p6[0].coins;
-        //     arr[5] += (p6[0].orbs * 1000);
-        //     pid[5] = 5;
-        // }
-        // if (p7.Count > 0 && nPlayers > 6) {
-        //     arr[6] += p7[0].coins;
-        //     arr[6] += (p7[0].orbs * 1000);
-        //     pid[6] = 6;
-        // }
-        // if (p8.Count > 0 && nPlayers > 7) {
-        //     arr[7] += p8[0].coins;
-        //     arr[7] += (p8[0].orbs * 1000);
-        //     pid[7] = 7;
-        // }
         // SORT THE HIGHEST POINT VALUES (DESCENDING ORDER)
         for ( int i=0 ; i<arr.Length ; i++ )
         {
@@ -1490,7 +1405,6 @@ public class GameController : MonoBehaviour
             }
         }
 
-        // PLAYER(S) WITH THE HIGHEST SCORE
         List<int> losing = new List<int>();
         for (int i=0 ; i<arr.Length ; i++) { if (arr[nPlayers-1] == arr[i]) { losing.Add( pid[i] ); } }
 
