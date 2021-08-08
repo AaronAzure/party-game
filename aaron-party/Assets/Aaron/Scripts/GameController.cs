@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
 
     [Header("Board Settings")]
     public int maxTurns = 15;       // ** SET BY PLAYER 1 (LobbyControls)
-    public int restoreMpTurn = 1;
+    public int restoreMpTurn = 2;
     public bool isCasual = false;   // ** SET BY PLAYER 1 (LobbyControls) {true = casual | false = competitive}
     public bool easy;
     public bool norm = true;

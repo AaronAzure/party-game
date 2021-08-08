@@ -24190,6 +24190,7 @@ MonoBehaviour:
   whoIsTheSeller: 0
   lockedOn: {fileID: 854071645970123018}
   magicOrb: {fileID: 405553350848496210}
+  magicOrbHolder: {fileID: 5548089093288113412}
   firstMagicOrb: 0
   aaronPrefab: {fileID: 4869864761181946912, guid: f76d089c99b3c4227bf8f0e4a46a5084,
     type: 3}

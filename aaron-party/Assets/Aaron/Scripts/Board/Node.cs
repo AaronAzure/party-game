@@ -16,10 +16,13 @@ public class Node : MonoBehaviour
     [Header("Spell Related")]
     [SerializeField] private SpriteRenderer lockedOn;
     [SerializeField] public GameObject magicOrb;
+    [SerializeField] public GameObject magicOrbHolder;
+    [Space]
     [SerializeField] public bool firstMagicOrb;
     private GameController controller;      // ** SCRIPT (RUN-TIME)
 
 
+    [Space]
     [SerializeField] private GameObject aaronPrefab;
     [SerializeField] private GameObject aaron;
     [SerializeField] private Animator aaronAnim;
@@ -209,9 +212,10 @@ public class Node : MonoBehaviour
         _soundNode = this.GetComponentInChildren<AudioSource>();
 
         // ONLY ORB SPACES SHOULD HAVE AN AARON GAMEOBJ
-        if (_spaceType.sprite != orbSpace) { Destroy(aaron); }
+        if (_spaceType.sprite != orbSpace && aaron != null) { Destroy(aaron); }
         if (_spaceType.sprite == freeSpace) { FREE_SPELL_SPACE_SETUP(); }
-    
+        if (magicOrbHolder == null) magicOrbHolder = magicOrb.transform.parent.gameObject;
+
         // SET ANIMATIONS
         CHANGE_ANIMATION();
     }
@@ -811,6 +815,7 @@ public class Node : MonoBehaviour
             Vector3 spawnPos = new Vector3(nodeContainer.transform.position.x, nodeContainer.transform.position.y );
             spawnPos += new Vector3(-2, 2);
             var orbHandler = Instantiate(aaronPrefab, spawnPos, Quaternion.identity, this.transform);
+            magicOrbHolder.transform.parent = this.transform;
             aaron = orbHandler.gameObject;
             aaronAnim = aaron.GetComponent<Animator>();
             aaron.SetActive(false); 

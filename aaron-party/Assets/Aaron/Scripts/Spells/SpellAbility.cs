@@ -29,13 +29,13 @@ public class SpellAbility : MonoBehaviour
                     StartCoroutine( player.STEAL_COINS(-10, playerToBenefit) );     break; 
                 }
                 //* PLASMA PALACE, TURRET CANNON
-                case string a when a.Contains("Steal_Explosion") :      { StartCoroutine( player.LOSE_ALL_COINS() );  break; }
+                // case string a when a.Contains("Steal_Explosion") :      { StartCoroutine( player.LOSE_ALL_COINS() );  break; }
                 
                 default : Debug.LogError("HAVE NOT ADDED EFFECT SPELL > " + effectName); break;
             }
             //* PLASMA PALACE, TURRET CANNON
             if (name.Contains("TurretLaserPurple")) {
-                StartCoroutine( player.LOSE_ALL_COINS() );
+                StartCoroutine( player.LOSE_HALF_COINS() );
             }
             // if (player == null) { Debug.LogError("-- couldn't find player"); }
             // else { StartCoroutine( player.LOSE_COINS(-10) ); }
