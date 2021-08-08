@@ -33,6 +33,7 @@ public class Node : MonoBehaviour
         public Directions direction;
         public GameObject alternative;
         public bool dontCreateArrow;
+        public bool defaultFirst;
     }
     [Header("Paths - next node(s)")]
     public Nexts[] nexts;
