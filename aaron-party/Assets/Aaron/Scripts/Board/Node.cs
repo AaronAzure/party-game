@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using TMPro;
 
 public class Node : MonoBehaviour
 {
+    public Sprite spaceSprite;
+    [Space]
     private AudioSource _soundNode;                 // AUDIO FOR GOING OVER A NODE/SPACE
+    [Header("Node")]
     [SerializeField] private GameObject nodeContainer;     // space containing sprite
     
 
@@ -51,6 +55,7 @@ public class Node : MonoBehaviour
 
 
     [Header("Type of Space")]
+    // [Space]
     [SerializeField] private Sprite emptySpace;     //
     [SerializeField] private Sprite blueSpace;      
     [SerializeField] private Sprite redSpace;       
@@ -120,7 +125,7 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite charlotteOrb;
 
 
-    private SpriteRenderer _spaceType;
+    public SpriteRenderer _spaceType;
     private Animator _anim;
     [SerializeField] private TextMeshPro nSpace;
 
@@ -859,5 +864,30 @@ public class Node : MonoBehaviour
         if (GameObject.Find("Game_Controller") != null) {
             controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
         }
+    }
+
+
+
+
+    public void NodeSetup(Sprite sp)
+    {
+        if (sp == null) return;
+        _spaceType.sprite = sp;
+    }
+}
+
+
+[CustomEditor(typeof(Node), true)]
+[CanEditMultipleObjects]
+public class NodeEditor : Editor
+{
+    public Sprite img;
+
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        Node myScript = (Node)target;
+        if (myScript.spaceSprite != null) myScript._spaceType.sprite = myScript.spaceSprite;
     }
 }

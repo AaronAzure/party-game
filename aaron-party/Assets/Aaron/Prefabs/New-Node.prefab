@@ -24199,6 +24199,7 @@ MonoBehaviour:
   teleportEffect: {fileID: 145256, guid: 426d849a9ad6e4ea5a3fc0b68bede053, type: 3}
   nexts: []
   magicGate: {fileID: 0}
+  space: {fileID: 0}
   emptySpace: {fileID: 21300000, guid: e6e36cc42fd46491f8c3d8f81e9357d3, type: 3}
   blueSpace: {fileID: 21300000, guid: 27aac94e109c9834295990e95443b405, type: 3}
   redSpace: {fileID: 21300000, guid: 5d79994be1ee0c146933cba13474436a, type: 3}
@@ -24246,6 +24247,7 @@ MonoBehaviour:
   charlotteCoin10: {fileID: 21300000, guid: 99e36675cab654d22b6bb18d89f5db6a, type: 3}
   charlotteCoin20: {fileID: 21300000, guid: 034e3d3bce191482696e0bd5a1f91a32, type: 3}
   charlotteOrb: {fileID: 21300000, guid: 99a3d800631fd4545b134aa220787d69, type: 3}
+  _spaceType: {fileID: 6945034686109693340}
   nSpace: {fileID: 7826182701447639266}
   trapCreateEffect: {fileID: 188698, guid: d59453060233d2f49884f7de0b768335, type: 3}
   instanBlueEffect: {fileID: 100006, guid: 4ac279154e61c4c8286ca1061947cfdc, type: 3}
