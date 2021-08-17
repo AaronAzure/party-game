@@ -617,13 +617,22 @@ public class PathFollower : MonoBehaviour
                 comment.text = ":(";
                 commentAnim.Play("Comment_Anim", -1, 0);
             }
-            else if (player.GetButtonDown("R"))
+            else if (player.GetButtonDown("ZL"))
             {
-                comment.text = "Come Again?";
+                comment.text = "Don't do it";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("ZR"))
+            {
+                comment.text = "Do it";
                 commentAnim.Play("Comment_Anim", -1, 0);
             }
         }
 
+        if (coins > 999)
+        {
+            coins = 999;
+        }
         textBox[0].text = coins.ToString();
         textBox[1].text = orbs.ToString();
     }
@@ -2102,7 +2111,7 @@ public class PathFollower : MonoBehaviour
         if (!losingAll) {losingAll = true;}
         else yield break;
 
-        int n = Mathf.CeilToInt(coins / 2);
+        int n = Mathf.CeilToInt(coins / 2) * -1;
         // int tempGold = coins;
         var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
         // NOT ENOUGH COINS TO LOSE

@@ -279,7 +279,7 @@ public class GameManager : MonoBehaviour
     // -------------------------------------------------------------------------------
     public IEnumerator INCREMENT_TURN(float delay=0)
     {
-        yield return new WaitForSeconds(delay);
+        if (delay != 0) yield return new WaitForSeconds(delay);
 
         SCREEN_TRANSITION("Oval_Transition", 0);
         yield return new WaitForSeconds(transitionTime);

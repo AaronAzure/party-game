@@ -32,6 +32,9 @@ TextureImporter:
   - first:
       213: 3112609949424742987
     second: --rocks_9
+  - first:
+      213: -2142182372440006131
+    second: --rocks_10
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -137,7 +140,7 @@ TextureImporter:
         width: 697
         height: 304
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -263,7 +266,7 @@ TextureImporter:
         width: 1007
         height: 516
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -334,6 +337,27 @@ TextureImporter:
       bones: []
       spriteID: b42fec7f146323b20800000000000000
       internalID: 3112609949424742987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: --rocks_10
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 1551
+        width: 499
+        height: 744
+      alignment: 9
+      pivot: {x: 0.23793742, y: 0.07035204}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d022c966b707542e0800000000000000
+      internalID: -2142182372440006131
       vertices: []
       indices: 
       edges: []

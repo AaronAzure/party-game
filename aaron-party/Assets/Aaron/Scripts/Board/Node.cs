@@ -879,15 +879,52 @@ public class Node : MonoBehaviour
 
 [CustomEditor(typeof(Node), true)]
 [CanEditMultipleObjects]
+// public class NodeEditor : EditorWindow
 public class NodeEditor : Editor
 {
-    public Sprite img;
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
 
         Node myScript = (Node)target;
-        if (myScript.spaceSprite != null) myScript._spaceType.sprite = myScript.spaceSprite;
+        if (myScript.spaceSprite != null) {
+            myScript._spaceType.sprite = myScript.spaceSprite;
+        }
     }
+
+
+    //* EDITOR WINDOW
+    // public Sprite spaceSprite;
+
+    // [MenuItem("Window/Node")]
+    // public static void ShowWindow()
+    // {
+    //     GetWindow<NodeEditor>("Node Editor Window");
+    // }
+
+
+    // void OnGUI ()
+	// {
+	// 	GUILayout.Label("Set Space Sprite", EditorStyles.boldLabel);
+
+	// 	color = EditorGUILayout.ColorField("Color", color);
+
+	// 	if (GUILayout.Button("COLORIZE!"))
+	// 	{
+	// 		Colorize();
+	// 	}
+	// }
+
+	// void Colorize ()
+	// {
+	// 	foreach (GameObject obj in Selection.gameObjects)
+	// 	{
+	// 		Renderer renderer = obj.GetComponent<Renderer>();
+	// 		if (renderer != null)
+	// 		{
+	// 			renderer.sharedMaterial.color = color;
+	// 		}
+	// 	}
+	// }
 }

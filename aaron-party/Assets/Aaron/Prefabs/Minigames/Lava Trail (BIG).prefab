@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3734270786200885251}
   - component: {fileID: 3734270786208661337}
   - component: {fileID: 642717242462521479}
+  - component: {fileID: -533639627329735213}
   m_Layer: 0
   m_Name: Lava Trail (BIG)
   m_TagString: Hurtbox
@@ -4773,6 +4774,17 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1.6, y: 1.1}
   m_Direction: 1
+--- !u!210 &-533639627329735213
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3734270786218834929}
+  m_Enabled: 1
+  m_SortingLayerID: -2073579037
+  m_SortingLayer: 1
+  m_SortingOrder: 0
 --- !u!1 &3734270786218843999
 GameObject:
   m_ObjectHideFlags: 0

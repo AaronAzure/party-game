@@ -156,26 +156,8 @@ public class GameController : MonoBehaviour
         }
 
         playerData = new List<PlayerPrevData>();
-        //! DELETE
-        // p1 = new List<PlayerPrevData>();
-        // p2 = new List<PlayerPrevData>();
-        // p3 = new List<PlayerPrevData>();
-        // p4 = new List<PlayerPrevData>();
-        // p5 = new List<PlayerPrevData>();
-        // p6 = new List<PlayerPrevData>();
-        // p7 = new List<PlayerPrevData>();
-        // p8 = new List<PlayerPrevData>();
 
         playerSpells = new List<List<SpellType>>();
-        //! DELETE
-        // spells1 = new List<SpellType>();
-        // spells2 = new List<SpellType>();
-        // spells3 = new List<SpellType>();
-        // spells4 = new List<SpellType>();
-        // spells5 = new List<SpellType>();
-        // spells6 = new List<SpellType>();
-        // spells7 = new List<SpellType>();
-        // spells8 = new List<SpellType>();
 
 
         randomSpells   = new List<SpellType>();
