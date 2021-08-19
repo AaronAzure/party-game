@@ -69,6 +69,7 @@ public class PathAutomator : MonoBehaviour
 }
 
 [CustomEditor(typeof(PathAutomator))]
+[CanEditMultipleObjects]
 public class PathAutomatorEditor : Editor
 {
     public override void OnInspectorGUI()
