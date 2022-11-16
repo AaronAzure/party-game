@@ -16,5 +16,9 @@ Each player takes their turn to roll the dice in order to traverse the linear bo
 
 At the end of each player's turn, a side quest will appear, in which each player will battle it out to complete the objective. Each player will be rewarded based on each their performance.
 
+
+https://user-images.githubusercontent.com/83049775/202097988-87d63bf7-1bd3-422e-ba96-7e4198f070bf.mp4
+
+
 <br />
 
