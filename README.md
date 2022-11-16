@@ -8,16 +8,18 @@ Spectacular Aaron Party is party video game where up to eigth local players can 
 
 The game is inspired by and pays homage to the Mario Party series produced by Nintendo.
 
+https://user-images.githubusercontent.com/83049775/202102470-dfc4019f-db8f-414b-a356-f1990f7bf2a1.mp4
+
 
 ## Gameplay
 
 Each player takes their turn to roll the dice in order to traverse the linear board, which can include branching paths. Players can purchase items, trigger events or cast spells to further their lead.
 
-
 At the end of each player's turn, a side quest will appear, in which each player will battle it out to complete the objective. Each player will be rewarded based on each their performance.
 
+https://user-images.githubusercontent.com/83049775/202099169-5c56c3f4-3866-4153-b5a4-5715b20eaf30.mp4
 
-https://user-images.githubusercontent.com/83049775/202097988-87d63bf7-1bd3-422e-ba96-7e4198f070bf.mp4
+
 
 
 <br />
