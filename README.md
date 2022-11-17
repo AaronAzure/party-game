@@ -8,7 +8,7 @@ Spectacular Aaron Party is party video game where up to eigth local players can 
 
 The game is inspired by and pays homage to the Mario Party series produced by Nintendo.
 
-https://user-images.githubusercontent.com/83049775/202102470-dfc4019f-db8f-414b-a356-f1990f7bf2a1.mp4
+https://user-images.githubusercontent.com/83049775/202411075-7cdfe0c0-534b-4e19-a4ab-cf45f312f320.mp4
 
 
 ## Gameplay
