@@ -669,14 +669,13 @@ MonoBehaviour:
   winnerText: {fileID: 5349501730343627201}
   spawnPlayers: {fileID: 6101957075515222740, guid: adbd9298c40484f81810b73a8e57a5ad,
     type: 3}
-  spawnCursors: {fileID: 9135720775213058035, guid: 64f8dc615743a453fabb247e52925c06,
-    type: 3}
   _A: {fileID: 0}
   _B: {fileID: 0}
   spawnPos: []
   bgMusic: {fileID: 6949220279377682594}
   ui: {fileID: 109014489629841805}
   timeUI: {fileID: 109014488807610692}
+  correctAns: 15
   instances: {fileID: 8746777671033860618}
   players: []
   winMusic: {fileID: -1280342534485929112}
@@ -969,8 +968,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 45
-  m_fontSizeBase: 45
+  m_fontSize: 72
+  m_fontSizeBase: 72
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

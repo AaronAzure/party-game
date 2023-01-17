@@ -70,6 +70,21 @@ public class CentralZombieSpawner : MonoBehaviour
             int rng2 = Random.Range(0, spawners.Length);
             while (rng2==rng) { rng2 = Random.Range(0, spawners.Length); }
             StartCoroutine( spawners[rng2].StartSpawn(0) );
+			if (ctr.hard)
+			{
+				if (nSpawn > 12)
+				{
+					int rng3 = Random.Range(0, spawners.Length);
+					while (rng3==rng||rng3==rng2) { rng3 = Random.Range(0, spawners.Length); }
+					StartCoroutine( spawners[rng3].StartSpawn(0) );
+					if (nSpawn > 18)
+					{
+						int rng4 = Random.Range(0, spawners.Length);
+						while (rng4==rng||rng4==rng2||rng4==rng3) { rng4 = Random.Range(0, spawners.Length); }
+						StartCoroutine( spawners[rng4].StartSpawn(0) );
+					}
+				}
+			}
         }
 
         if (ctr.hard)

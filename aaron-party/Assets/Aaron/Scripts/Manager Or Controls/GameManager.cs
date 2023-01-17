@@ -8,10 +8,6 @@ using BeautifulTransitions.Scripts.Transitions.Components.Camera;
 public class GameManager : MonoBehaviour
 {
     // GLOBAL VARIABLES
-    [System.Serializable]
-    public class MyEventType : UnityEvent { }
- 
-    public MyEventType OnEvent;
 
     [SerializeField] private int nPlayers;
     private string sceneName;
@@ -59,6 +55,11 @@ public class GameManager : MonoBehaviour
     private bool turretOnCoolDown;
 
     private float mainCamOrigSize;
+
+
+    [Header("Volcanic Villa")]
+    [SerializeField] private MagmabeastBoard[] magmabeasts;
+    private bool magmabeastsCalled;
 
 
     // -------------------------------------------------------------------------------
@@ -184,6 +185,7 @@ public class GameManager : MonoBehaviour
             controller.ResetAllTraps();
             if (sceneName != "Shogun_Seaport") StartCoroutine( DelayChoosingMagicOrbSpace(1) );
             gamers[ controller.playerOrder[playerOrder] ].BEGIN(); 
+            if (!controller.dontSaveState) StartCoroutine( TELL_CONTROLLER_TO_SAVE_GAME() );
             StartCoroutine( CAMERA_TRANSITION(0.5f, 1f, false));
             // StartCoroutine(CAMERA_TRANSITION());
             // SCREEN_TRANSITION("Oval_Transition", 0.5f);
@@ -208,7 +210,6 @@ public class GameManager : MonoBehaviour
 
             HIDE_UI();
             currentTurn = 1;
-            // UPDATE_ALL_INFO();
             if (sceneName == "Crystal_Caverns")
             {
                 if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
@@ -217,6 +218,13 @@ public class GameManager : MonoBehaviour
                 SCREEN_TRANSITION("Oval_Transition", 0.5f);
             }
             else if (sceneName == "Plasma_Palace")
+            {
+                if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
+                controller.orbCam.gameObject.SetActive(true);
+                StartCoroutine( DelayChoosingMagicOrbSpace(0) );
+                SCREEN_TRANSITION("Oval_Transition", 0.5f);
+            }
+            else if (sceneName == "Volcanic_Villa")
             {
                 if (playerSpawn != null) controller.orbCam.transform.position = playerSpawn.position + new Vector3(0,0,-30);
                 controller.orbCam.gameObject.SetActive(true);
@@ -269,8 +277,10 @@ public class GameManager : MonoBehaviour
     public void p1Start() { StartCoroutine( CAMERA_TRANSITION(0,1,false) ); }
 
     // -------------------------------------------------------------------------------
-    public IEnumerator INCREMENT_TURN()
+    public IEnumerator INCREMENT_TURN(float delay=0)
     {
+        if (delay != 0) yield return new WaitForSeconds(delay);
+
         SCREEN_TRANSITION("Oval_Transition", 0);
         yield return new WaitForSeconds(transitionTime);
 
@@ -348,14 +358,69 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public bool IS_MERCY_RULE_WINNER()
+    {
+        if (!controller.mercyRule || nPlayers <= 1) return false;
+
+        int[] score = new int[nPlayers];
+        int[] pID   = new int[nPlayers];    // playerID
+
+        for (int i=0 ; i<pID.Length ; i++) { pID[i] = i; }
+        
+        for (int i=0 ; i<gamers.Length ; i++)
+        {
+            score[i] += gamers[i].coins;
+            score[i] += (gamers[i].orbs * 1000);
+        }
+
+        // SORT EVERYONE'S SCORES (DESCENDING)
+        for ( int i=0 ; i<score.Length ; i++ )
+        {
+            for ( int j=0 ; j<score.Length ; j++ )
+            {
+                if (score[i] > score[j])
+                {
+                    int temp = score[i];
+                    score[i] = score[j];
+                    score[j] = temp;
+
+                    int tempID = pID[i];
+                    pID[i] = pID[j];
+                    pID[j] = tempID;
+                }
+            }
+        }
+
+        // FIRST PLACE HAS MORE THAN THREE ORBS THAN THE PLAYER IN SECOND, IMMEDIATE VICTORY
+        Debug.Log(controller.playerData[ pID[0] ].orbs + "  :  " + (controller.playerData[ pID[1] ].orbs + 3));
+        return (pID.Length > 1 && controller.playerData[ pID[0] ].orbs >= (controller.playerData[ pID[1] ].orbs + 3) );
+    }
+
     // todo ------------------------------------------------------------------------
+    private int nMagmaBeast = 0;
+    public void NEXT_MAGMABEAST_TURN(int n=0)
+    {
+        if (n >= magmabeasts.Length) {
+            mainCam.gameObject.SetActive(true);
+            magmabeastsCalled = true;
+            NEXT_PLAYER_TURN();
+        }
+        else {
+            if (magmabeasts.Length > 0) {
+                magmabeasts[n].endOfTurn = true;
+                StartCoroutine( magmabeasts[n].PICK_A_DEST() );
+            }
+            mainCam.gameObject.SetActive(true);
+        }
+    }
+
     public void NEXT_PLAYER_TURN()
     {
         if (playerOrder < nPlayers)
         {
             mainCam.gameObject.SetActive(false);
 
-            Debug.Log("|| player " + (controller.playerOrder[playerOrder]+1) + " 's TURN");
+            // Debug.Log("|| player " + (controller.playerOrder[playerOrder]+1) + " 's TURN");
             int gamer = controller.playerOrder[playerOrder];
 
             // switch (gamer)
@@ -379,18 +444,19 @@ public class GameManager : MonoBehaviour
             // }
             switch (gamer)
             {
-                case 0:     Debug.Log("Player 1 turn");   StartCoroutine( player1.YOUR_TURN() );  break;
-                case 1:     Debug.Log("Player 2 turn");   StartCoroutine( player2.YOUR_TURN() );  break;
-                case 2:     Debug.Log("Player 3 turn");   StartCoroutine( player3.YOUR_TURN() );  break;
-                case 3:     Debug.Log("Player 4 turn");   StartCoroutine( player4.YOUR_TURN() );  break;
-                case 4:     Debug.Log("Player 5 turn");   StartCoroutine( player5.YOUR_TURN() );  break;
-                case 5:     Debug.Log("Player 6 turn");   StartCoroutine( player6.YOUR_TURN() );  break;
-                case 6:     Debug.Log("Player 7 turn");   StartCoroutine( player7.YOUR_TURN() );  break;
-                case 7:     Debug.Log("Player 8 turn");   StartCoroutine( player8.YOUR_TURN() );  break;
+                case 0:     StartCoroutine( player1.YOUR_TURN() );  break;
+                case 1:     StartCoroutine( player2.YOUR_TURN() );  break;
+                case 2:     StartCoroutine( player3.YOUR_TURN() );  break;
+                case 3:     StartCoroutine( player4.YOUR_TURN() );  break;
+                case 4:     StartCoroutine( player5.YOUR_TURN() );  break;
+                case 5:     StartCoroutine( player6.YOUR_TURN() );  break;
+                case 6:     StartCoroutine( player7.YOUR_TURN() );  break;
+                case 7:     StartCoroutine( player8.YOUR_TURN() );  break;
             }
         }
         //* PLASMA PALACE, TURRET'S TURN
-        else if (sceneName == "Plasma_Palace" && !turretOnCoolDown && playerOrder >= nPlayers) {
+        else if (sceneName == "Plasma_Palace" && !turretOnCoolDown && playerOrder >= nPlayers) 
+        {
             turretCount = PlayerPrefs.GetInt("TurretCount") - 1;
             PlayerPrefs.SetInt("TurretCount", turretCount);
             turretOnCoolDown = true;
@@ -409,16 +475,45 @@ public class GameManager : MonoBehaviour
                 mainCam.transform.position = turret.transform.position + new Vector3(0,0,-30);
             }
         }
+        //* VOLCANIC VILLA, TURRET'S TURN
+        else if (sceneName == "Volcanic_Villa" && !magmabeastsCalled && playerOrder >= nPlayers) 
+        {
+            NEXT_MAGMABEAST_TURN(nMagmaBeast);
+            nMagmaBeast++;
+            // if (magmabeasts.Length > 0) {
+            //     magmabeasts[0].endOfTurn = true;
+            //     StartCoroutine( magmabeasts[0].PICK_A_DEST() );
+            // }
+            // mainCam.gameObject.SetActive(true);
+            // magmabeastsCalled = true;
+        }
         // ALL PLAYERS HAD THEIR TURN
         else
         {
-            if (controller.skipSideQuest) {
-                StartCoroutine( SKIP_SIDE_QUEST() );
+            // DOES A PLAYER HAVE MORE THAN 3 ORBS THAN ALL OTHER PLAYERS
+            UPDATE_ALL_INFO();
+            if (controller.mercyRule) {
+                if (IS_MERCY_RULE_WINNER()) {
+                    controller.mercyWinner = true;
+                    StartCoroutine( WE_HAVE_A_WINNER() );
+                }
+                else {
+                    if (controller.skipSideQuest) {
+                        StartCoroutine( SKIP_SIDE_QUEST() );
+                    }
+                    else {
+                        StartCoroutine( SIDE_QUEST_TIME() );
+                    }
+                }
             }
             else {
-                StartCoroutine( SIDE_QUEST_TIME() );
+                if (controller.skipSideQuest) {
+                    StartCoroutine( SKIP_SIDE_QUEST() );
+                }
+                else {
+                    StartCoroutine( SIDE_QUEST_TIME() );
+                }
             }
-            // UPDATE_ALL_INFO();
 
             // // MINIGAME TIME!
             // controller.GAME_START();
@@ -454,11 +549,16 @@ public class GameManager : MonoBehaviour
         // SCREEN FADES FROM BLACK
         else
         {
-            Debug.Log("MANAGER - TRANSITION");
             transitionAnim.Play("Oval_Transition", -1, normTime);
             yield return new WaitForSeconds(delay);
             NEXT_PLAYER_TURN();
         }
+    }
+
+    public IEnumerator TELL_CONTROLLER_TO_SAVE_GAME()
+    {
+        yield return new WaitForSeconds(0.5f);
+        controller.SAVE_GAME();
     }
 
     // NO FADING, JUST NEXT PLAYER TURN
@@ -504,7 +604,6 @@ public class GameManager : MonoBehaviour
     public IEnumerator SIDE_QUEST_TIME() 
     {
         // HIDE UI STUFF
-        UPDATE_ALL_INFO();
         HIDE_UI();
         for (int i=0 ; i<gamers.Length ; i++) { gamers[ i ].HIDE_DATA_CANVAS(); }
 
@@ -549,7 +648,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator SKIP_SIDE_QUEST() 
     {
         // HIDE UI STUFF
-        UPDATE_ALL_INFO();
         HIDE_UI();
         for (int i=0 ; i<gamers.Length ; i++) { gamers[ i ].HIDE_DATA_CANVAS(); }
 
@@ -609,6 +707,21 @@ public class GameManager : MonoBehaviour
 
     // WHEN NOT VIEWING MAP, UNHIDE UI
     public void UNHIDE_UI() { UIcanvas.SetActive(true); }
+
+
+    //* MERCY RULE WINNER
+    IEnumerator WE_HAVE_A_WINNER()
+    {
+        SCREEN_TRANSITION("Oval_Transition", 0);
+        if (GameObject.Find("BACKGROUND_MUSIC") != null) {
+            AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
+            bgMusic.volume = 0;
+        }
+
+        yield return new WaitForSeconds(1);
+        controller.LOAD_CUTAWAY();
+    }
+
 
     // -------------------------------------------------------------------- //
     // -------------- PAYING SOMEONE COINS FROM TRAP ---------------------- //

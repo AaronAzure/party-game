@@ -39,6 +39,7 @@ public class SpotlightSafe : MonoBehaviour
 
     IEnumerator RESIZE()
     {
+		// GETS BIGGER
         if (!shrinker)
         {
             for (int i=0 ; i<6 ; i++)
@@ -69,6 +70,7 @@ public class SpotlightSafe : MonoBehaviour
                 transform.localScale /= 1.05f;
             }
         }
+		// GETS SMALLER
         else
         {
             for (int i=0 ; i<6 ; i++)
@@ -79,7 +81,7 @@ public class SpotlightSafe : MonoBehaviour
                     for ( int s=0 ; s<25 ; s++)
                     {
                         yield return new WaitForEndOfFrame();
-                        transform.localScale *= 1.01f;
+                        transform.localScale *= 1.025f;
                     }
                 }
                 else 
@@ -87,7 +89,7 @@ public class SpotlightSafe : MonoBehaviour
                     for ( int s=0 ; s<25 ; s++)
                     {
                         yield return new WaitForEndOfFrame();
-                        transform.localScale /= 1.01f;
+                        transform.localScale /= 1.025f;
                     }
                 }
             }

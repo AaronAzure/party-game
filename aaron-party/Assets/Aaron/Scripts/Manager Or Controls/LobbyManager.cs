@@ -62,7 +62,21 @@ public class LobbyManager : MonoBehaviour
         // if (p8 != null) p8.gameObject.transform.position = p1.transform.position;
     }
 
-    public IEnumerator FADE(string boardName)
+    public IEnumerator JUST_FADE()
+    {
+        blackScreen.CrossFadeAlpha(1, transitionTime, false);  // FADE OUT
+        if (bgMusic != null)
+        {
+            float decrease = bgMusic.volume / 8f;
+            while (bgMusic.volume > 0) 
+            {
+                yield return new WaitForSeconds(0.1f);
+                bgMusic.volume -= decrease;
+            }
+        }
+    }
+
+    public IEnumerator FADE_AND_LOAD_BOARD(string boardName)
     {
         blackScreen.CrossFadeAlpha(1, transitionTime, false);  // FADE OUT
         if (bgMusic != null)

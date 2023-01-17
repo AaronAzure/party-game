@@ -371,6 +371,7 @@ GameObject:
   - component: {fileID: 5019297087790477807}
   - component: {fileID: 684997648748456752}
   - component: {fileID: 7859782802535428258}
+  - component: {fileID: 1738635593463450711}
   m_Layer: 0
   m_Name: Shop_Keep
   m_TagString: Untagged
@@ -426,6 +427,22 @@ SortingGroup:
   m_SortingLayerID: 1798455321
   m_SortingLayer: 2
   m_SortingOrder: 0
+--- !u!70 &1738635593463450711
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5019297087790477806}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.25, y: 0}
+  m_Size: {x: 2, y: 1}
+  m_Direction: 1
 --- !u!1 &5019297087842323116
 GameObject:
   m_ObjectHideFlags: 0

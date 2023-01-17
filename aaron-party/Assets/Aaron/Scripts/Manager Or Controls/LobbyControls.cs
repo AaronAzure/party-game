@@ -41,12 +41,21 @@ public class LobbyControls : MonoBehaviour
     private LobbyQuest playSideQuest;
     [SerializeField] private GameObject minigame;   // TENT
 
+    [Header("Button Text")]
     [SerializeField] private TextMeshProUGUI maxTurns;
     [SerializeField] private TextMeshProUGUI gameStyle;
     [SerializeField] private TextMeshProUGUI gameDifficulty;
     [SerializeField] private TextMeshProUGUI orderStyle;
     [SerializeField] private TextMeshProUGUI restoreMpTurn;
+    [SerializeField] private TextMeshProUGUI mercyRuleText;
     [SerializeField] private TextMeshPro backToCharacter;
+    [SerializeField] private TextMeshPro resumeLastGame;
+
+    [Header("Resume Game")]
+    [SerializeField] private GameObject timeCirclePrefab;
+    [SerializeField] private GameObject timeMaster;
+    private bool resuming;
+    private bool canResume;
 
     private int nSetting = 0;
     [Header("Board Settings")]
@@ -82,6 +91,11 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private Button[] questList;
     string sceneName;
 
+	public List<string> bonuses;
+	public Slider maxBonus;
+	public TextMeshProUGUI nBonusTxt;
+	public BonusSettingUi[] bonusUis;
+
 
     [Header("Rewired")]    
     [SerializeField] private RewiredStandaloneInputModule rInput;
@@ -111,6 +125,18 @@ public class LobbyControls : MonoBehaviour
                 questList = questListPrefab.GetComponentsInChildren<Button>();
                 WHAT_MINIGAMES_ARE_AVAILABLE();
             }
+
+			string[] temp = PlayerPrefsElite.GetStringArray("bonuses");
+			bonuses = new List<string>(temp);
+
+			foreach (BonusSettingUi bonusUi in bonusUis)
+			{
+				if (!bonuses.Contains(bonusUi.bonusName))
+					bonusUi.TOGGLE();
+			}
+			maxBonus.maxValue = bonuses.Count;
+			maxBonus.value = Mathf.Min(PlayerPrefsElite.GetInt("nBonuses"), maxBonus.maxValue);
+			nBonusTxt.text = maxBonus.value.ToString();
         }
         
         rb = this.GetComponent<Rigidbody2D>();
@@ -146,6 +172,9 @@ public class LobbyControls : MonoBehaviour
 
         player = ReInput.players.GetPlayer(playerID);
         
+        if (PlayerPrefsElite.VerifyArray("board-settings")) {
+            canResume = true;
+        }
     }
 
     // Update is called once per frame
@@ -154,7 +183,7 @@ public class LobbyControls : MonoBehaviour
         if (!_settings.activeSelf && !_quests.activeSelf) MOVEMENT();
 
         // LOBBY SCENE
-        if (playerID == 0 && sceneName == "2Lobby")
+        if (playerID == 0 && sceneName == "2Lobby" && !resuming)
         {
             // ADJUSTING SETTINGS
             if (_settings.activeSelf)
@@ -165,6 +194,12 @@ public class LobbyControls : MonoBehaviour
             else if (backToCharacter.gameObject.activeSelf && player.GetButtonDown("A"))
             {
                 Debug.Log("restarting"); RESTART_GAME();
+            }
+            // RESUME LAST GAME
+            else if (resumeLastGame.gameObject.activeSelf && player.GetButtonDown("A") && !resuming && canResume)
+            {
+                resuming = true;
+                StartCoroutine( TIMEMASTER_MAGIC() );
             }
             // GO INTO MINIGAME TENT
             else if (minigame.activeSelf && player.GetButtonDown("A"))
@@ -182,7 +217,7 @@ public class LobbyControls : MonoBehaviour
             }
             else if (boardName != null && Application.CanStreamedLevelBeLoaded(boardName) && player.GetButtonDoublePressDown("X")) 
             {
-                if (controller.noList.Count < controller.quests.Count) StartCoroutine( manager.FADE(boardName) );
+                if (controller.noList.Count < controller.quests.Count) StartCoroutine( manager.FADE_AND_LOAD_BOARD(boardName) );
             }
             // PLAY BOARD, OPEN SETTINGS
             else if (player.GetButtonDown("A") && touchingBoard && !boardSelected && boardToPlay != null
@@ -311,7 +346,8 @@ public class LobbyControls : MonoBehaviour
             if(SceneUtility.GetBuildIndexByScenePath(boardToPlay) >= 0)
             {
                 boardSelected = false;
-                StartCoroutine( manager.FADE(boardToPlay) );
+				SAVE_BONUS_SETTINGS();
+                StartCoroutine( manager.FADE_AND_LOAD_BOARD(boardToPlay) );
             }
             else
             {
@@ -319,6 +355,12 @@ public class LobbyControls : MonoBehaviour
             }
         }
     }
+
+	void SAVE_BONUS_SETTINGS()
+	{
+		PlayerPrefsElite.SetStringArray("bonuses", bonuses.ToArray());
+		PlayerPrefsElite.SetInt("nBonuses", (int) maxBonus.value);
+	}
 
     // CHOOSE WHICH SIDE QUEST SHOULD AND SHOULDN'T BE PLAYED
     public void SELECT_QUESTS()
@@ -332,6 +374,21 @@ public class LobbyControls : MonoBehaviour
         {
             currentSetting[0].SetActive(true); 
             currentSetting[1].SetActive(false);
+        }
+    }
+
+    // CHOOSE WHICH SIDE QUEST SHOULD AND SHOULDN'T BE PLAYED
+    public void SELECT_BONUS()
+    {
+        if (currentSetting[0].activeSelf)
+        {
+            currentSetting[0].SetActive(false); 
+            currentSetting[2].SetActive(true);
+        }
+        else 
+        {
+            currentSetting[0].SetActive(true); 
+            currentSetting[2].SetActive(false);
         }
     }
 
@@ -378,6 +435,8 @@ public class LobbyControls : MonoBehaviour
     }
 
 
+    // todo ----------------------- SETTINGS -----------------------
+
     // PRESS 'L' OR 'R' BUTTON
     private void ADJUST_SETTINGS()
     {
@@ -391,6 +450,10 @@ public class LobbyControls : MonoBehaviour
             else if (currentSetting[0].activeSelf)
             {
                 _settings.gameObject.SetActive(false);
+            }
+            else if (currentSetting[2].activeSelf)
+            {
+                currentSetting[2].SetActive(false); currentSetting[0].SetActive(true);
             }
         }
         // SIDE QUEST CUSTOMIZATION
@@ -414,6 +477,7 @@ public class LobbyControls : MonoBehaviour
                     case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(true); break;
                     case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
                     case "MP_Restore_Panel":    CHANGE_N_TURN_TO_RECOVER_MP(true); break;
+                    case "Mercy_Panel":         TOGGLE_MERCY_RULES(); break;
                 }
             }
             else if (player.GetButtonDown("L")) {
@@ -424,6 +488,7 @@ public class LobbyControls : MonoBehaviour
                     case "Difficulty_Panel":    CHANGE_MINIGAME_DIFFICULTY(false); break;
                     case "Order_Panel":         CHANGE_PLAYER_ORDER_STYLE(); break;
                     case "MP_Restore_Panel":    CHANGE_N_TURN_TO_RECOVER_MP(false); break;
+                    case "Mercy_Panel":         TOGGLE_MERCY_RULES(); break;
                 }
             }
             // LONG PRESS
@@ -553,6 +618,12 @@ public class LobbyControls : MonoBehaviour
         }
     }
 
+    private void TOGGLE_MERCY_RULES()
+    {
+        // ON / OFF
+        controller.mercyRule = !controller.mercyRule;
+    }
+
     private void RESTART_GAME()
     {
         Destroy(controller.gameObject);    
@@ -579,6 +650,9 @@ public class LobbyControls : MonoBehaviour
         restoreMpTurn.text = "Every " + controller.restoreMpTurn + " Turns";
         if (controller.restoreMpTurn == 1) restoreMpTurn.text = "Every Turn";
         if (controller.restoreMpTurn == 0) restoreMpTurn.text = "Never";
+
+        if (controller.mercyRule) mercyRuleText.text = "On";
+        else                      mercyRuleText.text = "Off";
 
         DISPLAY_DIFFICULTY();
     }
@@ -628,6 +702,29 @@ public class LobbyControls : MonoBehaviour
 
         NO_SIDE_QUEST();
     }
+
+
+
+	// BONUS(ES) AVAILABLE
+    public void TOGGLE_BONUS(string bonusName)
+    {
+        // MAKE AVAILABLE
+		if (!bonuses.Contains(bonusName))
+			bonuses.Add(bonusName);
+        // MAKE UNAVAILABLE
+		else
+        	bonuses.Remove(bonusName);
+
+		if (bonuses.Count < maxBonus.value)
+			maxBonus.value = bonuses.Count;
+		maxBonus.maxValue = bonuses.Count;
+		nBonusTxt.text = maxBonus.value.ToString();
+    }
+
+	public void MAX_BONUS_CHANGED()
+	{
+		nBonusTxt.text = maxBonus.value.ToString();
+	}
 
     public void TOGGLE_ALL()
     {
@@ -679,6 +776,26 @@ public class LobbyControls : MonoBehaviour
     }
 
 
+    private IEnumerator TIMEMASTER_MAGIC()
+    {
+        StartCoroutine( REWINDING_TIME() );
+        if (timeMaster != null && timeCirclePrefab != null) {
+            Instantiate(timeCirclePrefab, timeMaster.transform.position, timeCirclePrefab.transform.rotation);
+            yield return new WaitForSeconds(0.5f);
+        }
+
+    }
+
+    private IEnumerator REWINDING_TIME()
+    {
+        yield return new WaitForSeconds(2f);
+		SAVE_BONUS_SETTINGS();
+        StartCoroutine( manager.JUST_FADE() );
+
+        yield return new WaitForSeconds(0.8f);
+        Debug.Log(" resuming last game"); 
+        controller.RESUME_LAST_GAME();
+    }
 
 
     private void OnTriggerEnter2D(Collider2D other) 
@@ -698,6 +815,12 @@ public class LobbyControls : MonoBehaviour
         {
             questToPlay = other.GetComponent<Minigame>();
         }    
+        // TIME MASTER
+        if (other.tag == "Respawn" && playerID == 0)
+        {
+            if (timeMaster == null) timeMaster = other.gameObject;
+            resumeLastGame.gameObject.SetActive(true);
+        }    
     }
     private void OnTriggerExit2D(Collider2D other) 
     {
@@ -713,6 +836,11 @@ public class LobbyControls : MonoBehaviour
         if (other.tag == "Special" && playerID == 0)
         {
             questToPlay = null;
+        }    
+        // TIME MASTER
+        if (other.tag == "Respawn" && playerID == 0)
+        {
+            resumeLastGame.gameObject.SetActive(false);
         }    
     }
 

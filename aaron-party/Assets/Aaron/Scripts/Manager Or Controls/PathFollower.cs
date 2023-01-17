@@ -17,26 +17,50 @@ public class PathFollower : MonoBehaviour
     // GLOBAL VARIABLES
     [Header("Data to save across Scenes")]
     [SerializeField] private int playerID;
-    [SerializeField] private Player player;
-    public List<PlayerPrevData> data;
+    private Player player;
+
+
+    [Header("PLAYER GAME DATA")]
+    public int coins;
+    public int orbs;   // MARIO PARTY STARS
+    [Space]
+    public PlayerPrevData data;
+    public TextMeshProUGUI ranking;
+
+    // ** PLAYER STATUS/BUFFS (TO UPDATE TO CONTROLLER)
+    public bool playerTitan     = false;
+    public bool playerSlowed    = false;
+    [SerializeField] private GameObject slowed;
+    public bool playerBarrier   = false;
+    [SerializeField] private GameObject barrier;
+    public bool playerMove15    = false;
+    public bool playerRange2    = false;
+    public bool playerExtraBuy  = false;
+    [HideInInspector] public bool boughtASpellBook;
+    [HideInInspector] public int  spellsLeftToGain = 0;
+    private SpellType newSpellToGain;
+    [SerializeField] private GameObject powerup;  //   RAINBOW SPARKLE EFFECT
     private List<PlayerBuffData> stat;
-    
-    //! DELETE
-    //// public Node[] _currentPath;                    // CURRENT NODE(PATH)    
-    //// public int _currentNode;                       // INDEX OF THE CURRENT SPACE ON NODE(PATH)  
-    //// public Vector3 _currentPositionHolder;         // POSITION OF THE CURRENT SPACE 
     private Vector3 asidePos;
 
 
     [Header("Player Character")]
-    [SerializeField] public string characterName;
+    public string characterName;
     private float lScale;
     public  Animator _animator;
     private GameObject character;
+    [SerializeField] private GameObject characterHolder;
     [SerializeField] private GameObject[] characters;   // ** inspector
     [SerializeField] private GameObject[] heads;        // ** inspector
+
+
+    [Header("Comment")]
+    [SerializeField] private Animator commentAnim;
+    [SerializeField] private GameObject commentBox;
+    [SerializeField] private TextMeshProUGUI comment;
     
 
+    [Header("Path")]
     // CUSTOM PATHS 
     [SerializeField] public Node currentNode;
     [SerializeField] public Node nextNode;
@@ -52,16 +76,20 @@ public class PathFollower : MonoBehaviour
     public int _movesRemaining;
     private bool moveDecremented;
 
-    private float _moveSpeed = 5f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
+    [Range(1,20)]
+    [SerializeField] private float _moveSpeed = 6f;                 // SPEED TO MOVE TO NEXT SPACE (7.5f)
     private float _timer;
 
     private GameManager manager;
     public Camera _cam;           // PLAYER TRACKING CAM
+    private float elapsed;
+    private float duration = 1;
+    private bool zoomOut;
     private float camSizeLarge = 17.5f;
     private float camSizeNormal = 7.5f;
-    [SerializeField] private float camSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
-    [SerializeField] private float maxCamSpeed = 60;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
-    [SerializeField] private float minCamSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
+    private float camSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
+    private float maxCamSpeed = 74;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
+    private float minCamSpeed = 15;                   // CAMERA PANNING SPEED ON VIEW MAP MODE
     private float transitionTime = 1;
     [SerializeField] private GameObject _choice;    // VISUAL INDICATING WHICH WAY TO GO
 
@@ -94,8 +122,11 @@ public class PathFollower : MonoBehaviour
     private bool isAside;
     public  bool diceRolled;                // excludes movement from spells
 
-    [SerializeField] private GameObject gateUi;
-    [SerializeField] private GameObject gateCannotOpenUi;
+    [Header("Magic Gate")]
+    [SerializeField] private GameObject gateUi;             // ** INSPECTOR
+    [SerializeField] private GameObject gateUiWithKey;      // ** INSPECTOR
+    [SerializeField] private Button gateMana;      // ** INSPECTOR
+    [SerializeField] private GameObject gateCannotOpenUi;   // ** INSPECTOR
     private bool openingGate;
 
 
@@ -108,30 +139,10 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private AudioSource gotAnOrb;
     [SerializeField] private AudioSource spellPickup;
     [SerializeField] private AudioSource manaUsed;
+    [SerializeField] private AudioSource powerupSound;  
     [SerializeField] private GameObject layout;
 
 
-    [Header("PLAYER GAME DATA")]
-    public int coins;
-    public int orbs;   // MARIO PARTY STARS
-    public TextMeshProUGUI ranking;
-
-
-
-    // ** PLAYER STATUS/BUFFS (TO UPDATE TO CONTROLLER)
-    [SerializeField] private Slider[] movebars;
-    public bool playerSlowed    = false;
-    [SerializeField] private GameObject slowed;
-    public bool playerBarrier   = false;
-    [SerializeField] private GameObject barrier;
-    public bool playerMove15    = false;
-    public bool playerRange2    = false;
-    public bool playerExtraBuy  = false;
-    public bool boughtASpellBook;
-    public int  spellsLeftToGain = 0;
-    private SpellType newSpellToGain;
-    [SerializeField] private GameObject powerup;  //   RAINBOW SPARKLE EFFECT
-    [SerializeField] private AudioSource powerupSound;  
 
 
     [Header("Prefabs to Spawn")]
@@ -140,6 +151,8 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private GameObject floatingManaTextPrefab;
     [SerializeField] private GameObject floatingSpellTextPrefab;
     [SerializeField] private GameObject confettiPrefab;
+    [SerializeField] private GameObject smoke;
+    [SerializeField] private GameObject fireExplosion;
     [SerializeField] private Text[] textBox;
     private GameController controller;
 
@@ -191,11 +204,17 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private EffectSpell  spellEffectTarget;
     [SerializeField] private EffectSpell  spellSpecialEffectTarget; // EFFECT SINGLE PLAYER
     [SerializeField] private GameObject   lockedOn;
+    [SerializeField] private GameObject   effectCastCircle;
+    [SerializeField] private GameObject aoeHolder;
     [SerializeField] private GameObject areaOfEffect;
+    [SerializeField] private GameObject areaOfEffectSmall;
     [SerializeField] private GameObject blueSpellCirclePrefab;
     [SerializeField] private GameObject blueBuffPrefab;
     [SerializeField] private GameObject greenSpellCirclePrefab;
     [SerializeField] private GameObject greenBuffPrefab;
+    [SerializeField] private GameObject solarFlarePrefab;
+    [SerializeField] private GameObject movementCircle;
+
 
     // ************************* SPELL STATES ************************* //
     private bool trapSpellActive;               //   CASTING TRAP SPELL
@@ -231,17 +250,16 @@ public class PathFollower : MonoBehaviour
     private int spellToGain;        // RANDOM SPELL FROM CONTROLLER
     private bool fromGoodSpell;
     private int shopSeller;
-    public bool shop1;
-    public bool shop2;
-    public bool shop3;
-    public bool shop4;
+    [HideInInspector] public bool shop1;
+    [HideInInspector] public bool shop2;
+    [HideInInspector] public bool shop3;
+    [HideInInspector] public bool shop4;
     public int  nPurchaseLeft;
     public int  maxNPurchases;
     [SerializeField] private Sprite[] shopKeepers;
     [SerializeField] private ShopMenu   playerPurchase;
     [SerializeField] private ShopMenu   potionShop;
     [SerializeField] private GameObject rewiredEventSystem;
-
 
     [Header("Rewired")]
     [SerializeField] private RewiredStandaloneInputModule[] rInputs;
@@ -267,27 +285,30 @@ public class PathFollower : MonoBehaviour
 
 
     [Header("Shogun Seaport")]
-    [SerializeField] private bool losingAll;
+    private bool losingAll;
 
 
     [Header("Images Spell")]
-    [SerializeField] public Sprite spellSlotEmpty;
-    [SerializeField] public Sprite spellNone;
-    [SerializeField] public Sprite spellTrap10;
-    [SerializeField] public Sprite spellTrap20;
-    [SerializeField] public Sprite spellTrapOrb;
-    [SerializeField] public Sprite spellEffect10;
-    [SerializeField] public Sprite spellEffectMana3;
-    [SerializeField] public Sprite spellEffectSpell1;
-    [SerializeField] public Sprite spellEffectSlow1;
-    [SerializeField] public Sprite spellEffectSwap;
-    [SerializeField] public Sprite spellMoveDash5;
-    [SerializeField] public Sprite spellMoveDash8;
-    [SerializeField] public Sprite spellMoveSlow;
-    [SerializeField] public Sprite spellMoveSlowgo;
-    [SerializeField] public Sprite spellMoveBarrier;
-    [SerializeField] public Sprite spellMoveSteal;
-    [SerializeField] public Sprite spellMoveOrb;
+    public Sprite spellSlotEmpty;
+    public Sprite spellNone;
+    public Sprite spellTrap10;
+    public Sprite spellTrap20;
+    public Sprite spellTrapOrb;
+    public Sprite spellEffect10;
+    public Sprite spellEffectMana3;
+    public Sprite spellEffectSpell1;
+    public Sprite spellEffectSlow1;
+    public Sprite spellEffectSwap;
+    public Sprite spellMoveDash5;
+    public Sprite spellMoveDash8;
+    public Sprite spellMoveSlow;
+    public Sprite spellMoveSlowgo;
+    public Sprite spellMoveBarrier;
+    public Sprite spellMoveSteal;
+    public Sprite spellMoveOrb;
+    public Sprite spellMoveTitan;
+    public Sprite spellEffectOrb;
+    public Sprite keySprite;
     private bool slowDice;
 
 
@@ -333,9 +354,8 @@ public class PathFollower : MonoBehaviour
         // CHARACTER MOVER
         for (int i=0 ; i<characters.Length ; i++) {
             if (characterName == characters[i].name) {
-                var obj = Instantiate(characters[i], transform.position, Quaternion.identity, this.transform); 
+                var obj = Instantiate(characters[i], transform.position, Quaternion.identity, characterHolder.transform); 
                 character = obj.gameObject; 
-                obj.transform.parent = this.transform;  
                 _animator = obj.GetComponent<Animator>();
                 break;
             }
@@ -363,8 +383,8 @@ public class PathFollower : MonoBehaviour
         {
             foreach (RewiredStandaloneInputModule rInput in rInputs)
             {
+                rInput.RewiredPlayerIds = new int[1]{playerID};
                 rInput.RewiredInputManager = GameObject.Find("Rewired_Input_Manager").GetComponent<InputManager>();
-                if (rInput.RewiredPlayerIds != null) rInput.RewiredPlayerIds[0] = playerID;
             }
         }
 
@@ -375,8 +395,8 @@ public class PathFollower : MonoBehaviour
         buttonMove.gameObject.SetActive(false);
         buttonSpells.gameObject.SetActive(false);
         buttonMap.gameObject.SetActive(false);
-        // moveBar.gameObject.SetActive(false);
         radialBar.gameObject.SetActive(false);
+        movementCircle.SetActive(false);
         radialCircle = radialBar.GetComponent<Image>();
 
         // VISUAL BUTTON INDICATORS AT FORK
@@ -386,28 +406,27 @@ public class PathFollower : MonoBehaviour
         arrowDown.gameObject.SetActive(false);
 
         grimoireUI.gameObject.SetActive(false);
-        areaOfEffect.SetActive(false);
+        DONE_CASTING();
         powerup.SetActive(false);
 
 
         // TURN 2+
         if (controller.hasStarted)
         {
-
             // GET PREVIOUS VALUES (LAST SCENE) FROM GAME_CONTROLLER
             data = controller.GET_PLAYER_DATA(playerID);
 
-            string newPath  = data[0].path;
-            currentNode = GameObject.Find(newPath).GetComponent<Node>();
-            transform.position  = data[0].pos;
-            mpBar.value         = data[0].mp;
-            coins               = data[0].coins;
-            orbs                = data[0].orbs;
+            // string newPath      = data.path;
+            currentNode         = GameObject.Find( data.path ).GetComponent<Node>();
+            transform.position  = data.pos;
+            mpBar.value         = data.mp;
+            coins               = data.coins;
+            orbs                = data.orbs;
 
             // IF PLAYER IS NOT FIRST, STAND ASIDE
             if (controller.playerOrder[0] != playerID) { 
-                float playerX = transform.position.x;
-                float playerY = transform.position.y;
+                // float playerX = transform.position.x;
+                // float playerY = transform.position.y;
                 float scale   = 1.5f;
 
                 float radians = 2 * Mathf.PI / controller.nPlayers * playerID;
@@ -415,16 +434,15 @@ public class PathFollower : MonoBehaviour
                 float vertical   = Mathf.Sin(radians) * scale;
                 float horizontal = Mathf.Cos(radians) * scale; 
                 
-                Vector3 aside = new Vector3 (playerX - horizontal, playerY + vertical);
-                transform.position += aside; 
+                transform.position += new Vector3 (-horizontal, vertical);
             }
 
             // STATUS EFFECTS / ITEMS FROM LAST TURN
-            playerSlowed    = controller.buffDatas[playerID][0].slowed;
-            playerBarrier   = controller.buffDatas[playerID][0].barrier;
-            playerMove15    = controller.buffDatas[playerID][0].move15;
-            playerRange2    = controller.buffDatas[playerID][0].range2;
-            playerExtraBuy  = controller.buffDatas[playerID][0].extraBuy;
+            playerSlowed    = controller.buffDatas[playerID].slowed;
+            playerBarrier   = controller.buffDatas[playerID].barrier;
+            playerMove15    = controller.buffDatas[playerID].move15;
+            playerRange2    = controller.buffDatas[playerID].range2;
+            playerExtraBuy  = controller.buffDatas[playerID].extraBuy;
 
             if (playerSlowed) { 
                 slowed.SetActive(true); slowed.transform.parent = character.transform; 
@@ -449,7 +467,7 @@ public class PathFollower : MonoBehaviour
             }
             if (playerExtraBuy) maxNPurchases = 3;
             else                maxNPurchases = 1;
-            if (playerRange2)   areaOfEffect.transform.localScale *= 2;
+            if (playerRange2)   aoeHolder.transform.localScale *= 2;
         }
         // TURN 1 ONLY
         else
@@ -466,25 +484,8 @@ public class PathFollower : MonoBehaviour
             maxNPurchases = 1;
         }
         
-        // UPDATE SPELL BOOK (GRIMOIRE)
-        switch (name) {
-            case "Player_1" : 
-                foreach (SpellType sp in controller.spells1) { spells.Add(sp); }    break;
-            case "Player_2" : 
-                foreach (SpellType sp in controller.spells2) { spells.Add(sp); }    break;
-            case "Player_3" : 
-                foreach (SpellType sp in controller.spells3) { spells.Add(sp); }    break;
-            case "Player_4" : 
-                foreach (SpellType sp in controller.spells4) { spells.Add(sp); }    break;
-            case "Player_5" : 
-                foreach (SpellType sp in controller.spells5) { spells.Add(sp); }    break;
-            case "Player_6" : 
-                foreach (SpellType sp in controller.spells6) { spells.Add(sp); }    break;
-            case "Player_7" : 
-                foreach (SpellType sp in controller.spells7) { spells.Add(sp); }    break;
-            case "Player_8" : 
-                foreach (SpellType sp in controller.spells8) { spells.Add(sp); }    break;
-        }
+        // REMEMBER SPELL BOOK (GRIMOIRE)
+        foreach (SpellType sp in controller.playerSpells[playerID]) { spells.Add(sp); }
         UPDATE_SPELLS_UI();
 
         RESET_PLAYER_UI();
@@ -515,9 +516,18 @@ public class PathFollower : MonoBehaviour
             //     // TURNS OFF
             //     if (!setting.activeSelf) { controller.pSpeed = this.pSpeed.value; }
             // }
+            // ZOOMING OUT CAMERA
+            if (zoomOut) {
+                if (_cam.orthographicSize >= camSizeLarge) {
+                    zoomOut = false;
+                    elapsed = 0;
+                }
+                elapsed += Time.deltaTime / duration;
+                _cam.orthographicSize = Mathf.Lerp(_cam.orthographicSize, camSizeLarge, elapsed);
+            }
 
             // CHARACTER START
-            if (startUi.gameObject.activeSelf)
+            else if (startUi.gameObject.activeSelf)
             {
                 READY_TO_START();
             }
@@ -580,7 +590,49 @@ public class PathFollower : MonoBehaviour
                 MOVE_ASIDE();
             }
         }
+        else if (!commentBox.activeSelf)
+        {
+            if      (player.GetButtonDown("A"))
+            {
+                comment.text = "Good Job!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("B"))
+            {
+                comment.text = "Nooo!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("X"))
+            {
+                comment.text = "What?!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("Y"))
+            {
+                comment.text = "You can do it!";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("L"))
+            {
+                comment.text = ":(";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("ZL"))
+            {
+                comment.text = "Don't do it";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+            else if (player.GetButtonDown("ZR"))
+            {
+                comment.text = "Do it";
+                commentAnim.Play("Comment_Anim", -1, 0);
+            }
+        }
 
+        if (coins > 999)
+        {
+            coins = 999;
+        }
         textBox[0].text = coins.ToString();
         textBox[1].text = orbs.ToString();
     }
@@ -616,11 +668,21 @@ public class PathFollower : MonoBehaviour
                     buttonMap.gameObject.SetActive(false);
 
                     radialBar.gameObject.SetActive(true);
+                    movementCircle.SetActive(true);
                     radialBar.maxValue = 360;
                     radialBar.value = Random.Range(radialBar.minValue, radialBar.maxValue);
-                    if      (playerSlowed) { radialCircle.sprite = radialCircles[0]; }
-                    else if (playerMove15) { radialCircle.sprite = radialCircles[2]; }
-                    else                   { radialCircle.sprite = radialCircles[1]; }
+                    if      (playerSlowed) { 
+                        radialCircle.sprite = radialCircles[0]; 
+                        if (playerTitan) radialCircle.sprite = radialCircles[0+3]; 
+                    }
+                    else if (playerMove15) { 
+                        radialCircle.sprite = radialCircles[2]; 
+                        if (playerTitan) radialCircle.sprite = radialCircles[2+3]; 
+                    }
+                    else                   { 
+                        radialCircle.sprite = radialCircles[1]; 
+                        if (playerTitan) radialCircle.sprite = radialCircles[1+3]; 
+                    }
 
                     isRollingDice = true;
                 }
@@ -691,6 +753,7 @@ public class PathFollower : MonoBehaviour
                 buttonSpells.gameObject.SetActive(true);
                 buttonMap.gameObject.SetActive(true);
                 radialBar.gameObject.SetActive(false);
+                movementCircle.SetActive(false);
                 isRollingDice = false;
             }
         }
@@ -808,7 +871,7 @@ public class PathFollower : MonoBehaviour
                     this.transform.position.y, this.transform.position.z);
                 isCastingSpell = false;
                 spellTrapTarget.gameObject.SetActive(false);
-                areaOfEffect.SetActive(false);
+                DONE_CASTING();
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = 
@@ -854,7 +917,7 @@ public class PathFollower : MonoBehaviour
                     this.transform.position.y, this.transform.position.z);
                 isCastingSpell = false;
                 spellEffectTarget.gameObject.SetActive(false);
-                areaOfEffect.SetActive(false);
+                DONE_CASTING();
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -30f);
@@ -898,7 +961,7 @@ public class PathFollower : MonoBehaviour
                     this.transform.position.y, this.transform.position.z);
                 isCastingSpell = false;
                 spellSpecialEffectTarget.gameObject.SetActive(false);
-                areaOfEffect.SetActive(false);
+                DONE_CASTING();
 
                 _cam.orthographicSize = camSizeNormal;
                 _cam.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -30f);
@@ -979,6 +1042,7 @@ public class PathFollower : MonoBehaviour
         {
             UserViewMap();
         }
+        //* IS AT MAGIC GATE
         else if (isAtGate)
         {
             if (gateCannotOpenUi.activeSelf && player.GetButtonDown("A")) {
@@ -987,6 +1051,16 @@ public class PathFollower : MonoBehaviour
                 gateUi.SetActive(false);
                 gateCannotOpenUi.SetActive(false);
             }
+            // HAS KEY
+            else if (gateUiWithKey.activeSelf) {
+                // if (player.GetButtonDown("A")) //! CALLED WITH BUTTON
+                if (player.GetButtonDown("B")) {
+                    nextNode = null;
+                    gateUiWithKey.SetActive(false);
+                    isAtGate = false;
+                }
+            }
+            // HAS MANA
             else if (gateUi.activeSelf) {
                 if (player.GetButtonDown("A")) {
                     gateUi.SetActive(false);
@@ -1094,19 +1168,21 @@ public class PathFollower : MonoBehaviour
         }
         //* MOVEMENT && SPECIAL SPACE EVENTS
         else {
-            // SOUND EFFECT
+            //* NEAR NODE
             if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && 
                 Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
+                // SOUND EFFECT
                     currentNode.PlaySound();   
             }
-            // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
             if (_movesRemaining != 1) {
                 if (nextNode.DOES_SPACE_DECREASE_MOVEMENT() && !noMovementLoss && !moveDecremented &&
                     Mathf.Abs(Vector2.Distance(this.transform.position, nextNode.transform.position)) < 0.5f) {
                         moveDecremented = true;
+                        // TODO - COMMENT OUT FOR INFINITE MOVEMENT - TODO //
                         if (!controller.infiniteMovement) _movesRemaining--;
                 }
             }
+            
             // MOVING TO NEXT NODE
             if (this.transform.position != nextNode.transform.position) {
                 if (!_animator.GetBool("IsWalking")) {
@@ -1122,6 +1198,10 @@ public class PathFollower : MonoBehaviour
                 currentNode = nextNode;
                 nextNode = null;
                 _timer = 0;
+
+                if (stealMode) {
+                    currentNode.STEALING_COINS(this);
+                }
 
                 // todo SPECIAL NON-DECREMENTING SPACES
                 if (!currentNode.DOES_SPACE_DECREASE_MOVEMENT()) {
@@ -1180,6 +1260,106 @@ public class PathFollower : MonoBehaviour
             }
         }
 
+    }
+
+    //* SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
+    private void SPACE_END()
+    {
+        isLanded = true;
+        _animator.SetBool("IsWalking", false);
+        _animator.speed = 1;
+        
+        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
+            StartCoroutine(fadeMovesLeft());
+        }
+        // SHIRNK IF PLAYER IS A LAGRE
+        if (playerTitan) {
+            playerTitan = false;
+            StartCoroutine( TITANIZE(false) );
+        }
+
+        if (currentNode.IS_GREEN())  { controller.EVENT_ORB_UPDATE(playerID); }
+        // LANDED ON BLUE | RED | EVENT (SO FAR)
+        if (currentNode.SPACE_LANDED()) {
+            int coinsGained = currentNode.COINS_RECEIVED_FROM_SPACE();
+            if (currentNode.IS_BLUE())   { controller.blueOrb[playerID]++; }
+            if (currentNode.IS_RED())    { controller.RED_ORB_UPDATE(playerID); }
+            StartCoroutine( UPDATE_PLAYER_COINS(coinsGained * controller.turnMultiplier) );
+        }
+        // GAIN SPELL FROM SPACE
+        else if (currentNode.IS_SPELL()) {
+            StartCoroutine( GAIN_RANDOM_SPELL() );
+        }
+        
+        // todo - EVENT RELATED
+        // LANDED ON EVENT (caving in)
+        else if (currentNode.IS_POISON()) {
+            // _cam.orthographicSize = camSizeLarge;
+            zoomOut = true;
+            StartCoroutine( UPDATE_PLAYER_COINS(0) );
+        }
+        // LANDED ON EVENT (caving in)
+        else if (currentNode.IS_BOULDER_EVENT()) {
+            if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
+            {
+                StartCoroutine( PATHFOLLOWER_CAVING_IN() );
+            }
+        }
+        // LANDED ON EVENT (changing boat)
+        else if (currentNode.IS_BOAT()) {
+            if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
+            {
+                StartCoroutine( HAPPEN_NEW_BOAT() );
+            }
+        }
+        // LANDED ON EVENT (rotate laser)
+        else if (currentNode.IS_ROTATE()) {
+            if (SceneManager.GetActiveScene().name == "Plasma_Palace")
+            {
+                StartCoroutine( PATHFOLLOWER_TURRET_ROTATE() );
+            }
+        }
+        // LANDED ON EVENT (laser speed up countdown)
+        else if (currentNode.IS_SPEED_UP()) {
+            if (SceneManager.GetActiveScene().name == "Plasma_Palace")
+            {
+                StartCoroutine( PATHFOLLOWER_TURRET_SPEED_UP() );
+            }
+        }
+       
+       
+        // LANDED ON ORB TRAP
+        else if (currentNode.IS_ORB_TRAP()) {
+            Debug.Log("LANDED ON ORB TRAP");
+            int onesTrap = currentNode.ORB_TRAP_SPACE_COST(characterName);
+            if (onesTrap == 5)
+            {
+                Debug.Log("-- " + onesTrap);
+                StartCoroutine( UPDATE_PLAYER_COINS(onesTrap * controller.turnMultiplier) );
+            } 
+            else 
+            {
+                Debug.Log("ORB BEING STOLEN");
+                if (!playerBarrier) StartCoroutine( ORB_STOLEN(-1) );
+                else { StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
+            }
+        }
+        // LANDED ON COIN TRAP
+        else {
+            int price = currentNode.TRAP_SPACE_COST(characterName);
+            if (price > 0) // OWN TRAP
+            {
+                StartCoroutine( UPDATE_PLAYER_COINS(price * controller.turnMultiplier) );
+            }
+            else            // OPPONENT'S TRAP
+            {
+                if (!playerBarrier) {
+                    isPayingSomeone = true;
+                    StartCoroutine( UPDATE_PLAYER_COINS(price) );
+                }
+                else { Debug.Log("PROTECTED"); StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
+            }
+        }
     }
 
     // todo ---------------- NODE/PATHING RELATED ---------------- *//
@@ -1288,16 +1468,48 @@ public class PathFollower : MonoBehaviour
         }
     }
     
-    // IS NEXT NODE A MAGIC GATE
+
+    // todo -------------------------- MAGIC GATE ------------------------------ *//
+
+
+    // IS NEXT NODE A MAGIC GATE (CALLED ONCE PER TIME)
     private void IS_AT_GATE()
     {
         if (nextNode.TYPE_OF_SPECIAL_SPACE("gate")) { 
             isAtGate = true; 
             _animator.SetBool("IsWalking", false);
             _animator.speed = 1;
-            if (mpBar.value >= 4)   gateUi.SetActive(true);
-            else                    gateCannotOpenUi.SetActive(true);
+
+            if (PLAYER_HAS_A_KEY()) {
+                gateUiWithKey.SetActive(true);
+                // DON'T WANT TO USE KEY BUT DOES NOT HAVE ENOUGH MANA
+                if (mpBar.value < 4) {
+                    gateMana.interactable = false;
+                    gateMana.GetComponent<Image>().color = new Color(1, 0.1f, 0.1f, 1);
+                }
+                else {
+                    gateMana.interactable = true;
+                    gateMana.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+                }
+            }
+            else if (mpBar.value >= 4) {
+                gateUi.SetActive(true);
+            }
+            else { 
+                gateCannotOpenUi.SetActive(true);
+            }
         }
+    }
+
+    // CHECK IF PLAYER HAS BOUGHT A KEY
+    bool PLAYER_HAS_A_KEY()
+    {
+        for (int i=0 ; i<spells.Count ; i++) {
+            if (spells[i].spellKind == "Key") {
+                return true;
+            }
+        }
+        return false;
     }
 
     // IF NEXT NODE IS A MAGIC GATE, RETURN TRUE IF THE PLAYER HAS ENOUGH MP
@@ -1306,13 +1518,34 @@ public class PathFollower : MonoBehaviour
         return (node.GetComponent<Node>().TYPE_OF_SPECIAL_SPACE("gate") && mpBar.value >= 4);
     }
 
+    public void BUTTON_OPEN_GATE(bool withKey)
+    {
+        if (withKey)
+        {
+            for (int i=0 ; i<spells.Count ; i++) {
+                if (spells[i].spellKind == "Key") {
+                    spellIndex = i;
+                    StartCoroutine( LOSE_SPELL(-1, spellIndex) );
+                    break;
+                }
+            }
+            StartCoroutine( OPEN_MAGIC_GATE(0) );
+
+        }
+        else
+        {
+            StartCoroutine( OPEN_MAGIC_GATE() );
+        }
+    }
     IEnumerator OPEN_MAGIC_GATE(int cost=4)
     {
         openingGate = true;
+        gateMana.interactable = true;
         nextNode.OPEN_MAGIC_GATE();
+        gateUiWithKey.SetActive(false);
         gateUi.SetActive(false);
-        LOSE_MP(cost);
-        for (int i=0 ; i<cost ; i++) {
+        if (cost > 0) LOSE_MP(cost);
+        for (int i=0 ; i<4 ; i++) {
             manaUsed.Play();
             yield return new WaitForSeconds(0.25f);
         }
@@ -1324,95 +1557,6 @@ public class PathFollower : MonoBehaviour
         openingGate = false;
     }
 
-    //* SPACE PLAYER LANDS ON WITH NO MOVEMENT REMAINING (RECEIVE GOLD/EFFECT)
-    private void SPACE_END()
-    {
-        isLanded = true;
-        _animator.SetBool("IsWalking", false);
-        _animator.speed = 1;
-        
-        if (_movesRemaining == 0 && isPlayerTurn && nMovesLeft.gameObject.activeSelf) {
-            StartCoroutine(fadeMovesLeft());
-        }
-
-        if (currentNode.IS_GREEN())  { controller.EVENT_ORB_UPDATE(playerID); }
-        // LANDED ON BLUE | RED | EVENT (SO FAR)
-        if (currentNode.SPACE_LANDED()) {
-            int coinsGained = currentNode.COINS_RECEIVED_FROM_SPACE();
-            if (currentNode.IS_BLUE())   { controller.blueOrb[playerID]++; }
-            if (currentNode.IS_RED())    { controller.RED_ORB_UPDATE(playerID); }
-            StartCoroutine( UPDATE_PLAYER_COINS(coinsGained * controller.turnMultiplier) );
-        }
-        // GAIN SPELL FROM SPACE
-        else if (currentNode.IS_SPELL()) {
-            StartCoroutine( GAIN_RANDOM_SPELL() );
-        }
-        
-        // todo - EVENT RELATED
-        // LANDED ON EVENT (caving in)
-        else if (currentNode.IS_BOULDER_EVENT()) {
-            if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
-            {
-                StartCoroutine( PATHFOLLOWER_CAVING_IN() );
-            }
-        }
-        // LANDED ON EVENT (changing boat)
-        else if (currentNode.IS_BOAT()) {
-            if (SceneManager.GetActiveScene().name == "Shogun_Seaport")
-            {
-                StartCoroutine( HAPPEN_NEW_BOAT() );
-            }
-        }
-        // LANDED ON EVENT (rotate laser)
-        else if (currentNode.IS_ROTATE()) {
-            if (SceneManager.GetActiveScene().name == "Plasma_Palace")
-            {
-                StartCoroutine( PATHFOLLOWER_TURRET_ROTATE() );
-            }
-        }
-        // LANDED ON EVENT (laser speed up countdown)
-        else if (currentNode.IS_SPEED_UP()) {
-            if (SceneManager.GetActiveScene().name == "Plasma_Palace")
-            {
-                StartCoroutine( PATHFOLLOWER_TURRET_SPEED_UP() );
-            }
-        }
-       
-       
-        // LANDED ON ORB TRAP
-        else if (currentNode.IS_ORB_TRAP()) {
-            Debug.Log("LANDED ON ORB TRAP");
-            int onesTrap = currentNode.ORB_TRAP_SPACE_COST(characterName);
-            if (onesTrap == 5)
-            {
-                Debug.Log("-- " + onesTrap);
-                StartCoroutine( UPDATE_PLAYER_COINS(onesTrap * controller.turnMultiplier) );
-            } 
-            else 
-            {
-                Debug.Log("ORB BEING STOLEN");
-                if (!playerBarrier) StartCoroutine( ORB_STOLEN(-1) );
-                else { StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
-            }
-        }
-        // LANDED ON COIN TRAP
-        else {
-            int price = currentNode.TRAP_SPACE_COST(characterName);
-            if (price > 0) // OWN TRAP
-            {
-                StartCoroutine( UPDATE_PLAYER_COINS(price * controller.turnMultiplier) );
-            }
-            else            // OPPONENT'S TRAP
-            {
-                if (!playerBarrier) {
-                    isPayingSomeone = true;
-                    StartCoroutine( UPDATE_PLAYER_COINS(price) );
-                }
-                else { Debug.Log("PROTECTED"); StartCoroutine( UPDATE_PLAYER_COINS(0) ); }
-            }
-        }
-    }
-    
 
     // todo -------------------------------------------------------- *//
 
@@ -1616,11 +1760,12 @@ public class PathFollower : MonoBehaviour
     // CAMERA FOCUSES ON PLAYER, WAIT BEFORE STARTING TURN
     public IEnumerator YOUR_TURN()
     {
+        Debug.Log("  Player " + (playerID+1) + "'s TURN", gameObject);
         // CAMERA FOCUSES ON PLAYER
         _cam.gameObject.SetActive(true);
 
         // MOVE BACK (UNASIDE)
-        if (controller.hasStarted) { transform.position = data[0].pos; }
+        if (controller.hasStarted) { transform.position = data.pos; }
         manager.CHECK_RANKINGS();
         manager.UNHIDE_UI();
         // manager.FADE_FROM_BLACK();
@@ -1628,7 +1773,7 @@ public class PathFollower : MonoBehaviour
         // LOSE BARRIER
         if (playerBarrier) {
             playerBarrier = false;
-            controller.buffDatas[playerID][0].barrier = false;
+            controller.buffDatas[playerID].barrier = false;
             barrier.SetActive(false);
             hurtBox.SetActive(true);
         }
@@ -1666,8 +1811,7 @@ public class PathFollower : MonoBehaviour
         string newPath = currentNode.transform.parent.name + "/" + currentNode.name;
 
         // SET ALL VALUES OF PLAYER
-        controller.SET_PLAYER_DATA(playerID, newPath, 0, currentNode.transform.position, transform.position,
-            coins, orbs, (int) mpBar.value);
+        controller.SET_PLAYER_DATA(playerID, newPath, currentNode.transform.position, coins, orbs, (int) mpBar.value);
 
         // STORE DATA ON THE CURRENT PLAYER'S SPELLS
         if (updateSpells) { controller.SET_SPELLS (playerID, spells); }
@@ -1718,10 +1862,12 @@ public class PathFollower : MonoBehaviour
     {
         _cam.gameObject.SetActive(true);    // CAM TURNS ON
     }
+
     public IEnumerator PLAYER_CAM_OFF(float delayTime)
     {
         yield return new WaitForSeconds(delayTime);
         _cam.gameObject.SetActive(false);   // CAM TURNS OFF
+        _cam.orthographicSize = camSizeNormal;
     }
 
     // ENABLE COLLIDER = SOUND EFFECT FOR WALKING OVER NODE
@@ -1736,20 +1882,21 @@ public class PathFollower : MonoBehaviour
     public void UNHIDE_DATA_CANVAS()  { layout.SetActive(true); }
 
 
-    /* --------------------------------------------------------- */
-    /* ------------ DURING THE START OF PLAYER TURN ------------ */
+    //* --------------------------------------------------------- */
+    //* ------------ DURING THE START OF PLAYER TURN ------------ */
 
 
     // AFTER ROLLING DICE, DELAY THEN MOVE PLAYER
     IEnumerator DICE_ROLLED()
     {
         if (!pseudoMove) {
-            // int nMoves = (int)(moveBar.value + 10) / 10;
             int nMoves;
             if      (playerSlowed) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 5); }
             else if (playerMove15) { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 15); }
             else                   { nMoves = (int)(radialBar.value) / ((int)(radialBar.maxValue) / 10); }
+            // TITAN = DOUBLE MOVEMENT
             _movesRemaining = (nMoves+1);
+            if (playerTitan) _movesRemaining *= 2;
             controller.SLOW_ORB_UPDATE(playerID, _movesRemaining);
             radialBar.GetComponent<Animator>().speed = 0;
         }
@@ -1757,8 +1904,8 @@ public class PathFollower : MonoBehaviour
         grimoireUI.gameObject.SetActive(false);
 
         if (!pseudoMove) yield return new WaitForSeconds(1.6f);
-        // moveBar.gameObject.SetActive(false);
         radialBar.gameObject.SetActive(false);
+        movementCircle.SetActive(false);
 
         yield return new WaitForSeconds(0.1f);
         _animator.SetBool("IsWalking", true);
@@ -1959,13 +2106,13 @@ public class PathFollower : MonoBehaviour
         }
         manager.CHECK_RANKINGS();
     }
-    public IEnumerator LOSE_ALL_COINS()
+    public IEnumerator LOSE_HALF_COINS()
     {
         if (!losingAll) {losingAll = true;}
         else yield break;
 
-        int n = -coins;
-        int tempGold = coins;
+        int n = Mathf.CeilToInt(coins / 2) * -1;
+        // int tempGold = coins;
         var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
         // NOT ENOUGH COINS TO LOSE
         if (coins < Mathf.Abs(n) ) {
@@ -1990,6 +2137,42 @@ public class PathFollower : MonoBehaviour
         }
         UPDATE_INFORMATION(false);
         manager.CHECK_RANKINGS();
+        yield return new WaitForSeconds(1);
+        losingAll = false;
+    }
+    public IEnumerator LOSE_ALL_COINS()
+    {
+        if (!losingAll) {losingAll = true;}
+        else yield break;
+
+        int n = -coins;
+        // int tempGold = coins;
+        var go = Instantiate(floatingCoinTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+        // NOT ENOUGH COINS TO LOSE
+        if (coins < Mathf.Abs(n) ) {
+            go.GetComponent<TextMeshPro>().text    = "-" + coins.ToString();
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        else {
+            go.GetComponent<TextMeshPro>().text    = n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        // LOSE COINS
+        for (int i = 0; i > n; i--)
+        {
+            if (coins <= 0) { break; }
+            if (n < 125) yield return new WaitForSeconds(0.01f);
+            coinLoss.Play();
+            coins--;
+        }
+        UPDATE_INFORMATION(false);
+        manager.CHECK_RANKINGS();
+        yield return new WaitForSeconds(1);
+        losingAll = false;
     }
     public void LOSE_MP(int n)
     {
@@ -2013,47 +2196,54 @@ public class PathFollower : MonoBehaviour
         }
         mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
     }
-    public IEnumerator LOSE_SPELL(int n)
+    public IEnumerator LOSE_SPELL(int n, int ind=-1)
     {
         n = Mathf.Abs(n);
         
-        for ( int i=0 ; i<n ; i++ )
-        {
-            if (spells.Count > 0) {
+        // LOSE A RANDOM SPELL
+        if (ind == -1) {
+            for ( int i=0 ; i<n ; i++ )
+            {
+                if (spells.Count > 0) {
+                    var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+                    SpriteRenderer spellImg = go.GetComponentInChildren<SpriteRenderer>();
+                    int rng = Random.Range(0,spells.Count);
+                    spellImg.sprite = GET_SPELL_ICON_SPRITE(spells[rng].spellName);
+                    
+                    go.GetComponent<TextMeshPro>().text = "-1";
+                    Color top = new Color(1, 0.15f, 0.2f);
+                    Color bot = new Color(0.8f, 0, 0.05f);
+                    go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+                    spells.RemoveAt( rng );
+                    yield return new WaitForSeconds(0.5f);
+                }
+            } 
+        }
+        // LOSE A SPECIFIED SPELL AT ind
+        else {
+            if (spells.Count > spellIndex) {
                 var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
                 SpriteRenderer spellImg = go.GetComponentInChildren<SpriteRenderer>();
-                int rng = Random.Range(0,spells.Count);
-                switch (spells[rng].spellName)
-                {
-                    case "Spell_Trap_10" :          spellImg.sprite = spellTrap10;   break;
-                    case "Spell_Trap_20" :          spellImg.sprite = spellTrap20;   break;
-                    case "Spell_Trap_Orb" :         spellImg.sprite = spellTrapOrb;  break;
-                    
-                    case "Spell_Effect_10" :        spellImg.sprite = spellEffect10; break;
-                    case "Spell_Effect_Mana_3" :    spellImg.sprite = spellEffectMana3; break;
-                    case "Spell_Effect_Spell_1" :   spellImg.sprite = spellEffectSpell1; break;
-                    case "Spell_Effect_Slow_1" :    spellImg.sprite = spellEffectSlow1; break;
-                    case "Spell_Effect_Swap" :      spellImg.sprite = spellEffectSwap; break;
-                    
-                    case "Spell_Move_Dash_5" :      spellImg.sprite = spellMoveDash5; break;
-                    case "Spell_Move_Dash_8" :      spellImg.sprite = spellMoveDash8; break;
-                    case "Spell_Move_Slow" :        spellImg.sprite = spellMoveSlow; break;
-                    case "Spell_Move_Slowgo" :      spellImg.sprite = spellMoveSlowgo; break;
-                    case "Spell_Move_Steal" :       spellImg.sprite = spellMoveSteal; break;
-                    case "Spell_Move_Barrier" :     spellImg.sprite = spellMoveBarrier; break;
-                    case "Spell_Move_Orb" :         spellImg.sprite = spellMoveOrb; break;
-                    default :      break;
-                }
+                spellImg.sprite = GET_SPELL_ICON_SPRITE(spells[spellIndex].spellName);
+                spells.RemoveAt( spellIndex );
+                
                 go.GetComponent<TextMeshPro>().text = "-1";
                 Color top = new Color(1, 0.15f, 0.2f);
                 Color bot = new Color(0.8f, 0, 0.05f);
                 go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
-                spells.RemoveAt( rng );
                 yield return new WaitForSeconds(0.5f);
             }
-        } 
+        }
 
         UPDATE_SPELLS_UI();
+    }
+    public void LOSE_ALL_SPELLs()
+    {
+        if (spells.Count > 0) 
+        {
+            spells.Clear();
+            UPDATE_SPELLS_UI();
+        }
     }
 
     public IEnumerator BOUGHT_AN_ORB(int n)
@@ -2097,7 +2287,8 @@ public class PathFollower : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         AudioSource bgMusic = GameObject.Find("BACKGROUND_MUSIC").GetComponent<AudioSource>();
         bgMusic.volume = bgMusicVol;
-        controller.CHOOSE_MAGIC_ORB_SPACE(name);
+        if (controller.GET_N_MAGIC_ORB_SPACES() > 1) controller.CHOOSE_MAGIC_ORB_SPACE(name);
+        else RESUME_PLAYER_TURN();
             
         if (isAtMagicOrb) { nMovesLeft.gameObject.SetActive(true); }
         manager.UNHIDE_UI();
@@ -2149,9 +2340,12 @@ public class PathFollower : MonoBehaviour
         manager.CHECK_RANKINGS();
     }
     
-    public IEnumerator ORB_GAINED(int n)
+    public IEnumerator ORB_GAINED(int n, float delay=0f)
     {
+        yield return new WaitForSeconds(delay);     //* DELAY
+
         var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+        Debug.Log("    Stealing " + n);
             
         go.GetComponent<TextMeshPro>().text    = "+" + n.ToString();
         Color top = new Color(0, 0.8f, 1);
@@ -2163,6 +2357,7 @@ public class PathFollower : MonoBehaviour
             if (n<11) { yield return new WaitForSeconds(0.1f); }
             else { yield return new WaitForSeconds(0.02f); }
             orbPickup.Play();    
+            Debug.Log("    Orb GAINED");
             orbs++;
         }
 
@@ -2173,6 +2368,38 @@ public class PathFollower : MonoBehaviour
         }
     }
     
+    public IEnumerator LOSE_ORBS(int n, float delay=0f)
+    {
+        yield return new WaitForSeconds(delay);     //* DELAY
+
+        var go = Instantiate(floatingOrbTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
+
+        n = Mathf.Abs(n);
+        // NOT ENOUGH ORBS TO LOSE
+        if (orbs < Mathf.Abs(n) ) {
+            go.GetComponent<TextMeshPro>().text    = "-" + orbs.ToString();
+            Color top = new Color(1, 0.7f, 0);
+            Color bot = new Color(1, 0.35f,0);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        else {
+            go.GetComponent<TextMeshPro>().text    = "-" + n.ToString();
+            Color top = new Color(1, 0.15f, 0.2f);
+            Color bot = new Color(0.8f, 0, 0.05f);
+            go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
+        }
+        // LOSE ORB(S)
+        for (int i = 0; i < n; i++)
+        {
+            if (n<11) { yield return new WaitForSeconds(0.1f); }
+            else { yield return new WaitForSeconds(0.02f); }
+            orbLoss.Play();    
+            orbs--;
+        }
+        UPDATE_INFORMATION(false);
+        // manager.CHECK_RANKINGS();
+    }
+
     private IEnumerator ORB_LOST_FROM_BOAT(int n)
     {
         if (orbStolen.isPlaying) orbStolen.Stop();
@@ -2214,7 +2441,7 @@ public class PathFollower : MonoBehaviour
     // DOUBLE PURCHASES IN LAST 5 TURNS
     public void RESET_PURCHASES() 
     { 
-        if (shop4)  { nPurchaseLeft = controller.turnMultiplier; }
+        if (shop4)  { nPurchaseLeft = 1; }
         else        { nPurchaseLeft = maxNPurchases * controller.turnMultiplier;  }
         purchaseLeftText.color = new Color(1,1,1);
         purchaseLeftText2.color = new Color(1,1,1);
@@ -2282,6 +2509,14 @@ public class PathFollower : MonoBehaviour
         manager.CHECK_RANKINGS();
     }
 
+    // ACQUIRE EFFECT OF BUFF/POTION/ITEM IMMEDIATELY
+    public void POWER_UP()
+    {
+        if (playerExtraBuy) maxNPurchases = 3;
+        else                maxNPurchases = 1;
+        if (playerRange2)   aoeHolder.transform.localScale *= 2;
+    }
+
     public void PURCHASES_LEFT()
     {
         purchaseLeftText.text = "Purchase Left: " + nPurchaseLeft;
@@ -2289,6 +2524,10 @@ public class PathFollower : MonoBehaviour
         if (nPurchaseLeft <= 0) {
             purchaseLeftText.color = new Color(1,0,0);
             purchaseLeftText2.color = new Color(1,0,0);
+        }
+        else {
+            purchaseLeftText.color = new Color(1,1,1);
+            purchaseLeftText2.color = new Color(1,1,1);
         }
     }
 
@@ -2391,7 +2630,7 @@ public class PathFollower : MonoBehaviour
         coins -= cost;
         nPurchaseLeft--;
         PURCHASES_LEFT();
-        // UPDATE_SPELLS_UI();
+        LOSE_ALL_SPELLs();
 
         // LOSE COINS
         for (int i = 0; i < cost; i++)
@@ -2424,7 +2663,6 @@ public class PathFollower : MonoBehaviour
             UPDATE_SPELLS_UI();
 
             yield return new WaitForSeconds(0.5f);
-            // isAtFree = false;
             UPDATE_INFORMATION(true);
             
             yield return new WaitForSeconds(0.5f);
@@ -2618,134 +2856,68 @@ public class PathFollower : MonoBehaviour
 
         if (gained)
         {
-            switch (spellName)
-            {
-                case "Spell_Trap_10" :          spellImg.sprite = spellTrap10;   break;
-                case "Spell_Trap_20" :          spellImg.sprite = spellTrap20;   break;
-                case "Spell_Trap_Orb" :         spellImg.sprite = spellTrapOrb;  break;
-
-                case "Spell_Effect_10" :        spellImg.sprite = spellEffect10; break;
-                case "Spell_Effect_Mana_3" :    spellImg.sprite = spellEffectMana3; break;
-                case "Spell_Effect_Spell_1" :   spellImg.sprite = spellEffectSpell1; break;
-                case "Spell_Effect_Slow_1" :    spellImg.sprite = spellEffectSlow1; break;
-                case "Spell_Effect_Swap" :      spellImg.sprite = spellEffectSwap; break;
-
-                case "Spell_Move_Dash_5" :      spellImg.sprite = spellMoveDash5; break;
-                case "Spell_Move_Dash_8" :      spellImg.sprite = spellMoveDash8; break;
-                case "Spell_Move_Slow" :        spellImg.sprite = spellMoveSlow; break;
-                case "Spell_Move_Slowgo" :      spellImg.sprite = spellMoveSlowgo; break;
-                case "Spell_Move_Steal" :       spellImg.sprite = spellMoveSteal; break;
-                case "Spell_Move_Barrier" :     spellImg.sprite = spellMoveBarrier; break;
-                case "Spell_Move_Orb" :         spellImg.sprite = spellMoveOrb; break;
-                default :      break;
-            }
+            spellImg.sprite = GET_SPELL_ICON_SPRITE(spellName);
 
             go.GetComponent<TextMeshPro>().text = "+1";
             Color top = new Color(0, 0.8f, 1);
             Color bot = new Color(0, 0.3f, 1);
             go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
 
-            switch (spellName)
-            {
-                case "Spell_Trap_10" :          discardSpellImg[3].sprite = spellTrap10;   break;
-                case "Spell_Trap_20" :          discardSpellImg[3].sprite = spellTrap20;   break;
-                case "Spell_Trap_Orb" :         discardSpellImg[3].sprite = spellTrapOrb;  break;
-
-                case "Spell_Effect_10" :        discardSpellImg[3].sprite = spellEffect10; break;
-                case "Spell_Effect_Mana_3" :    discardSpellImg[3].sprite = spellEffectMana3; break;
-                case "Spell_Effect_Spell_1" :   discardSpellImg[3].sprite = spellEffectSpell1; break;
-                case "Spell_Effect_Slow_1" :    discardSpellImg[3].sprite = spellEffectSlow1; break;
-                case "Spell_Effect_Swap" :      discardSpellImg[3].sprite = spellEffectSwap; break;
-
-                case "Spell_Move_Dash_5" :      discardSpellImg[3].sprite = spellMoveDash5; break;
-                case "Spell_Move_Dash_8" :      discardSpellImg[3].sprite = spellMoveDash8; break;
-                case "Spell_Move_Slow" :        discardSpellImg[3].sprite = spellMoveSlow; break;
-                case "Spell_Move_Slowgo" :      discardSpellImg[3].sprite = spellMoveSlowgo; break;
-                case "Spell_Move_Steal" :       discardSpellImg[3].sprite = spellMoveSteal; break;
-                case "Spell_Move_Barrier" :     discardSpellImg[3].sprite = spellMoveBarrier; break;
-                case "Spell_Move_Orb" :         discardSpellImg[3].sprite = spellMoveOrb; break;
-                default :      break;
-            }
+            discardSpellImg[3].sprite = GET_SPELL_ICON_SPRITE(spellName);
             discardSpellImg[3].name = spellName;
         }
         else
         {
-            spellImg.sprite = fourthSpell;
-            switch (spellName)
-            {
-                case "Spell_Trap_10" :          spellImg.sprite = spellTrap10;   break;
-                case "Spell_Trap_20" :          spellImg.sprite = spellTrap20;   break;
-                case "Spell_Trap_Orb" :         spellImg.sprite = spellTrapOrb;   break;
-
-                case "Spell_Effect_10" :        spellImg.sprite = spellEffect10;   break;
-                case "Spell_Effect_Mana_3" :    spellImg.sprite = spellEffectMana3;   break;
-                case "Spell_Effect_Spell_1" :   spellImg.sprite = spellEffectSpell1;   break;
-                case "Spell_Effect_Slow_1" :    spellImg.sprite = spellEffectSlow1;   break;
-                case "Spell_Effect_Swap" :      spellImg.sprite = spellEffectSwap;   break;
-
-                case "Spell_Move_Dash_5" :      spellImg.sprite = spellMoveDash5;   break;
-                case "Spell_Move_Dash_8" :      spellImg.sprite = spellMoveDash8;   break;
-                case "Spell_Move_Slow" :        spellImg.sprite = spellMoveSlow;   break;
-                case "Spell_Move_Slowgo" :      spellImg.sprite = spellMoveSlowgo;   break;
-                case "Spell_Move_Steal" :       spellImg.sprite = spellMoveSteal;   break;
-                case "Spell_Move_Barrier" :     spellImg.sprite = spellMoveBarrier;   break;
-                case "Spell_Move_Orb" :         spellImg.sprite = spellMoveOrb;   break;
-                default :      break;
-            }
+            spellImg.sprite = GET_SPELL_ICON_SPRITE(spellName);
 
             go.GetComponent<TextMeshPro>().text = "-1";
             Color top = new Color(1, 0.15f, 0.2f);
             Color bot = new Color(0.8f, 0, 0.05f);
             go.GetComponent<TextMeshPro>().colorGradient  = new VertexGradient(top, top, bot, bot);
             
-            switch (spellName)
-            {
-                case "Spell_Trap_10" :          discardSpellImg[3].sprite = spellTrap10;   break;
-                case "Spell_Trap_20" :          discardSpellImg[3].sprite = spellTrap20;   break;
-                case "Spell_Trap_Orb" :         discardSpellImg[3].sprite = spellTrapOrb;  break;
-
-                case "Spell_Effect_10" :        discardSpellImg[3].sprite = spellEffect10; break;
-                case "Spell_Effect_Mana_3" :    discardSpellImg[3].sprite = spellEffectMana3; break;
-                case "Spell_Effect_Spell_1" :   discardSpellImg[3].sprite = spellEffectSpell1; break;
-                case "Spell_Effect_Slow_1" :    discardSpellImg[3].sprite = spellEffectSlow1; break;
-                case "Spell_Effect_Swap" :      discardSpellImg[3].sprite = spellEffectSwap; break;
-
-                case "Spell_Move_Dash_5" :      discardSpellImg[3].sprite = spellMoveDash5; break;
-                case "Spell_Move_Dash_8" :      discardSpellImg[3].sprite = spellMoveDash8; break;
-                case "Spell_Move_Slow" :        discardSpellImg[3].sprite = spellMoveSlow; break;
-                case "Spell_Move_Slowgo" :      discardSpellImg[3].sprite = spellMoveSlowgo; break;
-                case "Spell_Move_Steal" :       discardSpellImg[3].sprite = spellMoveSteal; break;
-                case "Spell_Move_Barrier" :     discardSpellImg[3].sprite = spellMoveBarrier; break;
-                case "Spell_Move_Orb" :         discardSpellImg[3].sprite = spellMoveOrb; break;
-                default :      break;
-            }
+            discardSpellImg[3].sprite = GET_SPELL_ICON_SPRITE(spellName);
             discardSpellImg[3].name = spellName;
         }
         
-        switch (spellName)
-        {
-            case "Spell_Trap_10" :          fourthSpell = spellTrap10;   break;
-            case "Spell_Trap_20" :          fourthSpell = spellTrap20;   break;
-            case "Spell_Trap_Orb" :         fourthSpell = spellTrapOrb;   break;
-
-            case "Spell_Effect_10" :        fourthSpell = spellEffect10;   break;
-            case "Spell_Effect_Mana_3" :    fourthSpell = spellEffectMana3;   break;
-            case "Spell_Effect_Spell_1" :   fourthSpell = spellEffectSpell1;   break;
-            case "Spell_Effect_Slow_1" :    fourthSpell = spellEffectSlow1;   break;
-            case "Spell_Effect_Swap" :      fourthSpell = spellEffectSwap;   break;
-
-            case "Spell_Move_Dash_5" :      fourthSpell = spellMoveDash5;   break;
-            case "Spell_Move_Dash_8" :      fourthSpell = spellMoveDash8;   break;
-            case "Spell_Move_Slow" :        fourthSpell = spellMoveSlow;   break;
-            case "Spell_Move_Slowgo" :      fourthSpell = spellMoveSlowgo;   break;
-            case "Spell_Move_Steal" :       fourthSpell = spellMoveSteal;   break;
-            case "Spell_Move_Barrier" :     fourthSpell = spellMoveBarrier;   break;
-            case "Spell_Move_Orb" :         fourthSpell = spellMoveOrb;   break;
-            default :      break;
-        }
+        fourthSpell = GET_SPELL_ICON_SPRITE(spellName);
 
         REFRESH_SPELLS();
     }
+
+    Sprite GET_SPELL_ICON_SPRITE(string spellName, bool canReturnNull=false)
+    {
+        switch (spellName)
+        {
+            case "Spell_Trap_10" :          return spellTrap10;
+            case "Spell_Trap_20" :          return spellTrap20;
+            case "Spell_Trap_Orb" :         return spellTrapOrb;
+
+            case "Spell_Effect_10" :        return spellEffect10;
+            case "Spell_Effect_Mana_3" :    return spellEffectMana3;
+            case "Spell_Effect_Spell_1" :   return spellEffectSpell1;
+            case "Spell_Effect_Slow_1" :    return spellEffectSlow1;
+            case "Spell_Effect_Swap" :      return spellEffectSwap;
+
+            case "Spell_Move_Dash_5" :      return spellMoveDash5;
+            case "Spell_Move_Dash_8" :      return spellMoveDash8;
+            case "Spell_Move_Slow" :        return spellMoveSlow;
+            case "Spell_Move_Slowgo" :      return spellMoveSlowgo;
+            case "Spell_Move_Steal" :       return spellMoveSteal;
+            case "Spell_Move_Barrier" :     return spellMoveBarrier;
+            case "Spell_Move_Orb" :         return spellMoveOrb;
+            case "Spell_Move_Titan" :       return spellMoveTitan;
+            case "Spell_Effect_Orb" :       return spellEffectOrb;
+            case "Key" :                    return keySprite;
+            default :      
+                if (canReturnNull) {
+                    return null;
+                }
+                return spellSlotEmpty;
+                // Debug.LogError("HAVE NOT ADD SPELL SPRITE");
+        }
+    }
+
+
     void DISCARD_NEW_SPELL()
     {
         var go = Instantiate(floatingSpellTextPrefab, transform.position + new Vector3(0,3), transform.rotation);
@@ -2876,13 +3048,12 @@ public class PathFollower : MonoBehaviour
             mpBar.value -= mpCost;
             mpLeft.text = mpBar.value + "/" + mpBar.maxValue;
         }
-        manaUsed.Play();
+        if (mpCost > 0) manaUsed.Play();
         spells.RemoveAt(spellIndex);
         UPDATE_SPELLS_UI();
 
         spellTrapTarget.gameObject.SetActive(false);
         spellEffectTarget.gameObject.SetActive(false);
-        // areaOfEffect.SetActive(false);
     }
 
     public void UPDATE_SPELLS_UI()
@@ -2890,26 +3061,8 @@ public class PathFollower : MonoBehaviour
         // UPDATE UI TOP RIGHT CORNER
         foreach (SpellType sp in spells)
         {
-            switch (sp.spellName) {
-                case "Spell_Trap_10":       spellSlots[nSpells].sprite = spellTrap10; spellSlots[nSpells].name =    "Spell_Trap_10"; break;
-                case "Spell_Trap_20":       spellSlots[nSpells].sprite = spellTrap20; spellSlots[nSpells].name =    "Spell_Trap_20"; break;
-                case "Spell_Trap_Orb":      spellSlots[nSpells].sprite = spellTrapOrb; spellSlots[nSpells].name =   "Spell_Trap_Orb"; break;
-                
-                case "Spell_Effect_10":     spellSlots[nSpells].sprite = spellEffect10; spellSlots[nSpells].name =  "Spell_Effect_10"; break;
-                case "Spell_Effect_Mana_3": spellSlots[nSpells].sprite = spellEffectMana3; spellSlots[nSpells].name =  "Spell_Effect_Mana_3"; break;
-                case "Spell_Effect_Spell_1": spellSlots[nSpells].sprite = spellEffectSpell1; spellSlots[nSpells].name =  "Spell_Effect_Spell_1"; break;
-                case "Spell_Effect_Slow_1": spellSlots[nSpells].sprite = spellEffectSlow1; spellSlots[nSpells].name =  "Spell_Effect_Slow_1"; break;
-                case "Spell_Effect_Swap":   spellSlots[nSpells].sprite = spellEffectSwap; spellSlots[nSpells].name =  "Spell_Effect_Swap"; break;
-                
-                case "Spell_Move_Dash_5":   spellSlots[nSpells].sprite = spellMoveDash5; spellSlots[nSpells].name =  "Spell_Move_Dash_5"; break;
-                case "Spell_Move_Dash_8":   spellSlots[nSpells].sprite = spellMoveDash8; spellSlots[nSpells].name =  "Spell_Move_Dash_8"; break;
-                case "Spell_Move_Slow":     spellSlots[nSpells].sprite = spellMoveSlow; spellSlots[nSpells].name =  "Spell_Move_Slow"; break;
-                case "Spell_Move_Slowgo":   spellSlots[nSpells].sprite = spellMoveSlowgo; spellSlots[nSpells].name =  "Spell_Move_Slowgo"; break;
-                case "Spell_Move_Steal":    spellSlots[nSpells].sprite = spellMoveSteal; spellSlots[nSpells].name =  "Spell_Move_Steal"; break;
-                case "Spell_Move_Barrier":  spellSlots[nSpells].sprite = spellMoveBarrier; spellSlots[nSpells].name =  "Spell_Move_Barrier"; break;
-                case "Spell_Move_Orb":      spellSlots[nSpells].sprite = spellMoveOrb; spellSlots[nSpells].name =  "Spell_Move_Orb"; break;
-                default :                   spellSlots[nSpells].sprite = spellSlotEmpty; spellSlots[nSpells].name = ""; break;
-            }
+            spellSlots[nSpells].sprite = GET_SPELL_ICON_SPRITE(sp.spellName); 
+            spellSlots[nSpells].name =   sp.spellName;
             nSpells++;
         }
         nSpells = 0;
@@ -2928,37 +3081,24 @@ public class PathFollower : MonoBehaviour
             // UP TO CURRENT NUMBER OF SPELLS
             grimoireUI._slots[i].name = spells[i].spellName;
             grimoireUI._slots[i].interactable = true; 
-            switch (spells[i].spellName)
-            {
-                case "Spell_Trap_10" :          grimoireUI._slots[i].GetComponent<Image>().sprite = spellTrap10;   break;
-                case "Spell_Trap_20" :          grimoireUI._slots[i].GetComponent<Image>().sprite = spellTrap20;   break;
-                case "Spell_Trap_Orb" :         grimoireUI._slots[i].GetComponent<Image>().sprite = spellTrapOrb;  break;
-                
-                case "Spell_Effect_10" :        grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffect10; break;
-                case "Spell_Effect_Mana_3" :    grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectMana3; break;
-                case "Spell_Effect_Spell_1" :   grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectSpell1; break;
-                case "Spell_Effect_Slow_1" :    grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectSlow1; break;
-                case "Spell_Effect_Swap" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellEffectSwap; break;
-                
-                case "Spell_Move_Dash_5" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveDash5; break;
-                case "Spell_Move_Dash_8" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveDash8; break;
-                case "Spell_Move_Slow" :        grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveSlow; break;
-                case "Spell_Move_Slowgo" :      grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveSlowgo; break;
-                case "Spell_Move_Steal" :       grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveSteal; break;
-                case "Spell_Move_Barrier" :     grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveBarrier; break;
-                case "Spell_Move_Orb" :         grimoireUI._slots[i].GetComponent<Image>().sprite = spellMoveOrb; break;
-                default :                 
-                    grimoireUI._slots[i].GetComponent<Image>().sprite = spellNone;
-                    grimoireUI._slots[i].interactable = false; 
-                    break;
+            Sprite spellSprite = GET_SPELL_ICON_SPRITE(spells[i].spellName);
+            if (spellSprite != null) {
+                grimoireUI._slots[i].GetComponent<Image>().sprite = spellSprite;
+            }
+            else {
+                grimoireUI._slots[i].GetComponent<Image>().sprite = spellNone;
+                grimoireUI._slots[i].interactable = false; 
             }
         }
         REFRESH_SPELLS();
     }
 
     // ** CALLED BY BUTTON ON GRIMOIRE ** //
-    public void CAST_TRAP_SPELL(int index)
+    public void CAST_MAGIC_SPELL(int index)
     {
+        //* KEY - NOTHING HAPPENS
+        if (spells[index].spellKind == "Key") return;
+
         spellMpCost = spells[index].spellCost;
         spellIndex  = index;
         if (spellMpCost > mpBar.value) return;  // NOT ENOUGH MP
@@ -2966,6 +3106,7 @@ public class PathFollower : MonoBehaviour
         grimoireUI.gameObject.SetActive(false);
 
         // CAST ON SELF AND END CASTING
+        //* MOVE RELATED SPELLS
         if (spells[index].spellKind == "Move") {
             switch (spells[index].spellName) {
                 case "Spell_Move_Dash_5" : 
@@ -2991,6 +3132,9 @@ public class PathFollower : MonoBehaviour
                 case "Spell_Move_Steal" : 
                     StartCoroutine(ANIMATE_MAGIC_CIRCLE("steal"));   
                     return;
+                case "Spell_Move_Titan" : 
+                    StartCoroutine(ANIMATE_MAGIC_CIRCLE("titan"));   
+                    return;
                 case "Spell_Move_Orb" : 
                     StartCoroutine( CHANGE_ORB_SPACE() );
                     return;
@@ -3002,26 +3146,55 @@ public class PathFollower : MonoBehaviour
         isCastingSpell = true;
         if (!mapCastSpell.gameObject.activeSelf) mapCastSpell.gameObject.SetActive(true);
 
+        //* TRAP RELATED SPELLS
         if (spells[index].spellKind == "Trap")  { 
             trapSpellActive = true;
             spellTrapTarget.gameObject.SetActive(true); 
             spellTrapTarget.spellName = spells[index].spellName;
+            CASTING_EFFECT_SPELL();
         }
-        else if (spells[index].spellKind == "Effect" && spells[index].spellName != "Spell_Effect_Swap")  { 
-            effectSpellActive = true;
-            spellEffectTarget.gameObject.SetActive(true); 
-            spellEffectTarget.specialEffect = false;
-            spellEffectTarget.spellName = spells[index].spellName;
-        }
+        //* EFFECT (SINGLE PLAYER) RELATED SPELLS
         else if (spells[index].spellKind == "Effect" && spells[index].spellName == "Spell_Effect_Swap")  {
             specialSpellActive = true;
             spellSpecialEffectTarget.gameObject.SetActive(true); 
             spellSpecialEffectTarget.specialEffect = true; 
             spellSpecialEffectTarget.spellName = spells[index].spellName;
+            CASTING_EFFECT_SPELL();
+        }
+        //* EFFECT (SINGLE PLAYER) RELATED SPELLS
+        else if (spells[index].spellKind == "Effect" && spells[index].spellName == "Spell_Effect_Orb")  {
+            specialSpellActive = true;
+            spellSpecialEffectTarget.gameObject.SetActive(true); 
+            spellSpecialEffectTarget.specialEffect = true; 
+            spellSpecialEffectTarget.spellName = spells[index].spellName;
+            CASTING_EFFECT_SPELL(true);
+        }
+        //* EFFECT RELATED SPELLS
+        else if (spells[index].spellKind == "Effect")  { 
+            effectSpellActive = true;
+            spellEffectTarget.gameObject.SetActive(true); 
+            spellEffectTarget.specialEffect = false;
+            spellEffectTarget.spellName = spells[index].spellName;
+            CASTING_EFFECT_SPELL();
         }
 
-        areaOfEffect.SetActive(true);
         _cam.orthographicSize = camSizeLarge;
+    }
+
+    void CASTING_EFFECT_SPELL(bool smallAoe=false)
+    {
+        if (smallAoe)   areaOfEffectSmall.SetActive(true);
+        else            areaOfEffect.SetActive(true);
+        
+        effectCastCircle.SetActive(true);
+    }
+
+    void DONE_CASTING()
+    {
+        areaOfEffectSmall.SetActive(false);
+        areaOfEffect.SetActive(false);
+        
+        effectCastCircle.SetActive(false);
     }
 
     public void LOCKED_ON() { lockedOn.SetActive(true); }
@@ -3051,6 +3224,7 @@ public class PathFollower : MonoBehaviour
     // MOVE RELATED SPELLS
     private IEnumerator ANIMATE_MAGIC_CIRCLE(string effect)
     {
+        effect = effect.ToLower();
         yield return new WaitForEndOfFrame();
         USE_MP(spellMpCost); 
         grimoireUI.gameObject.SetActive(false);
@@ -3059,6 +3233,11 @@ public class PathFollower : MonoBehaviour
         yield return new WaitForSeconds(1);
         Destroy(mCircle.gameObject);
         var buff = Instantiate(blueBuffPrefab, transform.position, blueBuffPrefab.transform.rotation);
+        if (effect == "titan") {
+            playerTitan = true;
+            StartCoroutine( TITANIZE() );
+            yield return new WaitForSeconds(0.5f);
+        }
 
         yield return new WaitForSeconds(1);
         Destroy(buff.gameObject);
@@ -3095,15 +3274,24 @@ public class PathFollower : MonoBehaviour
         yield return new WaitForSeconds(0.6f);
         Destroy(buff.gameObject);
         isPlayerTurn = false;
-        if (SceneManager.GetActiveScene().name == "Crystal_Caverns")
+        switch (SceneManager.GetActiveScene().name)
         {
-            controller.MagicOrbBoughtController();
-            controller.CHOOSE_MAGIC_ORB_SPACE(name);
-        }
-        else 
-        {
-            PLAYER_CAM_OFF(0);
-            StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
+            case "Crystal_Caverns" :
+                controller.MagicOrbBoughtController();
+                controller.CHOOSE_MAGIC_ORB_SPACE(name);
+                break;
+            case "Volcanic_Villa" :
+                // TODO : MAGMABEAST
+                RESUME_PLAYER_TURN();
+                break;
+            case "Plasma_Palace" :
+                controller.MagicOrbBoughtController();
+                controller.CHOOSE_MAGIC_ORB_SPACE(name);
+                break;
+            case "Shogun_Seaport" :
+                PLAYER_CAM_OFF(0);
+                StartCoroutine( manager.MANAGER_BOAT_ALTERNATE(this) );
+                break;
         }
     }
 
@@ -3130,12 +3318,47 @@ public class PathFollower : MonoBehaviour
         slowed.transform.parent = character.transform; 
     }
 
+    // TITANIZE
+    IEnumerator TITANIZE(bool enlarge=true)
+    {
+        if (enlarge)
+        {
+            // GROW LARGE
+            while (characterHolder.transform.localScale.y < 2)
+            {
+                yield return new WaitForSeconds(0.01f);
+                characterHolder.transform.localScale += new Vector3(0.1f,0.1f,0.1f);
+            }
+        }
+        else
+        {
+            // SHRINK
+            while (characterHolder.transform.localScale.y > 1)
+            {
+                yield return new WaitForSeconds(0.01f);
+                characterHolder.transform.localScale -= new Vector3(0.1f,0.1f,0.1f);
+            }
+        }
+    }
+
     // TELEPORTATION
     public void SET_NEW_PATH(string newPath)
     {
         currentNode = GameObject.Find(newPath).GetComponent<Node>();
     }
 
+
+    public void STEALING_ORB_EFFECT(PathFollower victim)
+    {
+        StartCoroutine( victim.LOSE_ORBS(1, 0.5f) );
+        if (solarFlarePrefab != null) {
+            Instantiate(solarFlarePrefab, victim.transform.position, solarFlarePrefab.transform.rotation);
+        }
+
+        // yield return new WaitForSeconds(0.5f);
+        StartCoroutine( ORB_GAINED(1, 2) );
+
+    }
     public void RESET_TARGET_SPELL_CAM()
     {
         spellSpecialEffectTarget.transform.position = new Vector3(this.transform.position.x,
@@ -3144,6 +3367,11 @@ public class PathFollower : MonoBehaviour
         var obj = Instantiate(greenTeleportEffect, transform.position, greenTeleportEffect.transform.rotation);
         Destroy(obj, 1.5f);
     }
+
+
+
+
+
 
     public void DISPLAY_PLAYER_RANKINGS(int xth)
     {
@@ -3160,7 +3388,20 @@ public class PathFollower : MonoBehaviour
         }
     }
 
-    
+    private void OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("Enemy")) {
+            var obj = Instantiate(smoke, transform.position, smoke.transform.rotation);
+            Destroy(obj, 3);
+            var explosion = Instantiate(fireExplosion, transform.position, Quaternion.identity);
+            Destroy(explosion, 3);
+
+            currentNode = GameObject.Find("New-Node").GetComponent<Node>();
+            transform.position = currentNode.transform.position;
+            UPDATE_INFORMATION(false);
+        }
+    }
+
+
 
 
     // todo : HAPPENING \ EVENT SPACES

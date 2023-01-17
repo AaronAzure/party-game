@@ -32,6 +32,9 @@ public class PreviewOverlay : MonoBehaviour
     [SerializeField] private GameObject      map3;
     [SerializeField] private Image           pic3;
     [SerializeField] private TextMeshProUGUI txt3;
+    [SerializeField] private GameObject      map4;
+    [SerializeField] private Image           pic4;
+    [SerializeField] private TextMeshProUGUI txt4;
 
     [Header("Picture Sprites")]
     [SerializeField] private Sprite buttonEast;
@@ -98,6 +101,7 @@ public class PreviewOverlay : MonoBehaviour
         // MINIGAME DESCRIPTION AND CONTROLS
         map2.SetActive(false);
         map3.SetActive(false);
+        map4.SetActive(false);
         switch (SceneMiniName)
         {
             case "Sneak And Snore" : 
@@ -291,7 +295,6 @@ public class PreviewOverlay : MonoBehaviour
             case "County Bounty" : 
                 desc.text = "Count how many foxes there are.\n";
                 desc.text += "Whoever is the closest to or gets the correct answer wins!";
-                // desc.text += "which can camoflage in its own colour.\n";
                 map1.SetActive(true);
                 pic1.sprite = buttonEast;
                 txt1.text = "Increase count";
@@ -301,6 +304,9 @@ public class PreviewOverlay : MonoBehaviour
                 map3.SetActive(true);
                 pic3.sprite = buttonNorth;
                 txt3.text = "Hide/Display your answer";
+                map4.SetActive(true);
+                pic4.sprite = buttonWest;
+                txt4.text = "Done counting/Not done counting";
                 break;
             case "Slay The Shades" : 
                 desc.text = "Shoot down the malicious shades.\n";

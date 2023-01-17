@@ -29,6 +29,9 @@ public class IntroManager : MonoBehaviour
     private int nReady;
     private int nPlayers;
     private int nPrompt;
+    private int nBonusGiven=1;
+	private List<string> bonuses;
+	private int nBonuses;
     private string sceneName;
     [SerializeField] private GameObject         textUI;
     [SerializeField] private TextMeshProUGUI    aaronText;
@@ -45,8 +48,9 @@ public class IntroManager : MonoBehaviour
     private bool        isBonus;        // controller.turnNumber == controller.maxTurns - 4
     public bool         canContinue = true;
     private bool        isOutro;        // controller.turnNumber == controller.maxTurns + 1
-    private int         rBonusOrb;
-    private List<int>   randomBonus;
+    private bool        done;        // controller.turnNumber == controller.maxTurns + 1
+    private string		rBonusOrb;
+    // private List<int>   randomBonus;
 
     [SerializeField] private GameObject bonusOrbPrefab;
     [SerializeField] private GameObject winnerAura;
@@ -93,7 +97,8 @@ public class IntroManager : MonoBehaviour
 
             if      (controller.turnNumber == 1)                        { isStart = true; }
             else if (controller.turnNumber == controller.maxTurns - 4)  { isBonus = true; }
-            else if (controller.turnNumber == controller.maxTurns + 1)  { isOutro = true; }
+            else if (controller.turnNumber >= controller.maxTurns + 1)  { isOutro = true; }
+            else    { isOutro = true; }
         }
 
         transitionAnim = transitionScreen.GetComponent<Animator>();
@@ -106,13 +111,16 @@ public class IntroManager : MonoBehaviour
         bonusOrbs = new List<GameObject>();
         if (isOutro)
         {
-            randomBonus = new List<int>();
-            randomBonus.Add( 0 );   // rich
-            randomBonus.Add( 1 );   // event
-            randomBonus.Add( 2 );   // trap
-            randomBonus.Add( 3 );   // red
-            randomBonus.Add( 4 );   // slow
-            randomBonus.Add( 5 );   // shop
+            // randomBonus = new List<int>();
+            // randomBonus.Add( 0 );   // rich
+            // randomBonus.Add( 1 );   // event
+            // randomBonus.Add( 2 );   // trap
+            // randomBonus.Add( 3 );   // red
+            // randomBonus.Add( 4 );   // slow
+            // randomBonus.Add( 5 );   // shop
+
+            bonuses = new List<string>(PlayerPrefsElite.GetStringArray("bonuses"));
+			nBonuses = PlayerPrefsElite.GetInt("nBonuses");
         }
 
         // HIDE ALL CARDS ON THE BOARD
@@ -126,6 +134,8 @@ public class IntroManager : MonoBehaviour
         
         SCREEN_TRANSITION("Oval_Transition", 0.5f);
         StartCoroutine( AaronAppears() );
+
+		
     }
     
     void SpawnInLine()
@@ -174,21 +184,6 @@ public class IntroManager : MonoBehaviour
         }
     }
 
-    void SpawnAtNodes()
-    {
-        for ( int i=0 ; i<controller.nPlayers ; i++ )
-        {
-            var player = Instantiate(playerPrefab, controller.GET_PLAYER_POS(i), Quaternion.identity);
-            player.name = "Player_" + (i+1); 
-            players[i]  = player.gameObject;
-            gamers[i]   = player.GetComponent<CharacterHolder>();
-            gamers[i].intro = this.GetComponent<IntroManager>();
-            gamers[i].introMode = true;
-            gamers[i].playerID = i; gamers[i].movable = true; gamers[i].minSpeed = 10;
-            if (mtCam != null) { mtCam.targets.Add(player.transform); }
-        }
-    }
-
     private void Update() {
         if (player.GetAnyButtonDown() && textUI.activeSelf && !choosingCards) 
         { 
@@ -224,13 +219,31 @@ public class IntroManager : MonoBehaviour
 
     private void TextIndex()
     {
-        if (isStart)
+        // BOARD - END (MERCY RULE DOMINATING WINNER)
+        if (controller.mercyRule && controller.mercyWinner)
+        {
+            switch (nPrompt)
+            {
+                case 0 :  { aaronText.text = "That's all folks."; break; }
+                case 1 :  { aaronText.text = "I have seen quite enough."; break; }
+                case 2 :  { aaronText.text = "You all have fought so splendidly."; break; }
+                case 3 :  { aaronText.text = "But one of you clearly outranks everyone else."; break; }
+                case 4 :  { aaronText.text = "Such that it would be too cruel to continue this competition."; break; }
+                case 5 :  { aaronText.text = "And that person is..."; break; }
+                case 6 :  {
+                    StartCoroutine( REVEAL_THE_WINNER() );  
+                    break; }
+            }
+        }
+        // BOARD - INTRO
+        else if (isStart)
         {
             switch (nPrompt)
             {
                 case 0 :   { 
                     if (sceneName == "Crystal Caverns") { aaronText.text = "Welcome to the <b><#ff68f7>" + sceneName + "</color>."; }
                     if (sceneName == "Shogun Seaport") { aaronText.text = "Welcome to <b><#68b8ff>" + sceneName + "</color>."; }
+                    if (sceneName == "Plasma Palace") { aaronText.text = "Welcome to <b><#68b8ff>" + sceneName + "</color>."; }
                     break;
                 }
                 case 1 :   { aaronText.text = "I'll let my <b>doppelgänger</b> explain the rest."; break; }
@@ -254,6 +267,7 @@ public class IntroManager : MonoBehaviour
                 case 19 :  { aaronText.text = "."; break; }
             }
         }
+        // BOARD - FIVE LAST TURN
         else if (isBonus)
         {
             switch (nPrompt)
@@ -286,6 +300,79 @@ public class IntroManager : MonoBehaviour
                 case 19 :  { aaronText.text = "."; break; }
             }
         }
+        
+		// VERSION 2.0
+		else if (!done && isOutro)
+		{
+			switch (nPrompt)
+            {
+                case 0 :  { aaronText.text = "Welcome to the Grand Finale."; break; }
+                case 1 :  { aaronText.text = "Hope that you all had a blast."; break; }
+                case 2 :  { aaronText.text = "It is time to reveal who is the greatest mage."; break; }
+                case 3 :  { aaronText.text = "I wonder who it could be?."; break; }
+                case 4 :  { aaronText.text = "But before we can name the winner."; break; }
+                case 5 :  { aaronText.text = "We need to identify who will recieve bonus <color=red>M<color=orange>a<color=yellow>g<#2DFF00>i<#00C0FF>c <#0084FF>O<#B17AFF>r<#F17AFF>b<color=white>s!"; break; }
+
+				default :
+				{
+					// GET BONUSES
+					if (nPrompt > 5)
+					{
+						if (nBonusGiven > nBonuses)
+						{
+							done = true;
+
+							aaronText.text = "And the winner is...";
+							foreach(GameObject obj in bonusOrbs) { Destroy(obj); } 
+							bonusOrbs.Clear();
+							StartCoroutine( REVEAL_THE_WINNER() );  
+						}
+						else
+						{
+						switch ((nPrompt - 6) % 3)
+						{
+							case 0:
+								rBonusOrb = PICK_A_RANDOM_BONUS_ORB(); RANDOM_BONUS_STARTING(nBonusGiven);
+								foreach(GameObject obj in bonusOrbs) { Destroy(obj); } bonusOrbs.Clear(); 
+								break;
+							case 1:
+								aaronText.text = "And it goes to...";
+								break;
+							case 2:
+								aaronText.text = "";
+							
+								(List<int> winners, int highscore) = WINNER_OF_RANDOM_BONUS();
+								foreach (int winner in winners) { 
+									controller.BONUS_PRIZE(winner); 
+									GameObject bonus = (GameObject) Instantiate(bonusOrbPrefab, players[ winner ].transform.position, 
+										Quaternion.identity);
+									bonus.transform.parent = players[ winner ].transform;
+									bonusOrbs.Add(bonus);
+									var eff1 = Instantiate(winnerAura, players[winner].transform.position, winnerAura.transform.rotation);
+									eff1.transform.parent = players[winner].transform;
+									eff1.transform.localScale *= 1.5f;
+									bonusOrbs.Add(eff1);
+								}
+								for (int i=0; i<winners.Count ; i++) {
+									string bonusWinnerName = controller.ID_TO_NAME(winners[i]);
+									if (i == 0) { aaronText.text += bonusWinnerName; }
+									else if (i==winners.Count - 1)    { aaronText.text += " & " + bonusWinnerName; }
+									else        { aaronText.text += ", " + bonusWinnerName; }
+								}
+								RANDOM_BONUS_ENDING(highscore);
+								nBonusGiven++;
+								break; 
+						}
+						}
+					}
+					break;
+				}
+
+                
+            }
+		}
+		/*
+		// BOARD - END (FIXED BONUS ORBS)
         else if (isOutro && !controller.isCasual)
         {
             switch (nPrompt)
@@ -377,6 +464,7 @@ public class IntroManager : MonoBehaviour
                     break; }
             }
         }
+        // BOARD - END (RANDOM BONUS ORBS)
         else if (isOutro && controller.isCasual)
         {
             switch (nPrompt)
@@ -391,7 +479,7 @@ public class IntroManager : MonoBehaviour
                 case 7 :  { aaronText.text = "And it goes to..."; break; }
                 case 8 :  { aaronText.text = "";
                         
-                    (List<int> winners, int highscore) = WINNER_OF_RANDOM_BONUS(-1);
+                    (List<int> winners, int highscore) = WINNER_OF_RANDOM_BONUS();
                     foreach (int winner in winners) { 
                         controller.BONUS_PRIZE(winner); 
                         GameObject bonus = (GameObject) Instantiate(bonusOrbPrefab, players[ winner ].transform.position, 
@@ -416,7 +504,7 @@ public class IntroManager : MonoBehaviour
                     foreach(GameObject obj in bonusOrbs) { Destroy(obj); } bonusOrbs.Clear(); break; }
                 case 10 : { aaronText.text = "And it goes to..."; break; }
                 case 11 : { aaronText.text = "";
-                    (List<int> winners, int highscore) = WINNER_OF_RANDOM_BONUS(-1);
+                    (List<int> winners, int highscore) = WINNER_OF_RANDOM_BONUS();
                     foreach (int winner in winners) { 
                         controller.BONUS_PRIZE(winner); 
                         GameObject bonus = (GameObject) Instantiate(bonusOrbPrefab, players[ winner ].transform.position, 
@@ -441,7 +529,7 @@ public class IntroManager : MonoBehaviour
                     foreach(GameObject obj in bonusOrbs) { Destroy(obj); } bonusOrbs.Clear();  break; }
                 case 13 : { aaronText.text = "And it goes to..."; break; }
                 case 14 : { aaronText.text = "";
-                    (List<int> winners, int highscore) = WINNER_OF_RANDOM_BONUS(-1);
+                    (List<int> winners, int highscore) = WINNER_OF_RANDOM_BONUS();
                     foreach (int winner in winners) { 
                         controller.BONUS_PRIZE(winner); 
                         GameObject bonus = (GameObject) Instantiate(bonusOrbPrefab, players[ winner ].transform.position, 
@@ -469,6 +557,7 @@ public class IntroManager : MonoBehaviour
                     break; }
             }
         }
+		*/
 
     }
 
@@ -609,43 +698,49 @@ public class IntroManager : MonoBehaviour
     // *************************************************************************************** //
     // **************************************** OUTRO **************************************** //
 
-    int PICK_A_RANDOM_BONUS_ORB()
+    string PICK_A_RANDOM_BONUS_ORB()
     {
-        int index = Random.Range(0, randomBonus.Count);
-        int rng = randomBonus[ index ];
-        randomBonus.RemoveAt(index);
+		string randomBonus = bonuses[ Random.Range(0, bonuses.Count) ];
+		bonuses.Remove(randomBonus);
+		return randomBonus;
 
-        return rng;
+        // int index = Random.Range(0, randomBonus.Count);
+        // int rng = randomBonus[ index ];
+        // randomBonus.RemoveAt(index);
+
+        // return rng;
     }
 
-    (List<int>, int) WINNER_OF_RANDOM_BONUS(int fixBonus)
+    (List<int>, int) WINNER_OF_RANDOM_BONUS(string fixBonus="")
     {
-        if (fixBonus >= 0)
-        {
+        if (fixBonus != "")
             rBonusOrb = fixBonus;
-        }
 
-        if ( rBonusOrb == 0) { // GOLD      (RICH)
+        if (rBonusOrb == "rich") { // GOLD      (RICH)
             (List<int> winners, int highscore) = controller.CALCULATE_RICH_WINNER();
             return (winners, highscore);
         }
-        if ( rBonusOrb == 1) { // GREEN     (EVENT)
+        if (rBonusOrb == "event") { // GREEN     (EVENT)
             (List<int> winners, int highscore) = controller.CALCULATE_EVENT_WINNER();
             return (winners, highscore);
         }
-        if ( rBonusOrb == 2) { // SILVER    (TRAP)
+        if (rBonusOrb == "trap") { // SILVER    (TRAP)
             (List<int> winners, int highscore) = controller.CALCULATE_TRAP_WINNER();
             return (winners, highscore);
         }
-        if ( rBonusOrb == 3) { // RED       (RED)
+        if (rBonusOrb == "red") { // RED       (RED)
             (List<int> winners, int highscore) = controller.CALCULATE_RED_WINNER();
             return (winners, highscore);
         }
-        if ( rBonusOrb == 4) { // PINK      (SLOW)
+        if (rBonusOrb == "slow") { // PINK      (SLOW)
             (List<int> winners, int highscore) = controller.CALCULATE_SLOW_WINNER();
             return (winners, highscore);
         }
-        if ( rBonusOrb == 5) { // ORANGE    (SHOP)
+        if (rBonusOrb == "far") { // PINK      (FAR)
+            (List<int> winners, int highscore) = controller.CALCULATE_FAR_WINNER();
+            return (winners, highscore);
+        }
+        if (rBonusOrb == "shop") { // ORANGE    (SHOP)
             (List<int> winners, int highscore) = controller.CALCULATE_SHOP_WINNER();
             return (winners, highscore);
         }
@@ -664,30 +759,39 @@ public class IntroManager : MonoBehaviour
         {
             case 1:  xth = "<i>first</i>";    break;
             case 2:  xth = "<i>second</i>";   break;
-            case 3:  xth = "<i>last</i>";     break;
+            case 3:  xth = "<i>third</i>";     break;
+            case 4:  xth = "<i>fourth</i>";     break;
+            case 5:  xth = "<i>fifth</i>";     break;
+            case 6:  xth = "<i>sixth</i>";     break;
+            case 7:  xth = "<i>seventh</i>";     break;
+            case 8:  xth = "<i>eigth</i>";     break;
         }
 
-        if      ( rBonusOrb == 0) { 
+        if      (rBonusOrb == "rich") { 
             aaronText.text  = "The " + xth + " bonus is the <color=yellow>Rich Orb</color>,"; // GOLD
             aaronText.text += " which goes to the player who had the most gold at any point."; 
         }
-        else if ( rBonusOrb == 1) { 
+        else if (rBonusOrb == "event") { 
             aaronText.text  = "The " + xth + " bonus is the <#2DFF00>Event Orb</color>,"; // GREEN
             aaronText.text += " which goes to the player who landed on the most event spaces."; 
         }
-        else if ( rBonusOrb == 2) { 
+        else if (rBonusOrb == "trap") { 
             aaronText.text  = "The " + xth + " bonus is the <#B5B5B5>Trap Orb</color>,";  // SILVER
             aaronText.text += " which goes to the player who has the most traps on the board."; 
         }
-        else if ( rBonusOrb == 3) { 
+        else if (rBonusOrb == "red") { 
             aaronText.text  = "The " + xth + " bonus is the <color=red>Red Orb</color>,"; // RED
             aaronText.text += " which goes to the player who landed on the most red spaces."; 
         }
-        else if ( rBonusOrb == 4) { 
+        else if (rBonusOrb == "slow") { 
             aaronText.text  = "The " + xth + " bonus is the <#B17AFF>Slow Orb</color>,"; // PINK
             aaronText.text += " which goes to the player who moved the least."; 
         }
-        else if ( rBonusOrb == 5) { 
+        else if (rBonusOrb == "far") { 
+            aaronText.text  = "The " + xth + " bonus is the <#B17AFF>Far Orb</color>,"; // PINK
+            aaronText.text += " which goes to the player who moved the most."; 
+        }
+        else if (rBonusOrb == "shop") { 
             aaronText.text  = "The " + xth + " bonus is the <color=orange>Shop Orb</color>,"; // ORANGE
             aaronText.text += " which goes to the player who shopped the most."; 
         }
@@ -700,22 +804,25 @@ public class IntroManager : MonoBehaviour
     void RANDOM_BONUS_ENDING(int score)
     {
 
-        if      ( rBonusOrb == 0) { // GOLD      (RICH)
+        if      (rBonusOrb == "rich") { // GOLD      (RICH)
             aaronText.text += " who had " + score + " gold!!";
         }
-        else if ( rBonusOrb == 1) { // GREEN     (EVENT)
+        else if (rBonusOrb == "event") { // GREEN     (EVENT)
             aaronText.text += " who landed on " + score + " event spaces!!";
         }
-        else if ( rBonusOrb == 2) { // SILVER    (TRAP)
+        else if (rBonusOrb == "trap") { // SILVER    (TRAP)
             aaronText.text += " who has " + score + " traps on the board!!";
         }
-        else if ( rBonusOrb == 3) { // RED       (RED)
+        else if (rBonusOrb == "red") { // RED       (RED)
             aaronText.text += " who landed on " + score + " red spaces!!";
         }
-        else if ( rBonusOrb == 4) { // PINK      (SLOW)
+        else if (rBonusOrb == "slow") { // PINK      (SLOW)
             aaronText.text += " who moved only " + score + " spaces!!";
         }
-        else if ( rBonusOrb == 5) { // ORANGE    (SHOP)
+        else if (rBonusOrb == "far") { // PINK      (FAR)
+            aaronText.text += " who moved a total " + score + " spaces!!";
+        }
+        else if (rBonusOrb == "shop") { // ORANGE    (SHOP)
             aaronText.text += " who spent " + score + " at the shops!!";
         }
         else 

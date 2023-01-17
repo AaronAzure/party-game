@@ -171,6 +171,11 @@ public class PreviewManager : MonoBehaviour
             timer = 45;
             SpawnPlayers();
         }
+        else if (sceneName == "Among Us") 
+        {
+            timer = 45;
+            SpawnPlayers();
+        }
 
         else Debug.LogError("  ERROR : Have not added (spawning players) to PreviewManager");
 
@@ -423,11 +428,12 @@ public class PreviewManager : MonoBehaviour
     }
 
 
-    public void CheckIfEveyoneIsOut(int x)
+    public void CheckIfEveyoneIsOut(int x=0)
     {
         if (nPlayersOut >= controller.nPlayers - x)     
         { 
             if (sceneName == "Stop Watchers") { StartCoroutine( EventGameOver() ); }
+            else if (sceneName == "County Bounty") { StartCoroutine( EventGameOver() ); }
             else    { StartCoroutine( RELOAD() ); }
         }
     }

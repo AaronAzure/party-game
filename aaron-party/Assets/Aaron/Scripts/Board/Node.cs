@@ -1,25 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using TMPro;
 
 public class Node : MonoBehaviour
 {
+    public Sprite spaceSprite;
+    [Space]
     private AudioSource _soundNode;                 // AUDIO FOR GOING OVER A NODE/SPACE
+    [Header("Node")]
     [SerializeField] private GameObject nodeContainer;     // space containing sprite
     
 
     [Header("Spell Keeper / Potion Master")]
-    [Tooltip("The shop keeper number")] public int whoIsTheSeller;  // ** INSPECTOR
+    [Tooltip("The shop keeper number {0, 1, 2, 3}")] public int whoIsTheSeller;  // ** INSPECTOR
 
 
     [Header("Spell Related")]
     [SerializeField] private SpriteRenderer lockedOn;
     [SerializeField] public GameObject magicOrb;
+    [SerializeField] public GameObject magicOrbHolder;
+    [Space]
     [SerializeField] public bool firstMagicOrb;
     private GameController controller;      // ** SCRIPT (RUN-TIME)
 
 
+    [Space]
     [SerializeField] private GameObject aaronPrefab;
     [SerializeField] private GameObject aaron;
     [SerializeField] private Animator aaronAnim;
@@ -27,15 +34,17 @@ public class Node : MonoBehaviour
 
 
     // TODO : which node each node connects to
-    public enum Directions { none, left, right, up, down, blocked }
-    [System.Serializable] public class Nexts
-    {
+    public enum Directions { none, left, right, up, down }
+    [System.Serializable] public class Nexts {
         public GameObject node;
         public Directions direction;
         public GameObject alternative;
+        public bool dontCreateArrow;
+        public bool defaultFirst;
     }
     [Header("Paths - next node(s)")]
     public Nexts[] nexts;
+    // public bool mergeArrow;
 
 
     // MAGIC GATE = PATH IS LOCKED, UNLOCKED WITH 4 MANA CONSUMPTION
@@ -46,6 +55,7 @@ public class Node : MonoBehaviour
 
 
     [Header("Type of Space")]
+    // [Space]
     [SerializeField] private Sprite emptySpace;     //
     [SerializeField] private Sprite blueSpace;      
     [SerializeField] private Sprite redSpace;       
@@ -60,6 +70,7 @@ public class Node : MonoBehaviour
     
     //* map-exclusive spaces
     [Header("Event Spaces")]
+    [SerializeField] private Sprite poisonSpace;   // cause cave in
     [SerializeField] private Sprite boulderSpace;   // cause cave in
     [SerializeField] private Sprite boatSpace;    //  BOAT
     [SerializeField] private Sprite rotateSpace;   // laser rotate 90˚ anti-clockwise
@@ -114,7 +125,7 @@ public class Node : MonoBehaviour
     [SerializeField] private Sprite charlotteOrb;
 
 
-    private SpriteRenderer _spaceType;
+    public SpriteRenderer _spaceType;
     private Animator _anim;
     [SerializeField] private TextMeshPro nSpace;
 
@@ -134,6 +145,8 @@ public class Node : MonoBehaviour
     [SerializeField] private GameObject effectSlow1Prefab;
     [SerializeField] private GameObject moveStealPrefab;
 
+    [Space] [SerializeField] private GameObject poisonMistPrefab;
+
 
 
     // ---------------------------------------------------------------------
@@ -141,6 +154,8 @@ public class Node : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (magicOrb != null)   magicOrb.SetActive(false);
+        
         // * IF MAGIC GATE
         if (magicGate != null) {
             gateAnim = magicGate.GetComponent<Animator>();
@@ -160,8 +175,9 @@ public class Node : MonoBehaviour
         noCostSpace.Add(boulders);
 
         // SET THAT COUNTS TOWARDS HAPPENING BONUS (COLLECTION)
-        greenSpaces.Add(boatSpace);
+        greenSpaces.Add(poisonSpace);
         greenSpaces.Add(boulderSpace);
+        greenSpaces.Add(boatSpace);
         greenSpaces.Add(rotateSpace);
         greenSpaces.Add(speedUpSpace);
 
@@ -201,9 +217,10 @@ public class Node : MonoBehaviour
         _soundNode = this.GetComponentInChildren<AudioSource>();
 
         // ONLY ORB SPACES SHOULD HAVE AN AARON GAMEOBJ
-        if (_spaceType.sprite != orbSpace) { Destroy(aaron); }
+        if (_spaceType.sprite != orbSpace && aaron != null) { Destroy(aaron); }
         if (_spaceType.sprite == freeSpace) { FREE_SPELL_SPACE_SETUP(); }
-    
+        if (magicOrbHolder == null) magicOrbHolder = magicOrb.transform.parent.gameObject;
+
         // SET ANIMATIONS
         CHANGE_ANIMATION();
     }
@@ -261,7 +278,10 @@ public class Node : MonoBehaviour
     public bool IS_GREEN() { 
         if (magicGate != null) return false;    //! MAGIC GATE
 
-        if (greenSpaces.Contains(_spaceType.sprite)) {
+        if (_spaceType.sprite == poisonSpace) {
+            // Instantiate(poisonMistPrefab, transform.position, poisonMistPrefab.transform.rotation);
+        }
+        else if (greenSpaces.Contains(_spaceType.sprite)) {
             var eff = Instantiate(instanGreenEffect, transform.position, instanGreenEffect.transform.rotation);
             Destroy(eff, 4);
         }
@@ -278,13 +298,25 @@ public class Node : MonoBehaviour
             || _spaceType.sprite == mauriceOrb || _spaceType.sprite == mimiOrb || _spaceType.sprite == pinkinsOrb
             || _spaceType.sprite == sweeterellaOrb || _spaceType.sprite == thanatosOrb || _spaceType.sprite == charlotteOrb);
     }
-    public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
+    public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
 
     //* EVENT SPACES
-    public bool IS_BLOCKED() { return (_spaceType.sprite == boulders); }
+    public bool IS_POISON() { 
+        Invoke("CREATE_POISON_MIST", 0.1f);
+        return (_spaceType.sprite == poisonSpace); 
+    }
+    public bool IS_BOULDER_EVENT() { return (_spaceType.sprite == boulderSpace); }
     public bool IS_BOAT() { return (_spaceType.sprite == boatSpace); }
     public bool IS_ROTATE() { return (_spaceType.sprite == rotateSpace); }
     public bool IS_SPEED_UP() { return (_spaceType.sprite == speedUpSpace); }
+
+
+    void CREATE_POISON_MIST()
+    {
+        if (poisonMistPrefab != null && _spaceType.sprite == poisonSpace) {
+            Instantiate(poisonMistPrefab, transform.position, poisonMistPrefab.transform.rotation);
+        }
+    }
 
 
 
@@ -292,7 +324,7 @@ public class Node : MonoBehaviour
     public void BLOCK() { 
         _spaceType.sprite = boulders; 
         _anim.Play("Empty", -1 ,0); CHANGE_ANIMATION(); 
-        controller.NewBoulder(transform.parent.name, this.name, _spaceType.sprite); 
+        controller.NewBoulder(transform.parent.name, this.name); 
     }
     public void UNBLOCK() { 
         Debug.Log("         unblocked");
@@ -308,21 +340,21 @@ public class Node : MonoBehaviour
     {
         if (_spaceType.sprite == blueSpace)
         {
-            Debug.Log("  Landed on BLUE");
+            // Debug.Log("  Landed on BLUE");
             var eff = Instantiate(instanBlueEffect, transform.position, instanBlueEffect.transform.rotation);
             Destroy(eff, 4);
             return 3;
         }
         else if (_spaceType.sprite == redSpace)
         {
-            Debug.Log("  Landed on RED");
+            // Debug.Log("  Landed on RED");
             var eff = Instantiate(instanRedEffect, transform.position, instanRedEffect.transform.rotation);
             Destroy(eff, 4);
             return -3;
         }
         else if (_spaceType.sprite == goldSpace)
         {
-            Debug.Log("  Landed on FORTUNE");
+            // Debug.Log("  Landed on FORTUNE");
             var eff = Instantiate(instanGoldEffect, transform.position, instanGoldEffect.transform.rotation);
             Destroy(eff, 4);
             int[] fortune = new int[]{10,10,10,10,10,15,15,15,20,30};
@@ -349,6 +381,7 @@ public class Node : MonoBehaviour
         else if (_spaceType.sprite == redSpace)     { this._anim.SetTrigger("isRed"); }
         else if (_spaceType.sprite == goldSpace)    { this._anim.SetTrigger("isSpell"); }
         else if (_spaceType.sprite == eventSpace)   { this._anim.SetTrigger("isEvent"); }
+        // GREEN HAPPENING SPACE
         else if (greenSpaces.Contains(_spaceType.sprite))  { this._anim.SetTrigger("isHappen"); }
         //// else if (_spaceType.sprite == happenSpace)  { this._anim.SetTrigger("isHappen"); }
         else if (_spaceType.sprite == spellSpace)   { this._anim.SetTrigger("isSpell"); }
@@ -356,7 +389,9 @@ public class Node : MonoBehaviour
         else if (_spaceType.sprite == shopSpace)    {}
         else if (_spaceType.sprite == potionSpace)  {}
         else if (_spaceType.sprite == orbSpace)     {
-            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+            if (GameObject.Find("Game_Controller") != null) {
+                controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+            }
             this._anim.SetBool("isOrb", true);
             this._anim.SetBool("isOrb", false);
 
@@ -370,7 +405,7 @@ public class Node : MonoBehaviour
 
         if (canBeCavedIn) {
             originalNode = _spaceType.sprite;
-            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+            if (controller == null) controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
 
             // TURN 1 ONLY (REGISTER CAN BE CAVED-IN SPACES OF MAP)
             if (!controller.hasStarted && !haveNotCalled) {
@@ -466,6 +501,15 @@ public class Node : MonoBehaviour
 
         if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
         _spaceType.sprite = spaceType;
+
+        if (_anim == null) { _anim = this.GetComponentInChildren<Animator>(); }
+        _anim.SetTrigger("isTrap");
+    }
+
+    public void BACK_TO_BEING_A_BOULDER()
+    {
+        if (_spaceType == null) { _spaceType = nodeContainer.GetComponent<SpriteRenderer>(); }
+        _spaceType.sprite = boulders;
 
         if (_anim == null) { _anim = this.GetComponentInChildren<Animator>(); }
         _anim.SetTrigger("isTrap");
@@ -673,7 +717,7 @@ public class Node : MonoBehaviour
         {
             case "Spell_Effect_10" : 
                 Instantiate(effect10Prefab, transform.position, Quaternion.identity); 
-                if (_spaceType.sprite == boulders) UNBLOCK();
+                if (_spaceType.sprite == boulders) Invoke("UNBLOCK", 0.5f); // UNBLOCK();
                 break;
                 
             case "Spell_Effect_Mana_3" : Instantiate(effectMp3Prefab, transform.position, Quaternion.identity); break;
@@ -683,7 +727,7 @@ public class Node : MonoBehaviour
         }
     }
 
-    private void STEALING_MP(PathFollower p)
+    public void STEALING_COINS(PathFollower p)
     {
         if (p.stealMode)
         {
@@ -762,7 +806,7 @@ public class Node : MonoBehaviour
     public void TURN_INTO_ORB_SPACE()
     {
         magicOrb.SetActive(true);
-        magicOrb.transform.parent = null;
+        // magicOrb.transform.parent = null;
         _spaceType.color = new Color(1,1,1,1);
         StartCoroutine( AARON_APPEARS() );
         this._anim.SetBool("isOrb", true);
@@ -776,6 +820,7 @@ public class Node : MonoBehaviour
             Vector3 spawnPos = new Vector3(nodeContainer.transform.position.x, nodeContainer.transform.position.y );
             spawnPos += new Vector3(-2, 2);
             var orbHandler = Instantiate(aaronPrefab, spawnPos, Quaternion.identity, this.transform);
+            magicOrbHolder.transform.parent = this.transform;
             aaron = orbHandler.gameObject;
             aaronAnim = aaron.GetComponent<Animator>();
             aaron.SetActive(false); 
@@ -799,10 +844,15 @@ public class Node : MonoBehaviour
 
     public void MAGIC_ORB_BOUGHT()
     {
-        StartCoroutine( AARON_DISSAPPEARS() );
-        magicOrb.SetActive(false);
-        _spaceType.color = new Color(0.5f, 0.5f, 0.5f, 0.6f);
-        this._anim.SetBool("isOrb", false);
+        if (GameObject.Find("Game_Controller") != null) {
+            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+        }
+        if (controller.GET_N_MAGIC_ORB_SPACES() > 1) {
+            StartCoroutine( AARON_DISSAPPEARS() );
+            magicOrb.SetActive(false);
+            _spaceType.color = new Color(0.5f, 0.5f, 0.5f, 0.6f);
+            this._anim.SetBool("isOrb", false);
+        }
     }
 
 
@@ -811,7 +861,70 @@ public class Node : MonoBehaviour
     
     void FREE_SPELL_SPACE_SETUP()
     {
-        GameController controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
-        // if (controller.is) 
+        if (GameObject.Find("Game_Controller") != null) {
+            controller = GameObject.Find("Game_Controller").GetComponent<GameController>();
+        }
     }
+
+
+
+
+    public void NodeSetup(Sprite sp)
+    {
+        if (sp == null) return;
+        _spaceType.sprite = sp;
+    }
+}
+
+
+[CustomEditor(typeof(Node), true)]
+[CanEditMultipleObjects]
+// public class NodeEditor : EditorWindow
+public class NodeEditor : Editor
+{
+
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        Node myScript = (Node)target;
+        if (myScript.spaceSprite != null) {
+            myScript._spaceType.sprite = myScript.spaceSprite;
+        }
+    }
+
+
+    //* EDITOR WINDOW
+    // public Sprite spaceSprite;
+
+    // [MenuItem("Window/Node")]
+    // public static void ShowWindow()
+    // {
+    //     GetWindow<NodeEditor>("Node Editor Window");
+    // }
+
+
+    // void OnGUI ()
+	// {
+	// 	GUILayout.Label("Set Space Sprite", EditorStyles.boldLabel);
+
+	// 	color = EditorGUILayout.ColorField("Color", color);
+
+	// 	if (GUILayout.Button("COLORIZE!"))
+	// 	{
+	// 		Colorize();
+	// 	}
+	// }
+
+	// void Colorize ()
+	// {
+	// 	foreach (GameObject obj in Selection.gameObjects)
+	// 	{
+	// 		Renderer renderer = obj.GetComponent<Renderer>();
+	// 		if (renderer != null)
+	// 		{
+	// 			renderer.sharedMaterial.color = color;
+	// 		}
+	// 	}
+	// }
 }

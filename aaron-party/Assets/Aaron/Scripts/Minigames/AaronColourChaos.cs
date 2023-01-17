@@ -71,7 +71,7 @@ public class AaronColourChaos : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
         _anim.Play("Aaron_Cast_Anim", -1, 0);
         
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.4f);
 
         for ( int i=0 ; i<arr.Length ; i++ )
         {
@@ -110,6 +110,7 @@ public class AaronColourChaos : MonoBehaviour
             else if (nTimesCast == 8) { nCircles++; }       // 8
         }
 
+        yield return new WaitForSeconds(0.1f);
         StartCoroutine(TeleportElimination());
     }
 }

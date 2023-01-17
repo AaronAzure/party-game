@@ -47,7 +47,7 @@ public class CharacterHolder : MonoBehaviour
     [SerializeField] private TextMeshPro ranking;   // ** INSPECTOR
     [SerializeField] private GameObject floatingCoinTextPrefab;   // ** INSPECTOR
     [SerializeField] private AudioSource coinPickup;   // ** INSPECTOR
-    public List<PlayerPrevData> data;
+    public PlayerPrevData data;
 
     void Start()
     {
@@ -84,41 +84,6 @@ public class CharacterHolder : MonoBehaviour
                         Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
                     }
                 }
-                // if (characterName == "Felix") {
-                //         var obj = Instantiate(_Felix, transform.position, Quaternion.identity, this.transform); 
-                //         character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                //     }
-                // else if (characterName == "Jacob") {
-                //     var obj = Instantiate(_Jacob, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Laurel") {
-                //     var obj = Instantiate(_Laurel, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Maurice") {
-                //     var obj = Instantiate(_Maurice, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Mimi") {
-                //     var obj = Instantiate(_Mimi, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Pinkins") {
-                //     var obj = Instantiate(_Pinkins, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Sweeterella") {
-                //     var obj = Instantiate(_Sweeterella, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Thanatos") {
-                //     var obj = Instantiate(_Thanatos, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else {
-                //     Debug.LogError("ERROR : Have not assign character to name");
-                // }
                 scaleX = character.transform.localScale.x;
             }
         }
@@ -241,8 +206,8 @@ public class CharacterHolder : MonoBehaviour
     public void GET_PLAYER_DATA()
     {
         data = controller.GET_PLAYER_DATA(playerID);
-        gold.text = data[0].coins.ToString();
-        orbs.text = data[0].orbs.ToString();
+        gold.text = data.coins.ToString();
+        orbs.text = data.orbs.ToString();
         goldUI.SetActive(true);
         orbsUI.SetActive(true);
 
@@ -264,8 +229,8 @@ public class CharacterHolder : MonoBehaviour
     public void UPDATE_PLAYER_DATA()
     {
         // data = controller.GET_PLAYER_DATA(playerID);
-        gold.text = data[0].coins.ToString();
-        orbs.text = data[0].orbs.ToString();
+        gold.text = data.coins.ToString();
+        orbs.text = data.orbs.ToString();
         goldUI.SetActive(true);
         orbsUI.SetActive(true);
 
@@ -312,14 +277,16 @@ public class CharacterHolder : MonoBehaviour
                 else if (n >= 11 && n<101) { yield return new WaitForSeconds(0.02f); }
                 coinPickup.Play();
                 UPDATE_PLAYER_DATA();
-                if (playerID == 0) controller.p1[0].coins++;
-                if (playerID == 1) controller.p2[0].coins++;
-                if (playerID == 2) controller.p3[0].coins++;
-                if (playerID == 3) controller.p4[0].coins++;
-                if (playerID == 4) controller.p5[0].coins++;
-                if (playerID == 5) controller.p6[0].coins++;
-                if (playerID == 6) controller.p7[0].coins++;
-                if (playerID == 7) controller.p8[0].coins++;
+                controller.playerData[playerID].coins++;
+                //! DELETE
+                // if (playerID == 0) controller.p1[0].coins++;
+                // if (playerID == 1) controller.p2[0].coins++;
+                // if (playerID == 2) controller.p3[0].coins++;
+                // if (playerID == 3) controller.p4[0].coins++;
+                // if (playerID == 4) controller.p5[0].coins++;
+                // if (playerID == 5) controller.p6[0].coins++;
+                // if (playerID == 6) controller.p7[0].coins++;
+                // if (playerID == 7) controller.p8[0].coins++;
             }
             intro.SHOW_RANKINGS();
         }
