@@ -4,7 +4,7 @@
 
 ## The Game
 
-Spectacular Aaron Party is party video game where up to eigth local players can join and compete in a board game interspersed with various minigames. Players will race around the board, compete in side quests (minigames) and even sabotage each other in order to collect as many gold and gems within a specified amount of turns. The player with the most gems, then with the most gold wins.
+Spectacular Aaron Party is party video game where up to eight local players can join and compete in a board game interspersed with various minigames. Players will race around the board, compete in side quests (minigames) and even sabotage each other in order to collect as many gold and gems within a specified amount of turns. The player with the most gems, then with the most gold wins.
 
 The game is inspired by and pays homage to the Mario Party series produced by Nintendo.
 
