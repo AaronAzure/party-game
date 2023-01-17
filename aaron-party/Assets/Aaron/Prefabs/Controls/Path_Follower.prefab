@@ -43042,7 +43042,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 98216ec8447564624bdabd53fa48eae8, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -44995,7 +44995,6 @@ MonoBehaviour:
   confirmObj: {fileID: 1018807950897704239}
   player: {fileID: 0}
   buttonSpells: []
-  highlightKey: {fileID: 0}
   spellDesc: {fileID: 8995819264211127715}
   spellManaCost: {fileID: 0}
   spellIcon: {fileID: 7507853984465540801}
@@ -45010,6 +45009,8 @@ MonoBehaviour:
   - {fileID: 0}
   firstDiscard: {fileID: 0}
   spellName: 
+  lastButton: {fileID: 0}
+  defaultButton: {fileID: 0}
 --- !u!1 &4331793801777773961
 GameObject:
   m_ObjectHideFlags: 0
@@ -59114,7 +59115,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &113765150085893934
 RectTransform:
   m_ObjectHideFlags: 0
@@ -59491,7 +59492,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

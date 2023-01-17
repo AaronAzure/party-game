@@ -20,8 +20,8 @@ public class GameController : MonoBehaviour
     public bool skipSideQuest;  //* DEBUGGING ONLY, INSPECTOR
     public bool slowerDice;  //* DEBUGGING ONLY, INSPECTOR
     public bool infiniteMovement;  //* DEBUGGING ONLY, INSPECTOR
-    public bool playLatestQuest;  //* DEBUGGING ONLY, INSPECTOR
     public bool dontSaveState;  //* DEBUGGING ONLY, INSPECTOR
+    [Space] public bool playLatestQuest;  //* DEBUGGING ONLY, INSPECTOR
 
 
     [Header("Board Settings")]
@@ -108,6 +108,7 @@ public class GameController : MonoBehaviour
     private string introSceneName;
     public List<Quest> quests;
     public List<string> noList;
+    public List<string> bonusList;
 
 
     // *** BONUS ORBS *** //
@@ -146,6 +147,7 @@ public class GameController : MonoBehaviour
 
         quests = new List<Quest>();
         noList = new List<string>();
+        bonusList = new List<string>();
         RESET_QUESTS();
 
         // PREVIOUS GAME SETTINGS (MINIGAME NOT TO INCLUDE)
@@ -164,6 +166,18 @@ public class GameController : MonoBehaviour
         randomGoodSpells   = new List<SpellType>();
         spellBook   = new List<SpellType>();
         FILL_RANDOM_SPELLS();
+
+
+
+		if (!PlayerPrefsElite.VerifyArray("bonuses"))
+		{
+			string[] defaultBonus = new string[]{"event", "trap", "rich", "slow", "far", "shop"};
+			PlayerPrefsElite.SetStringArray("bonuses", defaultBonus);
+		}
+		if (!PlayerPrefsElite.VerifyInt("nBonuses"))
+		{
+			PlayerPrefsElite.SetInt("nBonuses", 3);
+		}
     }
 
     // SPELLS AT FREE SPELL SPACE
@@ -325,6 +339,7 @@ public class GameController : MonoBehaviour
         quests.Add( new Quest("Camo Cutters", "Camo-Cutters") );
         quests.Add( new Quest("County Bounty", "County-Bounty") );
         quests.Add( new Quest("Slay The Shades", "Slay-The-Shades") );
+        // quests.Add( new Quest("Among Us", "Among-Us") );
         // CATCHY TUNES
         // TIDAL FOOLS
         // SPEEDY SERVERS
@@ -1638,6 +1653,43 @@ public class GameController : MonoBehaviour
         for (int i=0 ; i<arr.Length ; i++) { if (arr[0] == arr[i]) { slowest.Add( pid[i] ); } }
 
         return (slowest, arr[0]);
+    }
+    public (List<int>, int) CALCULATE_FAR_WINNER()
+    {
+        if (slowOrb == null)    { slowOrb = new int[nPlayers]; }
+
+        int[] arr = new int[nPlayers];  // SCORE
+        int[] pid = new int[nPlayers];  // player ID
+
+        for ( int i=0 ; i<nPlayers ; i++ ) { arr[i] = slowOrb[i]; }
+        for ( int i=0 ; i<nPlayers ; i++ ) { pid[i] = i; }
+
+        // SORT THE HIGHEST POINT VALUES (ASCENDING ORDER)
+        for ( int i=0 ; i<arr.Length ; i++ )
+        {
+            for ( int j=0 ; j<arr.Length ; j++ )
+            {
+                if (arr[i] > arr[j])
+                {
+                    int temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                    int itemp = pid[i];
+                    pid[i] = pid[j];
+                    pid[j] = itemp;
+                }
+            }
+        }
+
+        string rich = "-- far Winner update  ";
+        for (int i=0 ; i<nPlayers ; i++) { rich += arr[i].ToString() + ", "; }
+        Debug.Log(rich);
+        
+        // PLAYER(S) WITH THE HIGHEST SCORE
+        List<int> farthest = new List<int>();
+        for (int i=0 ; i<arr.Length ; i++) { if (arr[0] == arr[i]) { farthest.Add( pid[i] ); } }
+
+        return (farthest, arr[0]);
     }
     public (List<int>, int) CALCULATE_SHOP_WINNER()
     {

@@ -84,41 +84,6 @@ public class CharacterHolder : MonoBehaviour
                         Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
                     }
                 }
-                // if (characterName == "Felix") {
-                //         var obj = Instantiate(_Felix, transform.position, Quaternion.identity, this.transform); 
-                //         character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                //     }
-                // else if (characterName == "Jacob") {
-                //     var obj = Instantiate(_Jacob, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Laurel") {
-                //     var obj = Instantiate(_Laurel, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Maurice") {
-                //     var obj = Instantiate(_Maurice, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Mimi") {
-                //     var obj = Instantiate(_Mimi, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Pinkins") {
-                //     var obj = Instantiate(_Pinkins, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Sweeterella") {
-                //     var obj = Instantiate(_Sweeterella, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else if (characterName == "Thanatos") {
-                //     var obj = Instantiate(_Thanatos, transform.position, Quaternion.identity, this.transform); 
-                //     character = obj.gameObject;     anim = obj.GetComponent<Animator>();
-                // }
-                // else {
-                //     Debug.LogError("ERROR : Have not assign character to name");
-                // }
                 scaleX = character.transform.localScale.x;
             }
         }

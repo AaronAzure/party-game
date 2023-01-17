@@ -91,6 +91,11 @@ public class LobbyControls : MonoBehaviour
     [SerializeField] private Button[] questList;
     string sceneName;
 
+	public List<string> bonuses;
+	public Slider maxBonus;
+	public TextMeshProUGUI nBonusTxt;
+	public BonusSettingUi[] bonusUis;
+
 
     [Header("Rewired")]    
     [SerializeField] private RewiredStandaloneInputModule rInput;
@@ -120,6 +125,18 @@ public class LobbyControls : MonoBehaviour
                 questList = questListPrefab.GetComponentsInChildren<Button>();
                 WHAT_MINIGAMES_ARE_AVAILABLE();
             }
+
+			string[] temp = PlayerPrefsElite.GetStringArray("bonuses");
+			bonuses = new List<string>(temp);
+
+			foreach (BonusSettingUi bonusUi in bonusUis)
+			{
+				if (!bonuses.Contains(bonusUi.bonusName))
+					bonusUi.TOGGLE();
+			}
+			maxBonus.maxValue = bonuses.Count;
+			maxBonus.value = Mathf.Min(PlayerPrefsElite.GetInt("nBonuses"), maxBonus.maxValue);
+			nBonusTxt.text = maxBonus.value.ToString();
         }
         
         rb = this.GetComponent<Rigidbody2D>();
@@ -329,6 +346,7 @@ public class LobbyControls : MonoBehaviour
             if(SceneUtility.GetBuildIndexByScenePath(boardToPlay) >= 0)
             {
                 boardSelected = false;
+				SAVE_BONUS_SETTINGS();
                 StartCoroutine( manager.FADE_AND_LOAD_BOARD(boardToPlay) );
             }
             else
@@ -337,6 +355,12 @@ public class LobbyControls : MonoBehaviour
             }
         }
     }
+
+	void SAVE_BONUS_SETTINGS()
+	{
+		PlayerPrefsElite.SetStringArray("bonuses", bonuses.ToArray());
+		PlayerPrefsElite.SetInt("nBonuses", (int) maxBonus.value);
+	}
 
     // CHOOSE WHICH SIDE QUEST SHOULD AND SHOULDN'T BE PLAYED
     public void SELECT_QUESTS()
@@ -350,6 +374,21 @@ public class LobbyControls : MonoBehaviour
         {
             currentSetting[0].SetActive(true); 
             currentSetting[1].SetActive(false);
+        }
+    }
+
+    // CHOOSE WHICH SIDE QUEST SHOULD AND SHOULDN'T BE PLAYED
+    public void SELECT_BONUS()
+    {
+        if (currentSetting[0].activeSelf)
+        {
+            currentSetting[0].SetActive(false); 
+            currentSetting[2].SetActive(true);
+        }
+        else 
+        {
+            currentSetting[0].SetActive(true); 
+            currentSetting[2].SetActive(false);
         }
     }
 
@@ -411,6 +450,10 @@ public class LobbyControls : MonoBehaviour
             else if (currentSetting[0].activeSelf)
             {
                 _settings.gameObject.SetActive(false);
+            }
+            else if (currentSetting[2].activeSelf)
+            {
+                currentSetting[2].SetActive(false); currentSetting[0].SetActive(true);
             }
         }
         // SIDE QUEST CUSTOMIZATION
@@ -660,6 +703,29 @@ public class LobbyControls : MonoBehaviour
         NO_SIDE_QUEST();
     }
 
+
+
+	// BONUS(ES) AVAILABLE
+    public void TOGGLE_BONUS(string bonusName)
+    {
+        // MAKE AVAILABLE
+		if (!bonuses.Contains(bonusName))
+			bonuses.Add(bonusName);
+        // MAKE UNAVAILABLE
+		else
+        	bonuses.Remove(bonusName);
+
+		if (bonuses.Count < maxBonus.value)
+			maxBonus.value = bonuses.Count;
+		maxBonus.maxValue = bonuses.Count;
+		nBonusTxt.text = maxBonus.value.ToString();
+    }
+
+	public void MAX_BONUS_CHANGED()
+	{
+		nBonusTxt.text = maxBonus.value.ToString();
+	}
+
     public void TOGGLE_ALL()
     {
         // SET ALL (ADD ALL TO NO LIST)
@@ -723,6 +789,7 @@ public class LobbyControls : MonoBehaviour
     private IEnumerator REWINDING_TIME()
     {
         yield return new WaitForSeconds(2f);
+		SAVE_BONUS_SETTINGS();
         StartCoroutine( manager.JUST_FADE() );
 
         yield return new WaitForSeconds(0.8f);

@@ -20,6 +20,7 @@ public class MinigameControls : MonoBehaviour
     private float moveSpeed;
     private float jumpSpeed;
     [SerializeField] private GameObject crystalised;
+    [SerializeField] private SortingGroup sorter;
     [SerializeField] private Rigidbody2D rb;
 
 
@@ -52,12 +53,14 @@ public class MinigameControls : MonoBehaviour
     public string characterName;
     private Animator _anim;
     private SpriteRenderer cursorSprite;
+    private Sprite circleSprite;
     private bool characterCreated;
     [SerializeField] private GameObject character;   // UNIVERSAL REFERENCE TO CHARACTER GAMEOBJECT (ANY)
     [SerializeField] private GameObject[] characters;   // ** INSPECTOR (ALL CHARACTER PREFABS)
     [SerializeField] private GameObject[] shooters;   // ** INSPECTOR (ALL CHARACTER PREFABS)
     // [SerializeField] private GameObject[] heads;        // ** INSPECTOR (ALL CHARACTER HEADS)
     [SerializeField] private GameObject[] cursors;      // ** INSPECTOR (ALL CHARACTER CURSORS)
+    [SerializeField] private Sprite[] circles;      // ** INSPECTOR (ALL CHARACTER CURSORS)
 
 
     [SerializeField] private GameObject felixH;
@@ -238,6 +241,11 @@ public class MinigameControls : MonoBehaviour
     [SerializeField] private GameObject[] targetBlastPrefabs;
     private GameObject targetBlast;
     private GameObject characterShooter;
+
+
+    [Header("Among Us")]
+	public Selector selected;
+
 
 
     [Header("Boss Battles")]
@@ -547,6 +555,20 @@ public class MinigameControls : MonoBehaviour
             GET_CHARACTER_TARGET_BLAST();
             RESET_PLAYER_UI();
         }
+        else if (sceneName == "Among-Us" || sceneName == "Among Us")
+        {
+			moveSpeed = 8;
+            rb = GetComponent<Rigidbody2D>();
+            _collider.enabled = false;
+            cursorCollider.enabled = true;
+            RESET_PLAYER_UI();
+
+            cursorMode = true;
+            CREATE_CHARACTER("Cursor");
+			cursorSprite.gameObject.transform.localScale *= 0.5f;
+			GET_CIRCLES();
+			sorter.sortingOrder = 2;
+        }
 
        
        else if (sceneName == "Aaron Boss Battle" || sceneName == "Aaron-Boss-Battle" || sceneName == "Dojo")
@@ -659,6 +681,19 @@ public class MinigameControls : MonoBehaviour
         }
     }
 
+
+	public void GET_CIRCLES()
+	{
+		for (int i=0 ; i<circles.Length ; i++) {
+			if (circles[i].name.Contains(characterName)) {
+				circleSprite = circles[i];
+				break;
+			}
+			if (i == circles.Length - 1) {
+				Debug.LogError("ERROR : Have not assign character to name (" + characterName + ")");
+			}
+		}
+	}
     private void GET_CHARACTER_TARGET_BLAST()
     {
         for (int i=0 ; i<targetBlastPrefabs.Length ; i++)
@@ -1089,6 +1124,23 @@ public class MinigameControls : MonoBehaviour
             TRANSLATION();
             BOUNDARIES();
             if (player.GetButtonDown("A") && !clicked) StartCoroutine( CLICK() );
+            UPDATE_SCORE_UI();
+        }
+
+        else if (sceneName == "Among-Us" && !isDone && manager.canPlay && !manager.timeUp) 
+        {
+            TRANSLATION();
+            BOUNDARIES();
+            if (player.GetButtonDown("A") && !clicked) 
+				SELECT();
+            UPDATE_SCORE_UI();
+        }
+        else if (sceneName == "Among Us" && !isDone && pw.canPlay) 
+        {
+            TRANSLATION();
+            BOUNDARIES();
+            if (player.GetButtonDown("A") && !clicked) 
+				SELECT();
             UPDATE_SCORE_UI();
         }
     
@@ -1741,58 +1793,61 @@ public class MinigameControls : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
         // splitCam.transform.position = new Vector3(splitCam.transform.position.x, this.transform.position.y + 3, -10);
 
-        if (player.GetButtonDown("Left") && isGrounded)
-        {
-            rb.velocity = (Vector2.up * jumpSpeed);
-            character.transform.localScale = new Vector3(scaleX, scaleX, scaleX);
-            leapLeft    = true;
-            leapRight   = false;
-            isGrounded  = false;
-        }
-        if (player.GetButtonDown("Right") && isGrounded)
-        {
-            rb.velocity = (Vector2.up * jumpSpeed);
-            character.transform.localScale = new Vector3(-scaleX, scaleX, scaleX);
-            leapRight   = true;
-            leapLeft    = false;
-            isGrounded  = false;
-        }
-        
-        // NEW LEAF
-        if (transform.position.y >= topLeaf.transform.position.y && isGrounded && rb.velocity.y <= 0)
-        {
-            // SAME SIDE
-            if (leafs.isRightLeaf[nleaf] == leafs.isRightLeaf[nleaf-1]) {
-                var obj = Instantiate(leafPrefab, 
-                    new Vector3(transform.position.x, transform.position.y + leafHeight), Quaternion.identity);
-                // obj.transform.parent = instances.transform;
-                if (leapRight) obj.GetComponent<SpriteRenderer>().flipX = true;
-                if (manager != null) obj.transform.parent = manager.instances.transform;
-                if (pw != null) obj.transform.parent = pw.transform;
-                topLeaf = obj;
-                nleaf++;
-            }
-            else if (leafs.isRightLeaf[nleaf]) {
-                var obj = Instantiate(leafPrefab, 
-                    new Vector3(transform.position.x + 3, transform.position.y + leafHeight), Quaternion.identity);
-                // obj.transform.parent = instances.transform;
-                if (manager != null) obj.transform.parent = manager.instances.transform;
-                if (pw != null) obj.transform.parent = pw.transform;
-                topLeaf = obj;
-                obj.GetComponent<SpriteRenderer>().flipX = true;
-                nleaf++;
-            }
-            else {
-                var obj = Instantiate(leafPrefab,
-                    new Vector3(transform.position.x - 3, transform.position.y + leafHeight), Quaternion.identity);
-                // obj.transform.parent = instances.transform;
-                if (manager != null) obj.transform.parent = manager.instances.transform;
-                if (pw != null) obj.transform.parent = pw.transform;
-                topLeaf = obj;
-                nleaf++;
-            }
-        }
-        
+		if (rb.velocity.y <= 0 && isGrounded)
+		{
+			// NEW LEAF
+			if (transform.position.y >= topLeaf.transform.position.y)
+			{
+				// SAME SIDE
+				if (leafs.isRightLeaf[nleaf] == leafs.isRightLeaf[nleaf-1]) {
+					var obj = Instantiate(leafPrefab, 
+						new Vector3(transform.position.x, transform.position.y + leafHeight), Quaternion.identity);
+					// obj.transform.parent = instances.transform;
+					if (leapRight) obj.GetComponent<SpriteRenderer>().flipX = true;
+					if (manager != null) obj.transform.parent = manager.instances.transform;
+					if (pw != null) obj.transform.parent = pw.transform;
+					topLeaf = obj;
+					nleaf++;
+				}
+				else if (leafs.isRightLeaf[nleaf]) {
+					var obj = Instantiate(leafPrefab, 
+						new Vector3(transform.position.x + 3, transform.position.y + leafHeight), Quaternion.identity);
+					// obj.transform.parent = instances.transform;
+					if (manager != null) obj.transform.parent = manager.instances.transform;
+					if (pw != null) obj.transform.parent = pw.transform;
+					topLeaf = obj;
+					obj.GetComponent<SpriteRenderer>().flipX = true;
+					nleaf++;
+				}
+				else {
+					var obj = Instantiate(leafPrefab,
+						new Vector3(transform.position.x - 3, transform.position.y + leafHeight), Quaternion.identity);
+					// obj.transform.parent = instances.transform;
+					if (manager != null) obj.transform.parent = manager.instances.transform;
+					if (pw != null) obj.transform.parent = pw.transform;
+					topLeaf = obj;
+					nleaf++;
+				}
+			}
+			
+			if (player.GetButtonDown("Left"))
+			{
+				rb.velocity = (Vector2.up * jumpSpeed);
+				character.transform.localScale = new Vector3(scaleX, scaleX, scaleX);
+				leapLeft    = true;
+				leapRight   = false;
+				isGrounded  = false;
+			}
+			else if (player.GetButtonDown("Right"))
+			{
+				rb.velocity = (Vector2.up * jumpSpeed);
+				character.transform.localScale = new Vector3(-scaleX, scaleX, scaleX);
+				leapRight   = true;
+				leapLeft    = false;
+				isGrounded  = false;
+			}
+			
+		}
         // POINTS BASED ON HEIGHT
         points = (int) Mathf.Abs(transform.position.y - origYpos);
         if (manager != null) score.text = (Mathf.Abs(transform.position.y - origYpos)).ToString("F1") + "m";
@@ -2579,16 +2634,39 @@ public class MinigameControls : MonoBehaviour
     }
 
 
-    
+	// ------------------------------------------------------------------- //
+    // ------------------------- /* AMONG US */ -------------------------- //
 
+    public void NEW_ROUND()
+	{
+		isDone = false;
+		if (cursorSprite != null)
+			cursorSprite.gameObject.SetActive(true);
+	}
 
-
-
-    // ***************************************************************************** //
-    // ***************************************************************************** //
-
-    private void OnTriggerEnter2D(Collider2D other) 
+	private void SELECT()
     {
+        if (selected != null)
+		{
+			isDone = true;
+			selected.Select(playerID, circleSprite);
+			selected = null;
+			manager.nPlayersOut++;
+			manager.CheckIfEveyoneIsOut(0);
+			cursorSprite.gameObject.SetActive(false);
+			// this.gameObject.SetActive(false);
+		}
+    }
+
+
+
+
+
+
+    // ***************************************************************************** //
+    // ***************************************************************************** //
+
+    private void OnTriggerEnter2D(Collider2D other) {
         // SNEAK AND SNORE
         if (sceneName == "Sneak_And_Snore")
         {
@@ -2921,6 +2999,27 @@ public class MinigameControls : MonoBehaviour
             }
         }
 
+        else if (sceneName == "Among-Us" || sceneName == "Among Us")
+        {
+            if (other.CompareTag("Finish")) {
+                selected = other.GetComponent<Selector>();
+                // if (manager != null) 
+                // {
+                //     StartCoroutine( DelayElimCo() );
+                //     dead.transform.parent = manager.transform;
+                //     points = manager.nPlayersOut - controller.nPlayers;
+                //     score.text = points.ToString();
+                // }
+                // else if (pw != null) 
+                // {
+                //     dead.GetComponent<AudioSource>().volume = 0;
+                //     dead.transform.parent = pw.transform;
+                //     pw.nPlayersOut++;
+                //     pw.CheckIfEveyoneIsOut(1);
+                // }
+            }
+        }
+
 
         else if (manager != null && manager.bossBattle)
         {
@@ -3188,6 +3287,12 @@ public class MinigameControls : MonoBehaviour
             if (other.tag == "Node") { 
                 currentCircle.HIGHLIGHT(-1);
                 currentCircle = null;
+            }
+        }
+		else if (sceneName == "Among-Us" || sceneName == "Among Us")
+        {
+            if (other.CompareTag("Finish")) {
+                selected = null;
             }
         }
     }
